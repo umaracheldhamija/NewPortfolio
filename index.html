@@ -3,367 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name - Portfolio</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --secondary: #8b5cf6;
-            --dark: #0f172a;
-            --light: #f1f5f9;
-            --text: #1e293b;
-            --text-light: #64748b;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--light);
-            color: var(--text);
-            line-height: 1.6;
-            cursor: none;
-            overflow-x: hidden;
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: all 0.1s ease;
-            transform: translate(-50%, -50%);
-        }
-
-        .cursor-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 5%;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        nav .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        nav .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--primary);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6rem 5% 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            top: -250px;
-            right: -250px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            text-align: center;
-            color: white;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            margin-bottom: 1rem;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .hero p {
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            animation: fadeInUp 0.8s ease 0.2s backwards;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            background: white;
-            color: var(--primary);
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeInUp 0.8s ease 0.4s backwards;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Section Styles */
-        section {
-            padding: 5rem 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h2 {
-            font-size: clamp(2rem, 5vw, 3rem);
-            margin-bottom: 3rem;
-            text-align: center;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Projects Grid */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .project-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .project-card.visible {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .project-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-        }
-
-        .project-content {
-            padding: 1.5rem;
-        }
-
-        .project-content h3 {
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .project-content p {
-            color: var(--text-light);
-            margin-bottom: 1rem;
-        }
-
-        .project-tags {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .tag {
-            padding: 0.3rem 0.8rem;
-            background: var(--light);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--primary);
-        }
-
-        /* Gallery Grid */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .gallery-item {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s;
-            opacity: 0;
-            transform: scale(0.9);
-        }
-
-        .gallery-item.visible {
-            animation: scaleIn 0.5s ease forwards;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
-
-        @keyframes scaleIn {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            text-align: center;
-            padding: 3rem 5%;
-        }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .mobile-menu span {
-            width: 25px;
-            height: 3px;
-            background: var(--text);
-            transition: 0.3s;
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 768px) {
-            body {
-                cursor: auto;
-            }
-
-            .cursor, .cursor-dot {
-                display: none;
-            }
-
-            nav ul {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                padding: 2rem;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            }
-
-            nav ul.active {
-                display: flex;
-            }
-
-            .mobile-menu {
-                display: flex;
-            }
-
-            .projects-grid,
-            .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <title>Uma Dhamija - Interface Designer</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- ===================================
+         LOADING SCREEN
+         Displays while page assets load
+         =================================== -->
+    <!-- <div class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div> -->
+
+    <!-- ===================================
+         CUSTOM CURSOR ELEMENTS
+         =================================== -->
     <div class="cursor"></div>
     <div class="cursor-dot"></div>
 
-    <!-- Navigation -->
+    <!-- ===================================
+         THUNDERSTORM BACKGROUND
+         Global atmospheric effect with realistic clouds
+         =================================== -->
+    <div class="thunderstorm-bg">
+        <!-- Multiple cloud shapes layered for realistic effect -->
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="cloud cloud-4"></div>
+        <div class="cloud cloud-5"></div>
+        <div class="cloud cloud-6"></div>
+        <div class="cloud cloud-7"></div>
+        <div class="cloud cloud-8"></div>
+        
+        <!-- Lightning effect -->
+        <div class="lightning-flash"></div>
+    </div>
+
+    <!-- ===================================
+         NAVIGATION BAR
+         =================================== -->
     <nav>
         <div class="container">
-            <div class="logo">Your Name</div>
+            <div class="logo">Uma Dhamija</div>
             <div class="mobile-menu" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
@@ -371,137 +56,398 @@
             </div>
             <ul id="navMenu">
                 <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li>
+                    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                </li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- ===================================
+         HERO SECTION
+         Main landing area with CTA
+         =================================== -->
     <section class="hero" id="home">
+        <!-- Intensified thunderstorm for hero -->
+        <div class="thunderstorm-bg hero-storm">
+            <div class="cloud cloud-1"></div>
+            <div class="cloud cloud-2"></div>
+            <div class="cloud cloud-3"></div>
+            <div class="cloud cloud-4"></div>
+            <div class="cloud cloud-5"></div>
+            <div class="cloud cloud-6"></div>
+            <div class="cloud cloud-7"></div>
+            <div class="cloud cloud-8"></div>
+            <div class="lightning-flash"></div>
+        </div>
+        
         <div class="hero-content">
-            <h1>Hi, I'm [Your Name]</h1>
-            <p>Developer • Designer • Creative</p>
-            <a href="#projects" class="cta-button">View My Work</a>
+            <h1>Hi, I'm Uma</h1>
+            <p>Interface Designer • User Experience Advocate • Creative • BCI-Enthusiast • Kathak Dancer</p>
+            <div class="hero-buttons">
+                <a href="#projects" class="cta-button">View My Work</a>
+                <a href="#" class="cta-button secondary" onclick="downloadResume(event)" target="_blank" >Download Resume</a>
+            </div>
         </div>
     </section>
 
-    <!-- Projects Section -->
+    <!-- ===================================
+         ABOUT SECTION
+         Personal introduction and skills
+         =================================== -->
+    <section id="about">
+        <h2>About Me</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <h3>Interface Designer & UX Advocate</h3>
+                <p>I'm a passionate interface designer who believes that great design should be both beautiful and functional. With a background in user experience and a deep interest in brain-computer interfaces, I create digital experiences that genuinely improve people's lives.</p>
+                <p>When I'm not designing, you'll find me practicing Kathak dance or exploring the fascinating intersection of technology and human cognition.</p>
+                
+                <!-- Skills showcase -->
+                <div class="skills-grid">
+                    <div class="skill-item">Figma</div>
+                    <div class="skill-item">Adobe Suite</div>
+                    <div class="skill-item">User Research</div>
+                    <div class="skill-item">Flutter</div>
+                    <div class="skill-item">Prototyping</div>
+                    <div class="skill-item">Design Systems</div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="images/Headshot.jpeg" alt="Uma Dhamija"> 
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================
+         PROJECTS SECTION
+         Portfolio showcase with modal details
+         =================================== -->
     <section id="projects">
-        <h2>Projects</h2>
+        <h2>Featured Projects</h2>
         <div class="projects-grid">
-            <div class="project-card">
-                <div class="project-image">🚀</div>
+            
+            <!-- PROJECT 1: MeditationWise -->
+            <div class="project-card" onclick="openModal('modal1')">
+                <div class="project-image">
+                         <img src="images/MW.png" alt="MeditationWise"> 
+                </div>
                 <div class="project-content">
-                    <h3>Project One</h3>
-                    <p>Description of your amazing project goes here. What did you build and why?</p>
+                    <h3>MeditationWise</h3>
+                    <p>As the only designer, I built the interface, design system, conducted user research, worked with developers and executives, and managed the project to create an intuitive meditation app experience.</p>
                     <div class="project-tags">
-                        <span class="tag">React</span>
-                        <span class="tag">Node.js</span>
-                        <span class="tag">MongoDB</span>
+                        <span class="tag">UI Design</span>
+                        <span class="tag">UX Research</span>
+                        <span class="tag">Flutter</span>
                     </div>
                 </div>
             </div>
 
-            <div class="project-card">
-                <div class="project-image">💡</div>
+            <!-- PROJECT 2: Template -->
+            <div class="project-card" onclick="openModal('modal2')">
+                <div class="project-image">
+                    <!-- TODO: Add your project image -->
+                    💡
+                </div>
                 <div class="project-content">
-                    <h3>Project Two</h3>
-                    <p>Another cool project you've worked on. Highlight the key features.</p>
+                    <h3>Project Name</h3>
+                    <p>Brief description of your project highlighting the main challenge and your role in solving it.</p>
                     <div class="project-tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">Machine Learning</span>
+                        <span class="tag">Tag 1</span>
+                        <span class="tag">Tag 2</span>
                     </div>
                 </div>
             </div>
 
-            <div class="project-card">
-                <div class="project-image">🎨</div>
+            <!-- PROJECT 3: Occulomotor Development -->
+            <div class="project-card" onclick="openModal('modal3')">
+                <div class="project-image">
+                    <!-- TODO: Add your project image -->
+                    🎨
+                </div>
                 <div class="project-content">
-                    <h3>Project Three</h3>
-                    <p>Third project showcasing your diverse skills and interests.</p>
+                    <h3>Project Name</h3>
+                    <p>Brief description of your project highlighting the main challenge and your role in solving it.</p>
                     <div class="project-tags">
-                        <span class="tag">JavaScript</span>
-                        <span class="tag">CSS</span>
-                        <span class="tag">HTML</span>
+                        <span class="tag">Tag 1</span>
+                        <span class="tag">Tag 2</span>
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 
-    <!-- Gallery Section -->
+    <!-- ===================================
+         PROJECT MODALS
+         Detailed case study views
+         =================================== -->
+    
+    <!-- MODAL 1: MeditationWise -->
+    <div class="modal" id="modal1">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal1')">&times;</button>
+            
+            <div class="modal-header">
+                <h2>MeditationWise</h2>
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Role</span>
+                        <span class="meta-value">Lead Designer</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Team Size</span>
+                        <span class="meta-value">3 People</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">6 Months</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Year</span>
+                        <span class="meta-value">2024</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Overview</h3>
+                <p>MeditationWise is a mobile meditation app designed to make mindfulness practices accessible and engaging for beginners and experienced practitioners alike. As the sole designer on a team of three, I was responsible for the complete design lifecycle from initial research to final implementation.</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>The Challenge</h3>
+                <p>Most meditation apps overwhelm new users with too many options and lack personalization. We needed to create an experience that was both simple enough for beginners yet powerful enough for regular practitioners.</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>My Role & Responsibilities</h3>
+                <ul>
+                    <li>Conducted user interviews and usability testing with 50+ participants</li>
+                    <li>Created comprehensive design system with 200+ components</li>
+                    <li>Designed complete user flows and interactive prototypes</li>
+                    <li>Collaborated with developers using Flutter for implementation</li>
+                    <li>Managed project timeline and coordinated with stakeholders</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Tools & Technologies</h3>
+                <div class="project-tags">
+                    <span class="tag">Figma</span>
+                    <span class="tag">Adobe Suite</span>
+                    <span class="tag">Loop11</span>
+                    <span class="tag">UserTesting</span>
+                    <span class="tag">Miro</span>
+                    <span class="tag">Notion</span>
+                    <span class="tag">Trello</span>
+                    <span class="tag">Flutter</span>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Solution & Impact</h3>
+                <p>We created a personalized onboarding experience that adapts to user goals and experience levels. The app features guided meditations, progress tracking, and ambient soundscapes.</p>
+                <p><strong>Results:</strong> 85% user retention after first week, 4.8/5 app store rating, featured in Apple's "Apps We Love" collection.</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>Screenshots</h3>
+                <div class="modal-images">
+                    <!-- TODO: Add actual project screenshots
+                         <img src="images/meditation-wise-1.jpg" alt="Screenshot 1">
+                         <img src="images/meditation-wise-2.jpg" alt="Screenshot 2"> -->
+                    <div class="modal-image-placeholder">Screenshot 1</div>
+                    <div class="modal-image-placeholder">Screenshot 2</div>
+                    <div class="modal-image-placeholder">Screenshot 3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Project Template -->
+    <div class="modal" id="modal2">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal2')">&times;</button>
+            
+            <div class="modal-header">
+                <h2>Project Name</h2>
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Role</span>
+                        <span class="meta-value">Your Role</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Team Size</span>
+                        <span class="meta-value">X People</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">X Months</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TODO: Fill in your project details -->
+            <div class="modal-section">
+                <h3>Overview</h3>
+                <p>Describe your project here. What problem were you solving? Who was it for?</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>The Challenge</h3>
+                <p>What specific challenges did this project present?</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>My Role & Responsibilities</h3>
+                <ul>
+                    <li>Responsibility 1</li>
+                    <li>Responsibility 2</li>
+                    <li>Responsibility 3</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Solution & Impact</h3>
+                <p>What was your solution? What were the measurable results?</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>Screenshots</h3>
+                <div class="modal-images">
+                    <div class="modal-image-placeholder">Add images here</div>
+                    <div class="modal-image-placeholder">Add images here</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: NWU - Occulomotor Development -->
+    <div class="modal" id="modal3">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal3')">&times;</button>
+            
+            <div class="modal-header">
+                <h2>Occulomotor Development</h2>
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Role</span>
+                        <span class="meta-value">Your Role</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TODO: Duplicate and customize this template for each project -->
+            <div class="modal-section">
+                <h3>Overview</h3>
+                <p>Project description goes here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: NWU - Girl Scouts STEM -->
+    <div class="modal" id="modal3">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal3')">&times;</button>
+            
+            <div class="modal-header">
+                <h2>Girl Scouts STEM</h2>
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Role</span>
+                        <span class="meta-value">Your Role</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TODO: Duplicate and customize this template for each project -->
+            <div class="modal-section">
+                <h3>Overview</h3>
+                <p>Project description goes here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         GALLERY SECTION
+         Photography and artwork showcase
+         =================================== -->
     <section id="gallery">
         <h2>Photography & Artwork</h2>
         <div class="gallery-grid">
-            <div class="gallery-item">📷</div>
-            <div class="gallery-item">🎨</div>
-            <div class="gallery-item">🖼️</div>
-            <div class="gallery-item">📸</div>
-            <div class="gallery-item">🌅</div>
-            <div class="gallery-item">🎭</div>
+            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/Diptychs.jpg" alt="Diptychs"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/michellegroup.jpg" alt="Description"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/oldman.jpg" alt="Artwork"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/paintings.png" alt="Photography"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/uma kathak.jpg" alt="Sunset"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/drawings.png" alt="Description"></div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer id="contact">
-        <h3>Let's Connect</h3>
+    <!-- Gallery Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <!-- ===================================
+         CONTACT SECTION
+         Contact form and links
+         =================================== -->
+    <section id="contact">
+        <h2>Let's Connect</h2>
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Get In Touch</h3>
+                <p>I'm always interested in hearing about new projects and opportunities. Whether you have a question or just want to say hi, feel free to reach out!</p>
+                
+                <div class="contact-links">
+                    <!-- TODO: Update with your actual links -->
+                    <a href="mailto:your.email@example.com">Email</a>
+                    <a href="https://github.com/yourusername" target="_blank">GitHub</a>
+                    <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a>
+                </div>
+            </div>
+
+            <form class="contact-form" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <button type="submit" class="form-submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ===================================
+         FOOTER
+         =================================== -->
+    <footer>
+        <h3>Uma Dhamija</h3>
         <p>
             <a href="mailto:your.email@example.com">Email</a> •
             <a href="https://github.com/yourusername" target="_blank">GitHub</a> •
             <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a>
         </p>
-        <p style="margin-top: 2rem; opacity: 0.6;">© 2026 Your Name. All rights reserved.</p>
+        <p style="margin-top: 2rem; opacity: 0.6;">© 2026 Uma Dhamija. All rights reserved.</p>
     </footer>
 
-    <script>
-        // Custom Cursor
-        const cursor = document.querySelector('.cursor');
-        const cursorDot = document.querySelector('.cursor-dot');
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorDot.style.left = e.clientX + 'px';
-            cursorDot.style.top = e.clientY + 'px';
-        });
-
-        // Mobile Menu Toggle
-        function toggleMenu() {
-            document.getElementById('navMenu').classList.toggle('active');
-        }
-
-        // Scroll Animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.project-card, .gallery-item').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Smooth Scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                    // Close mobile menu if open
-                    document.getElementById('navMenu').classList.remove('active');
-                }
-            });
-        });
-    </script>
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
