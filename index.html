@@ -3,420 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uma Dhamija - Interface Designer</title>
+    <meta name="description" content="Uma Dhamija - UX Designer specializing in human-centered design and brain-computer interfaces.">
+    <title>Uma Dhamija - Experience Designer</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lancelot&display=swap" rel="stylesheet">
+
 </head>
 <body>
-    <!-- ===================================
-         LOADING SCREEN
-         Displays while page assets load
-         =================================== -->
-    <!-- <div class="loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p>Loading...</p>
-        </div>
-    </div> -->
-
-    <!-- ===================================
-         CUSTOM CURSOR ELEMENTS
-         =================================== -->
-    <div class="cursor"></div>
-    <div class="cursor-dot"></div>
-
-    <!-- ===================================
-         THUNDERSTORM BACKGROUND
-         Global atmospheric effect with realistic clouds
-         =================================== -->
-    <div class="thunderstorm-bg">
-        <!-- Multiple cloud shapes layered for realistic effect -->
-        <div class="cloud cloud-1"></div>
-        <div class="cloud cloud-2"></div>
-        <div class="cloud cloud-3"></div>
-        <div class="cloud cloud-4"></div>
-        <div class="cloud cloud-5"></div>
-        <div class="cloud cloud-6"></div>
-        <div class="cloud cloud-7"></div>
-        <div class="cloud cloud-8"></div>
-        
-        <!-- Lightning effect -->
-        <div class="lightning-flash"></div>
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls" aria-label="Accessibility settings">
+        <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="control-btn" id="quiet-toggle" title="Reduce animation intensity" aria-label="Toggle quiet mode">
+           <i class="fa-solid fa-cloud-bolt"></i>
+        </button>
+        <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Toggle text size">
+            <i class="fas fa-text-height"></i>
+        </button>
     </div>
 
-    <!-- ===================================
-         NAVIGATION BAR
-         =================================== -->
-    <nav>
-        <div class="container">
-            <div class="logo">Uma Dhamija</div>
-            <div class="mobile-menu" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <ul id="navMenu">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#gallery">Gallery</a></li>
+    <!-- Navigation -->
+    <nav role="navigation">
+        <div class="nav-container">
+            <div class="logo"><a href="#hero">Uma Dhamija</a></div>
+            <ul class="nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#work">Work</a></li>
+                <li><a href="#explorations">Explorations</a></li>
+                <li><a href="#writing">Writing</a></li>
                 <li><a href="#contact">Contact</a></li>
-                <li>
-                    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-                        <span id="themeIcon">🌙</span>
-                    </button>
-                </li>
             </ul>
         </div>
     </nav>
 
-    <!-- ===================================
-         HERO SECTION
-         Main landing area with CTA
-         =================================== -->
-    <section class="hero" id="home">
-        <!-- Intensified thunderstorm for hero -->
-        <div class="thunderstorm-bg hero-storm">
-            <div class="cloud cloud-1"></div>
-            <div class="cloud cloud-2"></div>
-            <div class="cloud cloud-3"></div>
-            <div class="cloud cloud-4"></div>
-            <div class="cloud cloud-5"></div>
-            <div class="cloud cloud-6"></div>
-            <div class="cloud cloud-7"></div>
-            <div class="cloud cloud-8"></div>
-            <div class="lightning-flash"></div>
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+        <!-- Storm Background Layers -->
+        <div class="storm-container">
+            <div class="storm-base"></div>
+            <div class="storm-reveal" id="storm-reveal"></div>
+            <canvas id="neural-canvas" aria-hidden="true"></canvas>
         </div>
-        
+
+        <!-- Custom Cursor Dot -->
+        <div class="cursor-dot" id="cursor-dot"></div>
+
+        <!-- Hero Content -->
         <div class="hero-content">
-            <h1>Hi, I'm Uma</h1>
-            <p>Interface Designer • User Experience Advocate • Creative • BCI-Enthusiast • Kathak Dancer</p>
-            <div class="hero-buttons">
-                <a href="#projects" class="cta-button">View My Work</a>
-                <a href="#" class="cta-button secondary" onclick="downloadResume(event)" target="_blank" >Download Resume</a>
+            <div class="profile-image">
+                <img src="images/Headshot.jpeg" alt="Uma Dhamija portrait">
             </div>
-        </div>
-    </section>
-
-    <!-- ===================================
-         ABOUT SECTION
-         Personal introduction and skills
-         =================================== -->
-    <section id="about">
-        <h2>About Me</h2>
-        <div class="about-content">
-            <div class="about-text">
-                <h3>Interface Designer & UX Advocate</h3>
-                <p>I'm a passionate interface designer who believes that great design should be both beautiful and functional. With a background in user experience and a deep interest in brain-computer interfaces, I create digital experiences that genuinely improve people's lives.</p>
-                <p>When I'm not designing, you'll find me practicing Kathak dance or exploring the fascinating intersection of technology and human cognition.</p>
-                
-                <!-- Skills showcase -->
-                <div class="skills-grid">
-                    <div class="skill-item">Figma</div>
-                    <div class="skill-item">Adobe Suite</div>
-                    <div class="skill-item">User Research</div>
-                    <div class="skill-item">Flutter</div>
-                    <div class="skill-item">Prototyping</div>
-                    <div class="skill-item">Design Systems</div>
-                </div>
-            </div>
-            <div class="about-image">
-                <img src="images/Headshot.jpeg" alt="Uma Dhamija"> 
-            </div>
-        </div>
-    </section>
-
-    <!-- ===================================
-         PROJECTS SECTION
-         Portfolio showcase with modal details
-         =================================== -->
-    <section id="projects">
-        <h2>Featured Projects</h2>
-        <div class="projects-grid">
             
-            <!-- PROJECT 1: MeditationWise -->
-            <div class="project-card" onclick="openModal('modal1')">
+            <h1>Uma Dhamija</h1>
+            
+            <p class="bio">
+                Interface Designer • UX Advocate • NeuroTechnology Enthusiast • Kathak Dancer
+            </p>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener" aria-label="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://umadhamija.github.io/Portfolio/" target="_blank" rel="noopener" aria-label="Portfolio">
+                    <i class="fas fa-briefcase"></i>
+                </a>
+                <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener" aria-label="Medium">
+                    <i class="fab fa-medium"></i>
+                </a>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta-buttons">
+                <a href="#work" class="btn btn-primary">View My Work</a>
+                <a href="Uma_Dhamija_Resume.pdf" class="btn btn-secondary" download>Download Resume</a>
+            </div>
+        </div>
+    </section>
+
+   <!-- Work Section -->
+    <section id="work" class="work-section">
+        <h2>Featured Work</h2>
+        <div class="projects-grid">
+            <!-- MeditationWise -->
+            <a href="meditationwise/index.html" class="project-card">
                 <div class="project-image">
-                         <img src="images/MW.png" alt="MeditationWise"> 
+                    <img src="meditationwise/logo.png" alt="MeditationWise app interface">
                 </div>
                 <div class="project-content">
                     <h3>MeditationWise</h3>
-                    <p>As the only designer, I built the interface, design system, conducted user research, worked with developers and executives, and managed the project to create an intuitive meditation app experience.</p>
+                    <p>Lead Designer for a meditation app connecting users with global spiritual and authentic practices. From concept to launch with daily active users.</p>
                     <div class="project-tags">
-                        <span class="tag">UI Design</span>
+                        <span class="tag">Interface Design</span>
                         <span class="tag">UX Research</span>
-                        <span class="tag">Flutter</span>
+                        <span class="tag">Product Management</span>
+                    </div>
+                    <div class="tools-used">
+                        <span class="tool" data-tool="Figma"><i class="fab fa-figma"></i></span>
+                        <span class="tool" data-tool="Notion"><i class="fas fa-database"></i></span>
+                        <span class="tool" data-tool="UserTesting"><i class="fa-solid fa-users"></i></span>
+                        <span class="tool" data-tool="Flutter"><i class="fas fa-mobile-screen"></i></span>
+                        <span class="tool" data-tool="Adobe"><i class="fas fa-image"></i></span>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <!-- PROJECT 2: Template -->
-            <div class="project-card" onclick="openModal('modal2')">
+            <!-- Magee Hospital -->
+            <a href="#" class="project-card">
+                <div class="project-card coming-soon"> 
+                    <div class="project-image">
+                        <img src="upmc/logo.jpg" alt="UPMC Magee Hospital Gynocological Oncology Unit">
+                    </div>
+                    <div class="project-content">
+                        <h3>Designing w/CARE</h3>
+                        <p>Creating design solutions for Magee Hospital - Gynocological Oncology Unit.</p>
+                        <div class="project-tags">
+                            <!-- <span class="tag">Research</span>
+                            <span class="tag">Shadowing</span>
+                            <span class="tag">Interface Design</span> -->
+                            <span class="coming-soon-badge">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- OpenMined - Coming Soon -->
+            <a href="#" class="project-card">
+                <div class="project-card coming-soon">
+                    <div class="project-image">
+                        <img src="openmined/logo.jpg" alt="OpenMined logo">
+                    </div>
+                    <div class="project-content">
+                        <h3>OpenMined - Capstone</h3>
+                        <p>Developing use cases for privacy-preserving Artificial Intelligence Technology.</p>
+                        <div class="project-tags">
+                        <!-- <span class="tag">Research</span>
+                            <span class="tag">UX Design</span>
+                            <span class="tag">Shadowing</span> -->
+                            <span class="coming-soon-badge">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Pain Detector -->
+            <a href="#" class="project-card">
                 <div class="project-image">
-                    <!-- TODO: Add your project image -->
-                    💡
+                    <div class="placeholder-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
                 </div>
                 <div class="project-content">
-                    <h3>Project Name</h3>
-                    <p>Brief description of your project highlighting the main challenge and your role in solving it.</p>
+                    <h3>Brain-Computer Interaction: Pain Detector</h3>
+                    <p>BCI and Electromyography using arduino.</p>
                     <div class="project-tags">
-                        <span class="tag">Tag 1</span>
-                        <span class="tag">Tag 2</span>
+                        <span class="tag">Product Design</span>
+                        <span class="tag">Prototyping</span>
+                        <span class="tag">Fabrication</span>
+                    </div>
+                    <div class="tools-used">
+                        <span class="tool" title="Arduino"><i class="fas fa-microchip"></i></span>
+                        <span class="tool" title="Fusion 360"><i class="fas fa-cube"></i></span>
+                        <span class="tool" title="TinkerCard"><i class="fab fa-image"></i></span>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <!-- PROJECT 3: Occulomotor Development -->
-            <div class="project-card" onclick="openModal('modal3')">
+            <!-- Northwestern Capstone -->
+            <a href="#" class="project-card">
                 <div class="project-image">
-                    <!-- TODO: Add your project image -->
-                    🎨
+                    <div class="placeholder-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
                 </div>
                 <div class="project-content">
-                    <h3>Project Name</h3>
-                    <p>Brief description of your project highlighting the main challenge and your role in solving it.</p>
+                    <h3>Northwestern Capstone</h3>
+                    <p>AR-based research exploring children's oculomotor development using brain-computer interface principles.</p>
                     <div class="project-tags">
-                        <span class="tag">Tag 1</span>
-                        <span class="tag">Tag 2</span>
+                        <span class="tag">Research</span>
+                        <span class="tag">AR Design</span>
+                        <span class="tag">BCI</span>
+                    </div>
+                    <div class="tools-used">
+                        <span class="tool" title="Unity"><i class="fab fa-unity"></i></span>
+                        <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                        <span class="tool" title="Adobe"><i class="fab fa-image"></i></span>
                     </div>
                 </div>
-            </div>
+            </a>
 
+            <!-- Electric Scooters -->
+            <a href="#" class="project-card">
+                <div class="project-image">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-motorcycle"></i>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3>Electric Scooters for Kids</h3>
+                    <p>Physical prototype combining 3D printing, fabrication, and user-centered design for safer mobility.</p>
+                    <div class="project-tags">
+                        <span class="tag">Product Design</span>
+                        <span class="tag">Prototyping</span>
+                        <span class="tag">Fabrication</span>
+                    </div>
+                    <div class="tools-used">
+                        <span class="tool" title="Adobe"><i class="fas fa-cube"></i></span>
+                        <span class="tool" title="3D Printing"><i class="fas fa-print"></i></span>
+                        <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                    </div>
+                </div>
+            </a>
         </div>
     </section>
 
-    <!-- ===================================
-         PROJECT MODALS
-         Detailed case study views
-         =================================== -->
-    
-    <!-- MODAL 1: MeditationWise -->
-    <div class="modal" id="modal1">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('modal1')">&times;</button>
-            
-            <div class="modal-header">
-                <h2>MeditationWise</h2>
-                <div class="project-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Role</span>
-                        <span class="meta-value">Lead Designer</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Team Size</span>
-                        <span class="meta-value">3 People</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Duration</span>
-                        <span class="meta-value">6 Months</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Year</span>
-                        <span class="meta-value">2024</span>
-                    </div>
-                </div>
+    <!-- Explorations Section -->
+    <section id="explorations" class="explorations-section">
+        <h2>Explorations</h2>
+        <p class="section-intro">A collection of paintings, sketches, and select photography.</p>
+        <div class="explorations-grid">
+            <div class="exploration-item">
+                <img src="images/paintings.png" alt="Painting collection">
             </div>
-
-            <div class="modal-section">
-                <h3>Overview</h3>
-                <p>MeditationWise is a mobile meditation app designed to make mindfulness practices accessible and engaging for beginners and experienced practitioners alike. As the sole designer on a team of three, I was responsible for the complete design lifecycle from initial research to final implementation.</p>
+            <div class="exploration-item">
+                <img src="images/drawings.png" alt="Sketch collection">
             </div>
-
-            <div class="modal-section">
-                <h3>The Challenge</h3>
-                <p>Most meditation apps overwhelm new users with too many options and lack personalization. We needed to create an experience that was both simple enough for beginners yet powerful enough for regular practitioners.</p>
+            <div class="exploration-item">
+                <img src="images/uma kathak.jpg" alt="Kathak dance performance">
             </div>
-
-            <div class="modal-section">
-                <h3>My Role & Responsibilities</h3>
-                <ul>
-                    <li>Conducted user interviews and usability testing with 50+ participants</li>
-                    <li>Created comprehensive design system with 200+ components</li>
-                    <li>Designed complete user flows and interactive prototypes</li>
-                    <li>Collaborated with developers using Flutter for implementation</li>
-                    <li>Managed project timeline and coordinated with stakeholders</li>
-                </ul>
+            <div class="exploration-item">
+                <img src="images/Diptychs.jpg" alt="Photography diptych">
             </div>
-
-            <div class="modal-section">
-                <h3>Tools & Technologies</h3>
-                <div class="project-tags">
-                    <span class="tag">Figma</span>
-                    <span class="tag">Adobe Suite</span>
-                    <span class="tag">Loop11</span>
-                    <span class="tag">UserTesting</span>
-                    <span class="tag">Miro</span>
-                    <span class="tag">Notion</span>
-                    <span class="tag">Trello</span>
-                    <span class="tag">Flutter</span>
-                </div>
+            <div class="exploration-item">
+                <img src="images/michellegroup.jpg" alt="Group photograph">
             </div>
-
-            <div class="modal-section">
-                <h3>Solution & Impact</h3>
-                <p>We created a personalized onboarding experience that adapts to user goals and experience levels. The app features guided meditations, progress tracking, and ambient soundscapes.</p>
-                <p><strong>Results:</strong> 85% user retention after first week, 4.8/5 app store rating, featured in Apple's "Apps We Love" collection.</p>
+            <div class="exploration-item">
+                <img src="images/oldman.jpg" alt="Portrait photograph">
             </div>
-
-            <div class="modal-section">
-                <h3>Screenshots</h3>
-                <div class="modal-images">
-                    <!-- TODO: Add actual project screenshots
-                         <img src="images/meditation-wise-1.jpg" alt="Screenshot 1">
-                         <img src="images/meditation-wise-2.jpg" alt="Screenshot 2"> -->
-                    <div class="modal-image-placeholder">Screenshot 1</div>
-                    <div class="modal-image-placeholder">Screenshot 2</div>
-                    <div class="modal-image-placeholder">Screenshot 3</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: Project Template -->
-    <div class="modal" id="modal2">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('modal2')">&times;</button>
-            
-            <div class="modal-header">
-                <h2>Project Name</h2>
-                <div class="project-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Role</span>
-                        <span class="meta-value">Your Role</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Team Size</span>
-                        <span class="meta-value">X People</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Duration</span>
-                        <span class="meta-value">X Months</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TODO: Fill in your project details -->
-            <div class="modal-section">
-                <h3>Overview</h3>
-                <p>Describe your project here. What problem were you solving? Who was it for?</p>
-            </div>
-
-            <div class="modal-section">
-                <h3>The Challenge</h3>
-                <p>What specific challenges did this project present?</p>
-            </div>
-
-            <div class="modal-section">
-                <h3>My Role & Responsibilities</h3>
-                <ul>
-                    <li>Responsibility 1</li>
-                    <li>Responsibility 2</li>
-                    <li>Responsibility 3</li>
-                </ul>
-            </div>
-
-            <div class="modal-section">
-                <h3>Solution & Impact</h3>
-                <p>What was your solution? What were the measurable results?</p>
-            </div>
-
-            <div class="modal-section">
-                <h3>Screenshots</h3>
-                <div class="modal-images">
-                    <div class="modal-image-placeholder">Add images here</div>
-                    <div class="modal-image-placeholder">Add images here</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: NWU - Occulomotor Development -->
-    <div class="modal" id="modal3">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('modal3')">&times;</button>
-            
-            <div class="modal-header">
-                <h2>Occulomotor Development</h2>
-                <div class="project-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Role</span>
-                        <span class="meta-value">Your Role</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TODO: Duplicate and customize this template for each project -->
-            <div class="modal-section">
-                <h3>Overview</h3>
-                <p>Project description goes here.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: NWU - Girl Scouts STEM -->
-    <div class="modal" id="modal3">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('modal3')">&times;</button>
-            
-            <div class="modal-header">
-                <h2>Girl Scouts STEM</h2>
-                <div class="project-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Role</span>
-                        <span class="meta-value">Your Role</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TODO: Duplicate and customize this template for each project -->
-            <div class="modal-section">
-                <h3>Overview</h3>
-                <p>Project description goes here.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===================================
-         GALLERY SECTION
-         Photography and artwork showcase
-         =================================== -->
-    <section id="gallery">
-        <h2>Photography & Artwork</h2>
-        <div class="gallery-grid">
-            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/Diptychs.jpg" alt="Diptychs"></div>
-            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/michellegroup.jpg" alt="Description"></div>
-            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/oldman.jpg" alt="Artwork"></div>
-            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/paintings.png" alt="Photography"></div>
-            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/uma kathak.jpg" alt="Sunset"></div>
-            <div class="gallery-item" onclick="openLightbox(this)"> <img src="images/drawings.png" alt="Description"></div>
         </div>
     </section>
 
-    <!-- Gallery Lightbox -->
-    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-        <span class="lightbox-close">&times;</span>
-        <img id="lightbox-img" src="" alt="">
-    </div>
+    <!-- Writing Section -->
+    <section id="writing" class="writing-section">
+        <h2>Writing</h2>
+        <p class="section-intro">Thoughts on design, technology, and human experience.</p>
+        <div class="writing-grid">
+            <!-- Blog Post 1 - Placeholder -->
+            <article class="writing-card" data-modal="blog-1">
+                <div class="writing-meta">
+                    <span class="writing-date">On-site</span>
+                </div>
+                <h3>The Neural Interface: Designing for the Mind</h3>
+                <p>Exploring the intersection of brain-computer interfaces and human-centered design principles.</p>
+                <button class="read-more">Read More</button>
+            </article>
 
-    <!-- ===================================
-         CONTACT SECTION
-         Contact form and links
-         =================================== -->
-    <section id="contact">
-        <h2>Let's Connect</h2>
+            <!-- Medium Article Link -->
+            <article class="writing-card external">
+                <div class="writing-meta">
+                    <span class="writing-date">Medium</span>
+                </div>
+                <h3>Beyond the Screen</h3>
+                <p>User-Centered Design in Urban Bike-Sharing Systems</p>
+                <a href="https://medium.com/@umaracheldhamija/beyond-the-screen-user-centered-design-in-urban-bike-sharing-systems-7b118196a82d" target="_blank" rel="noopener" class="read-more">Read on Medium</a>
+            </article>
+
+            <!-- Blog Post 2 - Placeholder -->
+            <article class="writing-card" data-modal="blog-2">
+                <div class="writing-meta">
+                    <span class="writing-date">On-site</span>
+                </div>
+                <h3>The Paradox at the Heart of Design</h3>
+                <p>The deepest paradox in design is this: the best design often disappears.</p>
+                <button class="read-more">Read More</button>
+            </article>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <h2>Get In Touch</h2>
         <div class="contact-container">
             <div class="contact-info">
-                <h3>Get In Touch</h3>
-                <p>I'm always interested in hearing about new projects and opportunities. Whether you have a question or just want to say hi, feel free to reach out!</p>
-                
-                <div class="contact-links">
-                    <!-- TODO: Update with your actual links -->
-                    <a href="mailto:your.email@example.com">Email</a>
-                    <a href="https://github.com/yourusername" target="_blank">GitHub</a>
-                    <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a>
-                </div>
+                <h3>Let's make technology to improve lives.</h3>
+                <p>Whether you have a question or just want to say hello, I'd love to hear from you!</p>
+                <p>I'm always interested in hearing about new projects, collaboration opportunities, and thoughtful conversations about design and technology.</p>
             </div>
-
-            <form class="contact-form" onsubmit="handleFormSubmit(event)">
+            <form class="contact-form" action="https://formsubmit.co/umaracheldhamija@gmail.com" method="POST">
+                <input type="hidden" name="_subject" value="New portfolio contact">
+                <input type="hidden" name="_captcha" value="false">
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" required>
@@ -427,27 +310,193 @@
                 </div>
                 <div class="form-group">
                     <label for="message">Message</label>
-                    <textarea id="message" name="message" required></textarea>
+                    <textarea id="message" name="message" rows="6" required></textarea>
                 </div>
-                <button type="submit" class="form-submit">Send Message</button>
+                <button type="submit" class="btn btn-primary">Send Message</button>
             </form>
         </div>
     </section>
 
-    <!-- ===================================
-         FOOTER
-         =================================== -->
+    <!-- Footer -->
     <footer>
-        <h3>Uma Dhamija</h3>
-        <p>
-            <a href="mailto:your.email@example.com">Email</a> •
-            <a href="https://github.com/yourusername" target="_blank">GitHub</a> •
-            <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a>
-        </p>
-        <p style="margin-top: 2rem; opacity: 0.6;">© 2026 Uma Dhamija. All rights reserved.</p>
+        <div class="footer-content">
+            <h3>Uma Dhamija</h3>
+            <div class="footer-links">
+                <a href="mailto:umaracheldhamija@gmail.com">umaracheldhamija@gmail.com</a>
+                <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener">Medium</a>
+            </div>
+            <p class="footer-copyright">© 2026 Uma Dhamija. Designed with intention.</p>
+        </div>
     </footer>
 
-    <!-- Link to external JavaScript file -->
+    <!-- Blog Modals -->
+    <div class="modal" id="blog-1">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <article>
+                <h2>The Neural Interface: Designing for the Mind</h2>
+                <div class="blog-meta">
+                    <span class="blog-date">Uma Dhamija | January 2026</span>
+                </div>
+                <div class="blog-body">
+                    <p>
+    For decades, designers have focused on shaping interfaces for hands and eyes - screens,
+    buttons, gestures, and voice. Today, a quieter but more radical shift is underway:
+    interfaces that bypass traditional input altogether and connect directly with the
+    human brain. Brain-computer interfaces (BCIs) promise new forms of interaction,
+    accessibility, and augmentation - but they also challenge the very foundations of
+    human-centered design.
+  </p>
+
+  <p>
+    When the interface is the mind, what does it mean to design responsibly?
+  </p>
+
+  <h3>What Is a Neural Interface?</h3>
+  <p>
+    A neural interface, often referred to as a brain-computer interface, is a system that
+    enables direct communication between the brain and a computer. By reading neural
+    signals (and in some cases writing signals back), BCIs can translate brain activity
+    into actions - moving a cursor, typing text, controlling a prosthetic, or even modulating
+    emotional states.
+  </p>
+
+  <p>
+    While early BCI research was rooted in clinical and assistive contexts - helping people
+    with paralysis communicate or regain mobility - recent advances in machine learning,
+    sensor technology, and neuroscience have pushed BCIs into broader consumer and
+    experimental spaces. From non-invasive EEG headsets to implantable devices, the line
+    between user and system is beginning to blur.
+  </p>
+
+  <p>
+    For designers, this isn’t just a new interface. It’s a new relationship between humans
+    and technology.
+  </p>
+
+  <h3>From User-Centered to Mind-Centered Design</h3>
+  <p>
+    Human-centered design has always emphasized empathy: understanding user needs,
+    limitations, motivations, and contexts. Neural interfaces complicate this approach.
+    The user is no longer simply interacting with a tool - they are co-adapting with a
+    system that learns from their neural patterns over time.
+  </p>
+
+  <ul>
+    <li>Users may not have conscious awareness of what inputs they’re providing</li>
+    <li>Feedback loops can shape cognition, attention, and emotion</li>
+    <li>Errors may feel internal rather than external</li>
+  </ul>
+
+  <p>
+    Designing for neural interfaces requires a shift from usability to mental integrity.
+    Designers must consider trust, agency, and psychological safety alongside efficiency
+    and accuracy.
+  </p>
+
+  <h3>Agency, Consent, and Control</h3>
+  <p>
+    One of the most critical challenges in BCI design is preserving user agency. When
+    systems interpret neural signals, intent becomes ambiguous. Consent cannot be a
+    one-time action - it must be continuous, legible, and reversible.
+  </p>
+
+  <p>
+    Designers must ask: How does a user know when the system is listening? Can they pause
+    or disengage safely? What happens when the system misinterprets a thought?
+  </p>
+
+  <h3>Designing for Cognitive Load and Mental Wellbeing</h3>
+  <p>
+    Neural interfaces promise reduced friction, yet they risk increasing cognitive load
+    by demanding sustained focus or introducing intrusive feedback. If a system requires
+    users to think harder in a specific way, is it truly intuitive?
+  </p>
+
+  <p>
+    Human-centered neural design must account for onboarding, clear mental models, rest
+    states, and boundaries that prevent mental fatigue or anxiety.
+  </p>
+
+  <h3>Ethics Is Not a Layer - It’s the Interface</h3>
+  <p>
+    With BCIs, ethics cannot be deferred to policy alone. Design decisions determine what
+    data is collected, how it is framed, and how users perceive their own minds. Questions
+    of privacy, normalization, and power are embedded directly into the interface.
+  </p>
+
+  <p>
+    Ethical neural design is not just about avoiding harm - it is about protecting human
+    dignity.
+  </p>
+
+  <h3>Accessibility and the Promise of Empowerment</h3>
+  <p>
+    Neural interfaces hold extraordinary potential for accessibility, restoring
+    communication and autonomy for people with motor or speech impairments. Human-centered
+    design must stay grounded in these real outcomes rather than novelty or enhancement
+    alone.
+  </p>
+
+  <h3>Designing with Humility</h3>
+  <p>
+    The human brain is not a predictable input device. Good neural design embraces
+    uncertainty, communicates limitations, and treats users as partners rather than data
+    sources.
+  </p>
+
+  <h3>Looking Ahead</h3>
+  <p>
+    As brain-computer interfaces move into everyday life, designers will shape whether
+    these technologies feel empowering or invasive. Designing for the mind means designing
+    for vulnerability, identity, and trust.
+  </p>
+
+  <p>
+    The interface is no longer just something we use. It is something we become entangled
+    with - and that demands care.
+  </p>
+<p class="footer-copyright">Uma Dhamija</p>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <div class="modal" id="blog-2">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <article>
+                <h2>The Paradox at the Heart of Design</h2>
+                <div class="blog-meta">
+                    <span class="blog-date">January 2026</span>
+                </div>
+                <div class="blog-body">
+                    <p>
+
+Paradox exists everywhere in life. Beauty often requires pain. Discipline, strangely, creates freedom. These ideas feel contradictory at first, yet they ring true through lived experience. Design, too, is built on paradox-not as a flaw, but as a fundamental condition of making things that actually work in the world.
+<br><br>
+At its core, design is about constraint. Designers do not create in infinite space; they work within limits of time, technology, budget, ethics, and human behavior. Yet it is precisely these constraints that enable creativity. Without limits, design becomes vague and indulgent. With them, clarity emerges. Much like discipline in life, constraint in design doesn’t suffocate possibility - it sharpens it.
+<br><br>
+Another paradox lies in simplicity. Good design often looks effortless, even obvious. But that apparent ease is the result of immense effort: research, iteration, debate, failure, and refinement. Complexity is easy to produce; simplicity is not. The designer’s work is often to absorb complexity so that the user doesn’t have to. In this way, designers take on cognitive burden so others may experience relief.
+<br><br>
+There is also a tension between control and surrender. Designers are trained to be intentional - to define flows, anticipate behaviors, and shape outcomes. Yet the most successful designs accept that users will reinterpret, misuse, and adapt what is given to them. Designing for humans means designing for unpredictability. Control creates structure; surrender creates resilience. Both are necessary.
+<br><br>
+User-centered design itself contains a paradox. To design well for others, designers must empathize deeply - yet not project themselves onto the user. They must care, but also remain detached enough to see patterns beyond individual stories. Too much distance leads to cold systems; too much closeness leads to biased decisions. Good design lives in the narrow space between empathy and objectivity.
+<br><br>
+Even innovation carries contradiction. Novelty is celebrated, yet familiarity is what makes products usable. Users crave new possibilities but rely on mental models built from past experiences. Designers must introduce change without disorientation - pushing forward while anchoring backward. Innovation, then, is less about disruption and more about careful translation.
+<br><br>
+Perhaps the deepest paradox in design is this: the best design often disappears. When something works seamlessly, it fades into the background of daily life. Designers labor for years so that users barely notice the result. Visibility is not the measure of success; impact is. Like good infrastructure or good care, good design is felt more than seen.
+<br><br>
+Paradox in design is not something to resolve. It is something to hold. Designing is the practice of balancing opposing forces - freedom and constraint, empathy and distance, novelty and familiarity - without collapsing into extremes. In embracing these tensions, designers don’t just make better products; they reflect a deeper truth about life itself: meaning is often found not in certainty, but in the space between opposites.
+                <p class="footer-copyright">Uma Dhamija</p>
+
+                </div>
+            </article>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

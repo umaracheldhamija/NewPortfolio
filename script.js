@@ -1,280 +1,284 @@
-/* ===================================
-   CUSTOM CURSOR TRACKING
-   Follows mouse movement smoothly
-   =================================== */
-const cursor = document.querySelector('.cursor');
-const cursorDot = document.querySelector('.cursor-dot');
-let mouseX = 0;
-let mouseY = 0;
-let cursorX = 0;
-let cursorY = 0;
+// ============================================
+// STATE MANAGEMENT
+// ============================================
 
-document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    
-    // Update CSS variables for thunderstorm effect
-    document.documentElement.style.setProperty('--mouse-x', mouseX + 'px');
-    document.documentElement.style.setProperty('--mouse-y', mouseY + 'px');
-});
-
-// Smooth cursor following animation
-function animateCursor() {
-    // Cursor ring follows with slight delay
-    cursorX += (mouseX - cursorX) * 0.1;
-    cursorY += (mouseY - cursorY) * 0.1;
-    
-    cursor.style.left = cursorX + 'px';
-    cursor.style.top = cursorY + 'px';
-    
-    // Cursor dot follows directly
-    cursorDot.style.left = mouseX + 'px';
-    cursorDot.style.top = mouseY + 'px';
-    
-    requestAnimationFrame(animateCursor);
-}
-animateCursor();
-
-// Hide cursor when leaving window
-document.addEventListener('mouseleave', () => {
-    cursor.style.opacity = '0';
-    cursorDot.style.opacity = '0';
-});
-
-document.addEventListener('mouseenter', () => {
-    cursor.style.opacity = '1';
-    cursorDot.style.opacity = '1';
-});
-
-/* ===================================
-   MOBILE MENU TOGGLE
-   =================================== */
-function toggleMenu() {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.classList.toggle('active');
-}
-
-// Close menu when clicking on a link
-document.querySelectorAll('nav a').forEach(link => {
-    link.addEventListener('click', () => {
-        document.getElementById('navMenu').classList.remove('active');
-    });
-});
-
-/* ===================================
-   SCROLL ANIMATIONS
-   Fade in elements as they come into view
-   =================================== */
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+const state = {
+    mouse: {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        isMoving: false
+    },
+    isInHero: true,
+    preferences: {
+        theme: 'dark',
+        quietMode: false,
+        largeText: false
+    }
 };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, observerOptions);
 
-// Observe project cards and gallery items
-document.querySelectorAll('.project-card, .gallery-item').forEach(el => {
-    observer.observe(el);
+// ============================================
+// DOM ELEMENTS
+// ============================================
+
+const elements = {
+    cursorDot: document.getElementById('cursor-dot'),
+    stormReveal: document.getElementById('storm-reveal'),
+    heroSection: document.getElementById('hero'),
+    themeToggle: document.getElementById('theme-toggle'),
+    quietToggle: document.getElementById('quiet-toggle'),
+    textSizeToggle: document.getElementById('text-size-toggle')
+};
+
+
+// ============================================
+// HERO SECTION VISIBILITY TRACKING
+// ============================================
+
+// Use Intersection Observer to efficiently track if hero is in view
+const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        state.isInHero = entry.isIntersecting;
+    });
+}, { threshold: 0 });
+
+if (elements.heroSection) {
+    heroObserver.observe(elements.heroSection);
+}
+
+
+// ============================================
+// MOUSE TRACKING
+// ============================================
+
+let mouseMoveTimeout;
+
+document.addEventListener('mousemove', (e) => {
+    // Update target reveal position for smooth interpolation
+    targetRevealX = e.clientX;
+    targetRevealY = e.clientY;
+    
+    // Update cursor dot position
+    if (elements.cursorDot) {
+        elements.cursorDot.style.left = `${e.clientX}px`;
+        elements.cursorDot.style.top = `${e.clientY}px`;
+    }
+
+    state.mouse.isMoving = true;
+
+    // Clear timeout and set new one
+    clearTimeout(mouseMoveTimeout);
+    mouseMoveTimeout = setTimeout(() => {
+        state.mouse.isMoving = false;
+    }, 100);
+}, { passive: true });
+
+
+// ============================================
+// STORM REVEAL ANIMATION
+// Subtle, soft spotlight with eased interpolation and radial gradient falloff
+// ============================================
+
+let revealX = window.innerWidth / 2;
+let revealY = window.innerHeight / 2;
+let targetRevealX = window.innerWidth / 2;
+let targetRevealY = window.innerHeight / 2;
+
+function updateStormReveal() {
+    // Smooth easing interpolation (easeOutQuad)
+    const easing = 0.15;
+    revealX += (targetRevealX - revealX) * easing;
+    revealY += (targetRevealY - revealY) * easing;
+
+    if (!document.body.classList.contains('quiet-mode') && state.isInHero) {
+        // Significantly reduced radius for subtle, localized effect (60px)
+        const revealRadius = 120;
+        elements.stormReveal.style.opacity = '1';
+        const maskImage = `radial-gradient(circle ${revealRadius}px at ${revealX}px ${revealY}px, 
+                  rgba(0,0,0,0.95) 5%, 
+                  rgba(0,0,0,0.6) 40%, 
+                  rgba(0,0,0,0) 100%)`;
+        elements.stormReveal.style.maskImage = maskImage;
+        // elements.stormReveal.style.webkitMaskImage = maskImage;
+    } else {
+        elements.stormReveal.style.opacity = '0';
+    }
+
+    requestAnimationFrame(updateStormReveal);
+}
+
+updateStormReveal();
+
+
+
+// ============================================
+// ACCESSIBILITY CONTROLS
+// ============================================
+
+// Theme Toggle
+elements.themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    elements.themeToggle.classList.toggle('active');
+    
+    // Update icon
+    const icon = elements.themeToggle.querySelector('i');
+    icon.className = newTheme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+    
+    state.preferences.theme = newTheme;
+    savePreferences();
 });
 
-/* ===================================
-   SMOOTH SCROLLING
-   Smooth navigation to sections
-   =================================== */
+// Quiet Mode Toggle
+elements.quietToggle.addEventListener('click', () => {
+    document.body.classList.toggle('quiet-mode');
+    elements.quietToggle.classList.toggle('active');
+    
+    state.preferences.quietMode = document.body.classList.contains('quiet-mode');
+    savePreferences();
+});
+
+// Text Size Toggle
+elements.textSizeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('large-text');
+    elements.textSizeToggle.classList.toggle('active');
+    
+    state.preferences.largeText = document.body.classList.contains('large-text');
+    savePreferences();
+});
+
+
+// ============================================
+// PREFERENCES MANAGEMENT
+// ============================================
+
+function savePreferences() {
+    localStorage.setItem('portfolio-preferences', JSON.stringify(state.preferences));
+}
+
+function loadPreferences() {
+    const saved = localStorage.getItem('portfolio-preferences');
+    if (saved) {
+        const prefs = JSON.parse(saved);
+        
+        // Apply theme
+        if (prefs.theme) {
+            document.documentElement.setAttribute('data-theme', prefs.theme);
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = prefs.theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+            if (prefs.theme === 'light') {
+                elements.themeToggle.classList.add('active');
+            }
+        }
+        
+        // Apply quiet mode
+        if (prefs.quietMode) {
+            document.body.classList.add('quiet-mode');
+            elements.quietToggle.classList.add('active');
+        }
+        
+        // Apply text size
+        if (prefs.largeText) {
+            document.body.classList.add('large-text');
+            elements.textSizeToggle.classList.add('active');
+        }
+        
+        state.preferences = prefs;
+    }
+}
+
+// Respect prefers-reduced-motion
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.body.classList.add('quiet-mode');
+    state.preferences.quietMode = true;
+}
+
+
+// ============================================
+// SMOOTH SCROLLING
+// ============================================
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('navMenu').classList.remove('active');
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
     });
 });
 
-/* ===================================
-   MODAL FUNCTIONS
-   Project detail view modals
-   =================================== */
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-}
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-    }
-}
+// ============================================
+// BLOG MODALS
+// ============================================
 
-// Close modal when clicking outside of modal-content
+// Open modal
+document.querySelectorAll('[data-modal]').forEach(card => {
+    card.addEventListener('click', () => {
+        const modalId = card.getAttribute('data-modal');
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    });
+});
+
+// Close modal
+document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const modal = btn.closest('.modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+// Close on outside click
 document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-            closeModal(modal.id);
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
     });
 });
 
-// Close modal with Escape key
+// Close on Escape key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal.active').forEach(modal => {
-            closeModal(modal.id);
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         });
     }
 });
 
-/* ===================================
-   GALLERY LIGHTBOX
-   Image viewing modal
-   =================================== */
-function openLightbox(element) {
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+function init() {
+    // Load saved preferences
+    loadPreferences();
     
-    // Get image content (text for now, replace with actual images)
-    const content = element.textContent;
-    lightboxImg.alt = content;
-    lightboxImg.textContent = content;
+    // Start animation loops
+    updateStormReveal();
     
-    lightbox.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    console.log('Portfolio initialized with intention.');
 }
 
-function closeLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    lightbox.classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-// Close lightbox with Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeLightbox();
-    }
-});
-
-/* ===================================
-   THEME TOGGLE
-   Light/Dark mode switching
-   =================================== */
-function toggleTheme() {
-    const body = document.body;
-    const themeIcon = document.getElementById('themeIcon');
-    
-    if (body.classList.contains('light-mode')) {
-        body.classList.remove('light-mode');
-        themeIcon.textContent = '🌙';
-        localStorage.setItem('theme', 'dark');
-    } else {
-        body.classList.add('light-mode');
-        themeIcon.textContent = '☀️';
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// Load theme preference on page load
-window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    const themeIcon = document.getElementById('themeIcon');
-    
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        themeIcon.textContent = '☀️';
-    } else {
-        document.body.classList.remove('light-mode');
-        themeIcon.textContent = '🌙';
-    }
-});
-
-/* ===================================
-   CONTACT FORM HANDLER
-   =================================== */
-function handleFormSubmit(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    
-    // Here you would typically send this to a backend
-    console.log('Form submitted:', { name, email, message });
-    
-    // Show success message
-    alert('Thank you for your message! I\'ll get back to you soon.');
-    form.reset();
-}
-
-/* ===================================
-   RESUME DOWNLOAD
-   =================================== */
-function downloadResume(event) {
-    event.preventDefault();
-    
-    // TODO: Update with actual resume file path
-    const resumeUrl = 'Uma_Dhamija_Resume.pdf';
-    
-    // Create a link element and trigger download
-    const link = document.createElement('a');
-    link.href = resumeUrl;
-    link.download = 'Uma_Dhamija_Resume.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    console.log('Resume download initiated');
-}
-
-/* ===================================
-   LOADING ANIMATION
-   Hide loader when page is fully loaded
-   =================================== */
-window.addEventListener('load', () => {
-    const loader = document.querySelector('.loader');
-    if (loader) {
-        setTimeout(() => {
-            loader.classList.add('hidden');
-        }, 500);
-    }
-});
-
-/* ===================================
-   THROTTLE FUNCTION
-   For performance optimization on scroll/resize events
-   =================================== */
-function throttle(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-/* ===================================
-   PERFORMANCE OPTIMIZATION
-   Reduce thunderstorm effects on low-end devices
-   =================================== */
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-if (prefersReducedMotion) {
-    document.querySelectorAll('.cloud, .lightning-flash').forEach(el => {
-        el.style.animation = 'none';
-    });
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
 }
