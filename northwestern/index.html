@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project Name - Uma Dhamija">
+    <title>Project Name - Uma Dhamija</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lancelot&display=swap" rel="stylesheet">
+    <style>
+        .project-hero {
+            padding: 8rem 2rem 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .project-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            letter-spacing: -0.05rem;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            color: var(--accent-cool);
+            font-weight: 600;
+        }
+
+        .project-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .project-section {
+            margin-bottom: 4rem;
+        }
+
+        .project-section h2 {
+            font-size: 2rem;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cool);
+            font-family: var(--font-mono);
+        }
+
+        .project-section p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .project-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .project-section li {
+            color: var(--text-secondary);
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .project-section li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cool);
+        }
+
+        .project-image {
+            background-color: #0b0e17;
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-cool);
+            text-decoration: none;
+            margin: 2rem 0;
+            transition: gap 0.2s var(--transition-smooth);
+        }
+
+        .back-link:hover {
+            gap: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav role="navigation">
+        <div class="nav-container">
+            <div class="logo"><a href="../index.html#hero">Uma Dhamija</a></div>
+            <ul class="nav-links">
+                <li><a href="../index.html#hero">Home</a></li>
+                <li><a href="../index.html#work">Work</a></li>
+                <li><a href="../index.html#explorations">Explorations</a></li>
+                <li><a href="../index.html#writing">Writing</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Project Hero -->
+    <section class="project-hero">
+        <a href="../index.html#work" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>Back to Work
+        </a>
+        
+        <h1>GlowUp Eye Care: Oculomotor Development for Generation Alpha</h1>
+        <p style="font-size: 1.2rem; color: var(--text-secondary);">
+            Researching a VR app to help children with oculomotor development issues.
+
+        <div class="project-meta">
+            <div class="meta-item">
+                <span class="meta-label">Role</span>
+                <span class="meta-value">Researcher</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Timeline</span>
+                <span class="meta-value">6 weeks</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Team</span>
+                <span class="meta-value">Just me</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Year</span>
+                <span class="meta-value">2025</span>
+            </div>
+        </div>
+
+        <div class="tools-used">
+            <span class="tool" data-tool="Figma"><i class="fab fa-figma"></i></span>
+            <span class="tool" data-tool="Interviews"><i class="fa-solid fa-users"></i></span>
+            <span class="tool" data-tool="Unity"><i class="fas fa-unity"></i></span>
+            <span class="tool" data-tool="Adobe"><i class="fas fa-image"></i></span>
+        </div>
+    </section>
+
+    <!-- Project Content -->
+    <div class="project-content">
+        <!-- Overview -->
+        <section class="project-section">
+            <h2>Overview</h2>
+            <p>
+                For my thesis at Northwestern University, I chose to research eye health issues caused by prolonged screen use and to explore how design can create meaningful impact in healthcare. I was drawn to this project because of a personal experience with my niece - who had cataract surgery after birth and is now spending most of her days with an eye patch to train the eye muscles in her bad eye. 
+            </p>
+            <p> 
+                I wanted to explore how design could be used to create a solution that could help children with oculomotor development issues, and I was excited to work on a project that had the potential to make a real difference in people's lives.
+            </p>
+        </section>
+
+        <!-- Hero Image -->
+        <img src="intro.svg" alt="Project overview" class="project-image">
+
+        <!-- Challenge -->
+        <section class="project-section">
+            <h2>The Challenge</h2>
+            <p>
+                Generation Alpha (born 2010-2025) is growing up with screens before they can walk, speak, or read, and we're starting to see some concerning patterns. The World Health Organization has identified digital eye strain as a growing public health concern, with symptoms like headaches, blurred vision, and dry eyes becoming increasingly common among children. Additionally, excessive screen time has been linked to myopia (nearsightedness) and other vision problems in children.
+                <br><br>
+                <ul>
+                   <li>How can I design a solution that is effective for children who will be inevitably surrounded by technology and screens in the near future?</li>
+                    <li>My thesis required that I design a solution within 6 weeks, taking the appropriate approach through research, iteration, and testing. However, my knowledge of eye health and oculomotor development was limited, so I had to do extensive research and consult with experts in the field which took considerable time.</li>
+                </ul>
+                <br><br>
+                Currently, many children are unaware of underlying vision or eye-movement challenges. Even when these issues are identified by an ophthalmologist, families are often given generic eye exercises with little guidance or follow-up. These exercises are easy to forget, difficult to perform correctly, and rarely engaging—resulting in low adherence and limited improvement.
+
+                <br><br>
+                As designers, we hold the power - and the responsiblity - to shape digital tools that do more than entertain. We can create solutions that promote health, well-being, and positive habits, especially for the youngest generation who will grow up with screens as an integral part of their lives. This project was an opportunity to explore how design can be used to create meaningful impact in healthcare and to contribute to a healthier digital future for Generation Alpha.
+            </p>
+        </section>
+
+        <img src="wireframe.png" alt="Final solution" class="project-image">
+
+        <!-- Process -->
+        <section class="project-section" style="content: none">
+            <h2>Process</h2>
+            <p>
+                Researching requires a lot of time and effort, and I had to be strategic about how I allocated my time. I started by doing a literature review of existing research on digital eye strain and oculomotor development in children, as well as existing solutions and interventions. I also conducted interviews with experts in the field, including optometrists, ophthalmologists, and researchers who specialize in eye health and child development. I also conducted user research with parents of children who have oculomotor development issues to understand their needs, pain points, and preferences when it comes to solutions for their children.
+        </section>
+
+        <!-- Process Image -->
+        <img src="design-draft.png" alt="Design process" class="project-image">
+
+
+        <!-- Solution -->
+        <section class="project-section">
+            <h2>Solution</h2>
+            <p>
+                My research revealed that many oculomotor development issues in children can be effectively improved through targeted exercises that strengthen eye movement, coordination, and focus. Building on this insight, I designed GlowUp Eye Care, a VR-based application that transforms these clinically recommended exercises into playful, engaging experiences for children.
+                <br><br>
+                The app features a variety of interactive games that encourage key visual skills, such as tracking moving objects, shifting focus between distances, and improving eye–hand coordination. To support long-term outcomes, GlowUp Eye Care also includes a parent-facing dashboard that tracks progress over time and provides personalized recommendations based on each child’s performance.
+                <br><br> 
+                By leveraging the immersive and interactive nature of VR, "GlowUp Eye Care" aims to make these exercises more enjoyable and engaging for children, increasing the likelihood that they will stick with the program and see improvements in their eye health.
+            </p>
+        </section>
+
+        <!-- Solution Image -->
+        <img src="MW.png" alt="Final solution" class="project-image">
+
+        <!-- Impact -->
+        <section class="project-section">
+        <h2>Impact & Outcomes</h2>
+        <p>
+            The redesign clarified key usability issues and demonstrated how a more structured, habit-focused experience could better support users in developing a consistent meditation practice.
+        </p>
+        <ul>
+            <li>Identified core usability failures in navigation and content discoverability through usability testing with 9+ participants</li>
+            <li>Users responded positively to simplified navigation, clear categorization by need, level, and tradition, and the addition of habit-supporting features such as scheduling and favorites</li>
+            <li>Established a clear product direction for Meditation Wise, aligning user needs with long-term engagement goals rather than one-off meditation sessions</li>
+            <li>Learned the importance of reducing cognitive load in spiritually oriented products and designing consistency across navigation and content to support habit formation</li>
+        </ul>
+        <br><br>
+        
+        <a href="https://www.figma.com/proto/xyz123/MeditationWise-Prototype?node-id=1%3A2&scaling=scale-down&page-id=0%3A1" target="_blank" rel="noopener">Link to Figma Prototype</a> 
+
+        </section>
+
+         <img src="MW app.png" alt="Final solution" class="project-image">
+
+        <!-- Reflections
+        <section class="project-section">
+            <h2>Reflections</h2>
+            <p>
+                I wanted to develop a platform offering guided practices rooted in diverse spiritual traditions, led by authentic experts.
+
+            What did you learn? What would you do differently? 
+                This section shows growth and self-awareness.
+            </p>
+        </section> -->
+
+        <!-- Navigation -->
+        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+            <a href="../index.html#work" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to All Projects
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>Uma Dhamija</h3>
+            <div class="footer-links">
+                <a href="mailto:umaracheldhamija@gmail.com">Email</a>
+                <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener">Medium</a>
+            </div>
+            <p class="footer-copyright">© 2026 Uma Dhamija. Designed with intention.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

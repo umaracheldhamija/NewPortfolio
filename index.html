@@ -11,7 +11,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lancelot&display=swap" rel="stylesheet">
-
+    <!-- Some notes for when i can co-pilot:
+- Light mode toggle should adjust the color scheme of the entire site, including background, text, and interactive elements to meet accessibility standards
+- Light mode should also adjust the storm animation colors to maintain visibility and contrast
+- Add ARIA labels to all interactive elements for screen readers
+- Ensure color contrast meets WCAG guidelines for accessibility
+     
+    -->
 </head>
 <body>
     <!-- Accessibility Controls -->
@@ -22,9 +28,9 @@
         <button class="control-btn" id="quiet-toggle" title="Reduce animation intensity" aria-label="Toggle quiet mode">
            <i class="fa-solid fa-cloud-bolt"></i>
         </button>
-        <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Toggle text size">
+        <!-- <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Toggle text size">
             <i class="fas fa-text-height"></i>
-        </button>
+        </button> -->
     </div>
 
     <!-- Navigation -->
@@ -62,12 +68,12 @@
             <h1>Uma Dhamija</h1>
             
             <p class="bio">
-                Interface Designer • UX Advocate • NeuroTechnology Enthusiast • Kathak Dancer
+                UX Advocate • Interface Designer • NeuroTech Enthusiast • Kathak Dancer
             </p>
 
             <!-- Social Links -->
             <div class="social-links">
-                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/in/uma-dhamija" target="_blank" rel="noopener" aria-label="LinkedIn">
                     <i class="fab fa-linkedin-in"></i>
                 </a>
                 <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener" aria-label="GitHub">
@@ -92,6 +98,7 @@
    <!-- Work Section -->
     <section id="work" class="work-section">
         <h2>Featured Work</h2>
+        <p class="section-intro">Creating this website was also fun ;)</p>
         <div class="projects-grid">
             <!-- MeditationWise -->
             <a href="meditationwise/index.html" class="project-card">
@@ -116,9 +123,9 @@
                 </div>
             </a>
 
-            <!-- Magee Hospital -->
-            <a href="#" class="project-card">
-                <div class="project-card coming-soon"> 
+            <!-- UPMC Magee Hospital -->
+            <a href="upmc/index.html" class="project-card">
+                <!-- <div class="project-card coming-soon">  -->
                     <div class="project-image">
                         <img src="upmc/logo.jpg" alt="UPMC Magee Hospital Gynocological Oncology Unit">
                     </div>
@@ -126,18 +133,24 @@
                         <h3>Designing w/CARE</h3>
                         <p>Creating design solutions for Magee Hospital - Gynocological Oncology Unit.</p>
                         <div class="project-tags">
-                            <!-- <span class="tag">Research</span>
-                            <span class="tag">Shadowing</span>
-                            <span class="tag">Interface Design</span> -->
-                            <span class="coming-soon-badge">Coming Soon</span>
+                            <span class="tag">Research</span>
+                            <span class="tag">VR Design</span>
+                            <span class="tag">Ceonceptualization</span>
+                            <!-- <span class="coming-soon-badge">Coming Soon</span> -->
+
+                        </div>
+                        <div class="tools-used">
+                            <span class="tool" title="Unity"><i class="fab fa-unity"></i></span>
+                            <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                            <span class="tool" title="Adobe"><i class="fab fa-image"></i></span>
                         </div>
                     </div>
-                </div>
+                <!-- </div> -->
             </a>
 
             <!-- OpenMined - Coming Soon -->
-            <a href="#" class="project-card">
-                <div class="project-card coming-soon">
+            <a href="openmined/index.html" class="project-card">
+                <!-- <div class="project-card coming-soon"> -->
                     <div class="project-image">
                         <img src="openmined/logo.jpg" alt="OpenMined logo">
                     </div>
@@ -145,17 +158,87 @@
                         <h3>OpenMined - Capstone</h3>
                         <p>Developing use cases for privacy-preserving Artificial Intelligence Technology.</p>
                         <div class="project-tags">
-                        <!-- <span class="tag">Research</span>
-                            <span class="tag">UX Design</span>
-                            <span class="tag">Shadowing</span> -->
-                            <span class="coming-soon-badge">Coming Soon</span>
+                            <span class="tag">Research</span>
+                            <span class="tag">VR Design</span>
+                            <span class="tag">Ceonceptualization</span>
+                            <!-- <span class="coming-soon-badge">Coming Soon</span> -->
+
                         </div>
+                        <div class="tools-used">
+                            <span class="tool" title="Unity"><i class="fab fa-unity"></i></span>
+                            <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                            <span class="tool" title="Adobe"><i class="fab fa-image"></i></span>
+                        </div>
+                    </div>
+                <!-- </div> -->
+            </a>
+
+            <!-- Northwestern Capstone -->
+            <a href="northwestern/index.html" class="project-card">
+                <div class="project-image">
+                    <img src="northwestern/photo.jpg" alt="Northwestern Capstone logo">
+                </div>
+                <div class="project-content">
+                    <h3>GlowUp Eye Care</h3>
+                    <p>Northwestern Capstone: VR-based research exploring children's oculomotor development and eye exercise games.</p>
+                    <div class="project-tags">
+                        <span class="tag">Research</span>
+                        <span class="tag">VR Design</span>
+                        <span class="tag">Ceonceptualization</span>
+                    </div>
+                    <div class="tools-used">
+                        <span class="tool" title="Unity"><i class="fab fa-unity"></i></span>
+                        <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                        <span class="tool" title="Adobe"><i class="fab fa-image"></i></span>
                     </div>
                 </div>
             </a>
 
+            <!-- Electric Scooters -->
+            <a href="scooter/index.html" class="project-card">
+                <div class="project-image">
+                    <img src="scooter/photo.png" alt="Electric Scooters for Kids logo">
+                </div>
+                <div class="project-content">
+                    <h3>Electric Scooters for Kids</h3>
+                    <p>Physical prototype combining 3D printing, research, and user-centered design for safer mobility.</p>
+                    <div class="project-tags">
+                        <span class="tag">Wireframing</span>
+                        <span class="tag">Prototyping</span>
+                        <span class="tag">Research</span>
+                    </div>
+                    <div class="tools-used">
+                        <span class="tool" title="Adobe"><i class="fas fa-image"></i></span>
+                        <span class="tool" title="3D Printing"><i class="fas fa-print"></i></span>
+                        <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Kathak Kala Kendra -->
+            <a href="kathak/index.html" class="project-card">
+                <div class="project-image">
+                    <img src="kathak/photo.png" alt="Kathak Kala Kendra logo">
+                </div>
+                <div class="project-content">
+                    <h3>Kathak Kala Kendra</h3>
+                    <p>A website for a Kathak dance school based in India, made for my teacher of 15 years.</p>
+                    <div class="project-tags">
+                        <span class="tag">Product Design</span>
+                        <span class="tag">Conceptualization</span>
+                        <span class="tag">Web Development</span>
+                    </div>
+                        <div class="tools-used">
+                            <span class="tool" title="Unity"><i class="fab fa-unity"></i></span>
+                            <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
+                            <span class="tool" title="Adobe"><i class="fab fa-image"></i></span>
+                        </div>
+                </div>
+            </a>
+
+
             <!-- Pain Detector -->
-            <a href="#" class="project-card">
+            <!-- <a href="#" class="project-card">
                 <div class="project-image">
                     <div class="placeholder-icon">
                         <i class="fas fa-brain"></i>
@@ -175,53 +258,7 @@
                         <span class="tool" title="TinkerCard"><i class="fab fa-image"></i></span>
                     </div>
                 </div>
-            </a>
-
-            <!-- Northwestern Capstone -->
-            <a href="#" class="project-card">
-                <div class="project-image">
-                    <div class="placeholder-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h3>Northwestern Capstone</h3>
-                    <p>AR-based research exploring children's oculomotor development using brain-computer interface principles.</p>
-                    <div class="project-tags">
-                        <span class="tag">Research</span>
-                        <span class="tag">AR Design</span>
-                        <span class="tag">BCI</span>
-                    </div>
-                    <div class="tools-used">
-                        <span class="tool" title="Unity"><i class="fab fa-unity"></i></span>
-                        <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
-                        <span class="tool" title="Adobe"><i class="fab fa-image"></i></span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Electric Scooters -->
-            <a href="#" class="project-card">
-                <div class="project-image">
-                    <div class="placeholder-icon">
-                        <i class="fas fa-motorcycle"></i>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h3>Electric Scooters for Kids</h3>
-                    <p>Physical prototype combining 3D printing, fabrication, and user-centered design for safer mobility.</p>
-                    <div class="project-tags">
-                        <span class="tag">Product Design</span>
-                        <span class="tag">Prototyping</span>
-                        <span class="tag">Fabrication</span>
-                    </div>
-                    <div class="tools-used">
-                        <span class="tool" title="Adobe"><i class="fas fa-cube"></i></span>
-                        <span class="tool" title="3D Printing"><i class="fas fa-print"></i></span>
-                        <span class="tool" title="Figma"><i class="fab fa-figma"></i></span>
-                    </div>
-                </div>
-            </a>
+            </a> -->
         </div>
     </section>
 
@@ -285,6 +322,27 @@
                 <p>The deepest paradox in design is this: the best design often disappears.</p>
                 <button class="read-more">Read More</button>
             </article>
+
+
+            <!-- Blog Post 3 - Placeholder -->
+            <article class="writing-card" data-modal="blog-2">
+                <div class="writing-meta">
+                    <span class="writing-date">On-site</span>
+                </div>
+                <h3>Is AI replacing human creativity?</h3>
+                <p>We don't use our own brains anymore.</p>
+                <button class="read-more">Read More</button>
+            </article>
+
+            <!-- Blog Post 4 - Placeholder -->
+            <article class="writing-card" data-modal="blog-2">
+                <div class="writing-meta">
+                    <span class="writing-date">On-site</span>
+                </div>
+                <h3>Why Art Goes Underappreciated</h3>
+                <p>asdf.</p>
+                <button class="read-more">Read More</button>
+            </article>
         </div>
     </section>
 
@@ -322,10 +380,12 @@
         <div class="footer-content">
             <h3>Uma Dhamija</h3>
             <div class="footer-links">
-                <a href="mailto:umaracheldhamija@gmail.com">umaracheldhamija@gmail.com</a>
                 <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/uma-dhamija" target="_blank" rel="noopener">LinkedIn</a>
                 <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener">Medium</a>
+            </div>
+            <div class="cta-buttons">
+                <a href="Uma_Dhamija_Resume.pdf" class="btn btn-secondary" download>Download Resume</a>
             </div>
             <p class="footer-copyright">© 2026 Uma Dhamija. Designed with intention.</p>
         </div>
@@ -338,127 +398,127 @@
             <article>
                 <h2>The Neural Interface: Designing for the Mind</h2>
                 <div class="blog-meta">
-                    <span class="blog-date">Uma Dhamija | January 2026</span>
+                    <span class="blog-date">Uma Dhamija | December 2025</span>
                 </div>
                 <div class="blog-body">
                     <p>
-    For decades, designers have focused on shaping interfaces for hands and eyes - screens,
-    buttons, gestures, and voice. Today, a quieter but more radical shift is underway:
-    interfaces that bypass traditional input altogether and connect directly with the
-    human brain. Brain-computer interfaces (BCIs) promise new forms of interaction,
-    accessibility, and augmentation - but they also challenge the very foundations of
-    human-centered design.
-  </p>
+                        For decades, designers have focused on shaping interfaces for hands and eyes - screens,
+                        buttons, gestures, and voice. Today, a quieter but more radical shift is underway:
+                        interfaces that bypass traditional input altogether and connect directly with the
+                        human brain. Brain-computer interfaces (BCIs) promise new forms of interaction,
+                        accessibility, and augmentation - but they also challenge the very foundations of
+                        human-centered design.
+                    </p>
 
-  <p>
-    When the interface is the mind, what does it mean to design responsibly?
-  </p>
+                    <p>
+                        When the interface is the mind, what does it mean to design responsibly?
+                    </p>
 
-  <h3>What Is a Neural Interface?</h3>
-  <p>
-    A neural interface, often referred to as a brain-computer interface, is a system that
-    enables direct communication between the brain and a computer. By reading neural
-    signals (and in some cases writing signals back), BCIs can translate brain activity
-    into actions - moving a cursor, typing text, controlling a prosthetic, or even modulating
-    emotional states.
-  </p>
+                    <h3>What Is a Neural Interface?</h3>
+                    <p>
+                        A neural interface, often referred to as a brain-computer interface, is a system that
+                        enables direct communication between the brain and a computer. By reading neural
+                        signals (and in some cases writing signals back), BCIs can translate brain activity
+                        into actions - moving a cursor, typing text, controlling a prosthetic, or even modulating
+                        emotional states.
+                    </p>
 
-  <p>
-    While early BCI research was rooted in clinical and assistive contexts - helping people
-    with paralysis communicate or regain mobility - recent advances in machine learning,
-    sensor technology, and neuroscience have pushed BCIs into broader consumer and
-    experimental spaces. From non-invasive EEG headsets to implantable devices, the line
-    between user and system is beginning to blur.
-  </p>
+                    <p>
+                        While early BCI research was rooted in clinical and assistive contexts - helping people
+                        with paralysis communicate or regain mobility - recent advances in machine learning,
+                        sensor technology, and neuroscience have pushed BCIs into broader consumer and
+                        experimental spaces. From non-invasive EEG headsets to implantable devices, the line
+                        between user and system is beginning to blur.
+                    </p>
 
-  <p>
-    For designers, this isn’t just a new interface. It’s a new relationship between humans
-    and technology.
-  </p>
+                    <p>
+                        For designers, this isn’t just a new interface. It’s a new relationship between humans
+                        and technology.
+                    </p>
 
-  <h3>From User-Centered to Mind-Centered Design</h3>
-  <p>
-    Human-centered design has always emphasized empathy: understanding user needs,
-    limitations, motivations, and contexts. Neural interfaces complicate this approach.
-    The user is no longer simply interacting with a tool - they are co-adapting with a
-    system that learns from their neural patterns over time.
-  </p>
+                    <h3>From User-Centered to Mind-Centered Design</h3>
+                    <p>
+                        Human-centered design has always emphasized empathy: understanding user needs,
+                        limitations, motivations, and contexts. Neural interfaces complicate this approach.
+                        The user is no longer simply interacting with a tool - they are co-adapting with a
+                        system that learns from their neural patterns over time.
+                    </p>
 
-  <ul>
-    <li>Users may not have conscious awareness of what inputs they’re providing</li>
-    <li>Feedback loops can shape cognition, attention, and emotion</li>
-    <li>Errors may feel internal rather than external</li>
-  </ul>
+                    <ul>
+                        <li>Users may not have conscious awareness of what inputs they’re providing</li>
+                        <li>Feedback loops can shape cognition, attention, and emotion</li>
+                        <li>Errors may feel internal rather than external</li>
+                    </ul>
 
-  <p>
-    Designing for neural interfaces requires a shift from usability to mental integrity.
-    Designers must consider trust, agency, and psychological safety alongside efficiency
-    and accuracy.
-  </p>
+                    <p>
+                        Designing for neural interfaces requires a shift from usability to mental integrity.
+                        Designers must consider trust, agency, and psychological safety alongside efficiency
+                        and accuracy.
+                    </p>
 
-  <h3>Agency, Consent, and Control</h3>
-  <p>
-    One of the most critical challenges in BCI design is preserving user agency. When
-    systems interpret neural signals, intent becomes ambiguous. Consent cannot be a
-    one-time action - it must be continuous, legible, and reversible.
-  </p>
+                    <h3>Agency, Consent, and Control</h3>
+                    <p>
+                        One of the most critical challenges in BCI design is preserving user agency. When
+                        systems interpret neural signals, intent becomes ambiguous. Consent cannot be a
+                        one-time action - it must be continuous, legible, and reversible.
+                    </p>
 
-  <p>
-    Designers must ask: How does a user know when the system is listening? Can they pause
-    or disengage safely? What happens when the system misinterprets a thought?
-  </p>
+                    <p>
+                        Designers must ask: How does a user know when the system is listening? Can they pause
+                        or disengage safely? What happens when the system misinterprets a thought?
+                    </p>
 
-  <h3>Designing for Cognitive Load and Mental Wellbeing</h3>
-  <p>
-    Neural interfaces promise reduced friction, yet they risk increasing cognitive load
-    by demanding sustained focus or introducing intrusive feedback. If a system requires
-    users to think harder in a specific way, is it truly intuitive?
-  </p>
+                    <h3>Designing for Cognitive Load and Mental Wellbeing</h3>
+                    <p>
+                        Neural interfaces promise reduced friction, yet they risk increasing cognitive load
+                        by demanding sustained focus or introducing intrusive feedback. If a system requires
+                        users to think harder in a specific way, is it truly intuitive?
+                    </p>
 
-  <p>
-    Human-centered neural design must account for onboarding, clear mental models, rest
-    states, and boundaries that prevent mental fatigue or anxiety.
-  </p>
+                    <p>
+                        Human-centered neural design must account for onboarding, clear mental models, rest
+                        states, and boundaries that prevent mental fatigue or anxiety.
+                    </p>
 
-  <h3>Ethics Is Not a Layer - It’s the Interface</h3>
-  <p>
-    With BCIs, ethics cannot be deferred to policy alone. Design decisions determine what
-    data is collected, how it is framed, and how users perceive their own minds. Questions
-    of privacy, normalization, and power are embedded directly into the interface.
-  </p>
+                    <h3>Ethics Is Not a Layer - It’s the Interface</h3>
+                    <p>
+                        With BCIs, ethics cannot be deferred to policy alone. Design decisions determine what
+                        data is collected, how it is framed, and how users perceive their own minds. Questions
+                        of privacy, normalization, and power are embedded directly into the interface.
+                    </p>
 
-  <p>
-    Ethical neural design is not just about avoiding harm - it is about protecting human
-    dignity.
-  </p>
+                    <p>
+                        Ethical neural design is not just about avoiding harm - it is about protecting human
+                        dignity.
+                    </p>
 
-  <h3>Accessibility and the Promise of Empowerment</h3>
-  <p>
-    Neural interfaces hold extraordinary potential for accessibility, restoring
-    communication and autonomy for people with motor or speech impairments. Human-centered
-    design must stay grounded in these real outcomes rather than novelty or enhancement
-    alone.
-  </p>
+                    <h3>Accessibility and the Promise of Empowerment</h3>
+                    <p>
+                        Neural interfaces hold extraordinary potential for accessibility, restoring
+                        communication and autonomy for people with motor or speech impairments. Human-centered
+                        design must stay grounded in these real outcomes rather than novelty or enhancement
+                        alone.
+                    </p>
 
-  <h3>Designing with Humility</h3>
-  <p>
-    The human brain is not a predictable input device. Good neural design embraces
-    uncertainty, communicates limitations, and treats users as partners rather than data
-    sources.
-  </p>
+                    <h3>Designing with Humility</h3>
+                    <p>
+                        The human brain is not a predictable input device. Good neural design embraces
+                        uncertainty, communicates limitations, and treats users as partners rather than data
+                        sources.
+                    </p>
 
-  <h3>Looking Ahead</h3>
-  <p>
-    As brain-computer interfaces move into everyday life, designers will shape whether
-    these technologies feel empowering or invasive. Designing for the mind means designing
-    for vulnerability, identity, and trust.
-  </p>
+                    <h3>Looking Ahead</h3>
+                    <p>
+                        As brain-computer interfaces move into everyday life, designers will shape whether
+                        these technologies feel empowering or invasive. Designing for the mind means designing
+                        for vulnerability, identity, and trust.
+                    </p>
 
-  <p>
-    The interface is no longer just something we use. It is something we become entangled
-    with - and that demands care.
-  </p>
-<p class="footer-copyright">Uma Dhamija</p>
+                    <p>
+                        The interface is no longer just something we use. It is something we become entangled
+                        with - and that demands care.
+                    </p>
+                <p class="footer-copyright">Uma Dhamija</p>
                 </div>
             </article>
         </div>
@@ -470,32 +530,70 @@
             <article>
                 <h2>The Paradox at the Heart of Design</h2>
                 <div class="blog-meta">
-                    <span class="blog-date">January 2026</span>
+                    <span class="blog-date">Decemeber 2025</span>
                 </div>
                 <div class="blog-body">
                     <p>
 
-Paradox exists everywhere in life. Beauty often requires pain. Discipline, strangely, creates freedom. These ideas feel contradictory at first, yet they ring true through lived experience. Design, too, is built on paradox-not as a flaw, but as a fundamental condition of making things that actually work in the world.
-<br><br>
-At its core, design is about constraint. Designers do not create in infinite space; they work within limits of time, technology, budget, ethics, and human behavior. Yet it is precisely these constraints that enable creativity. Without limits, design becomes vague and indulgent. With them, clarity emerges. Much like discipline in life, constraint in design doesn’t suffocate possibility - it sharpens it.
-<br><br>
-Another paradox lies in simplicity. Good design often looks effortless, even obvious. But that apparent ease is the result of immense effort: research, iteration, debate, failure, and refinement. Complexity is easy to produce; simplicity is not. The designer’s work is often to absorb complexity so that the user doesn’t have to. In this way, designers take on cognitive burden so others may experience relief.
-<br><br>
-There is also a tension between control and surrender. Designers are trained to be intentional - to define flows, anticipate behaviors, and shape outcomes. Yet the most successful designs accept that users will reinterpret, misuse, and adapt what is given to them. Designing for humans means designing for unpredictability. Control creates structure; surrender creates resilience. Both are necessary.
-<br><br>
-User-centered design itself contains a paradox. To design well for others, designers must empathize deeply - yet not project themselves onto the user. They must care, but also remain detached enough to see patterns beyond individual stories. Too much distance leads to cold systems; too much closeness leads to biased decisions. Good design lives in the narrow space between empathy and objectivity.
-<br><br>
-Even innovation carries contradiction. Novelty is celebrated, yet familiarity is what makes products usable. Users crave new possibilities but rely on mental models built from past experiences. Designers must introduce change without disorientation - pushing forward while anchoring backward. Innovation, then, is less about disruption and more about careful translation.
-<br><br>
-Perhaps the deepest paradox in design is this: the best design often disappears. When something works seamlessly, it fades into the background of daily life. Designers labor for years so that users barely notice the result. Visibility is not the measure of success; impact is. Like good infrastructure or good care, good design is felt more than seen.
-<br><br>
-Paradox in design is not something to resolve. It is something to hold. Designing is the practice of balancing opposing forces - freedom and constraint, empathy and distance, novelty and familiarity - without collapsing into extremes. In embracing these tensions, designers don’t just make better products; they reflect a deeper truth about life itself: meaning is often found not in certainty, but in the space between opposites.
+                        Paradox exists everywhere in life. Beauty often requires pain. Discipline, strangely, creates freedom. These ideas feel contradictory at first, yet they ring true through lived experience. Design, too, is built on paradox-not as a flaw, but as a fundamental condition of making things that actually work in the world.
+                        <br><br>
+                        At its core, design is about constraint. Designers do not create in infinite space; they work within limits of time, technology, budget, ethics, and human behavior. Yet it is precisely these constraints that enable creativity. Without limits, design becomes vague and indulgent. With them, clarity emerges. Much like discipline in life, constraint in design doesn’t suffocate possibility - it sharpens it.
+                        <br><br>
+                        Another paradox lies in simplicity. Good design often looks effortless, even obvious. But that apparent ease is the result of immense effort: research, iteration, debate, failure, and refinement. Complexity is easy to produce; simplicity is not. The designer’s work is often to absorb complexity so that the user doesn’t have to. In this way, designers take on cognitive burden so others may experience relief.
+                        <br><br>
+                        There is also a tension between control and surrender. Designers are trained to be intentional - to define flows, anticipate behaviors, and shape outcomes. Yet the most successful designs accept that users will reinterpret, misuse, and adapt what is given to them. Designing for humans means designing for unpredictability. Control creates structure; surrender creates resilience. Both are necessary.
+                        <br><br>
+                        User-centered design itself contains a paradox. To design well for others, designers must empathize deeply - yet not project themselves onto the user. They must care, but also remain detached enough to see patterns beyond individual stories. Too much distance leads to cold systems; too much closeness leads to biased decisions. Good design lives in the narrow space between empathy and objectivity.
+                        <br><br>
+                        Even innovation carries contradiction. Novelty is celebrated, yet familiarity is what makes products usable. Users crave new possibilities but rely on mental models built from past experiences. Designers must introduce change without disorientation - pushing forward while anchoring backward. Innovation, then, is less about disruption and more about careful translation.
+                        <br><br>
+                        Perhaps the deepest paradox in design is this: the best design often disappears. When something works seamlessly, it fades into the background of daily life. Designers labor for years so that users barely notice the result. Visibility is not the measure of success; impact is. Like good infrastructure or good care, good design is felt more than seen.
+                        <br><br>
+                        Paradox in design is not something to resolve. It is something to hold. Designing is the practice of balancing opposing forces - freedom and constraint, empathy and distance, novelty and familiarity - without collapsing into extremes. In embracing these tensions, designers don’t just make better products; they reflect a deeper truth about life itself: meaning is often found not in certainty, but in the space between opposites.
                 <p class="footer-copyright">Uma Dhamija</p>
 
                 </div>
             </article>
         </div>
     </div>
+
+
+    <div class="modal" id="blog-2">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <article>
+                <h2>Is AI replacing human creativity?</h2>
+                <div class="blog-meta">
+                    <span class="blog-date">January 2026</span>
+                </div>
+                <div class="blog-body">
+                    <p>
+                    sakdjhf
+                    <p class="footer-copyright">Uma Dhamija</p>
+
+                </div>
+            </article>
+        </div>
+    </div>
+
+     <div class="modal" id="blog-2">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <article>
+                <h2>Is AI replacing human creativity?</h2>
+                <div class="blog-meta">
+                    <span class="blog-date">February 2026</span>
+                </div>
+                <div class="blog-body">
+                    <p>
+                    sakdjhf
+                    <p class="footer-copyright">Uma Dhamija</p>
+
+                </div>
+            </article>
+        </div>
+    </div>
+
 
     <script src="script.js"></script>
 </body>

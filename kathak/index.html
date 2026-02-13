@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project Name - Uma Dhamija">
+    <title>Project Name - Uma Dhamija</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lancelot&display=swap" rel="stylesheet">
+    <style>
+        .project-hero {
+            padding: 8rem 2rem 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .project-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            letter-spacing: -0.05rem;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            color: var(--accent-cool);
+            font-weight: 600;
+        }
+
+        .project-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .project-section {
+            margin-bottom: 4rem;
+        }
+
+        .project-section h2 {
+            font-size: 2rem;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cool);
+            font-family: var(--font-mono);
+        }
+
+        .project-section p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .project-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .project-section li {
+            color: var(--text-secondary);
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .project-section li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cool);
+        }
+
+        .project-image {
+            background-color: #0b0e17;
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-cool);
+            text-decoration: none;
+            margin: 2rem 0;
+            transition: gap 0.2s var(--transition-smooth);
+        }
+
+        .back-link:hover {
+            gap: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls" aria-label="Accessibility settings">
+        <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="control-btn" id="quiet-toggle" title="Quiet the storm" aria-label="Toggle animations">
+            <i class="fas fa-volume-mute"></i>
+        </button>
+        <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Toggle text size">
+            <i class="fas fa-text-height"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav role="navigation">
+        <div class="nav-container">
+            <div class="logo"><a href="../index.html#hero">Uma Dhamija</a></div>
+            <ul class="nav-links">
+                <li><a href="../index.html#hero">Home</a></li>
+                <li><a href="../index.html#work">Work</a></li>
+                <li><a href="../index.html#explorations">Explorations</a></li>
+                <li><a href="../index.html#writing">Writing</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Project Hero -->
+    <section class="project-hero">
+        <a href="../index.html#work" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>Back to Work
+        </a>
+        
+        <h1>Kathak Kala Kendra</h1>
+        <p style="font-size: 1.2rem; color: var(--text-secondary);">
+            Designing a webpage for a Kathak dance school based in India. This was made to surprise my teacher of 15 years.
+        </p>
+
+        <div class="project-meta">
+            <div class="meta-item">
+                <span class="meta-label">Role</span>
+                <span class="meta-value">Web Developer & Designer</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Timeline</span>
+                <span class="meta-value">2 months</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Team</span>
+                <span class="meta-value">Me</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Year</span>
+                <span class="meta-value">2026</span>
+            </div>
+        </div>
+
+        <div class="tools-used">
+            <span class="tool" data-tool="Figma"><i class="fab fa-figma"></i></span>
+            <span class="tool" data-tool="Notion"><i class="fas fa-database"></i></span>
+            <span class="tool" data-tool="Squarespace"><i class="fas fa-squarespace"></i></span>
+            <span class="tool" data-tool="Adobe"><i class="fas fa-image"></i></span>
+        </div>
+    </section>
+
+    <!-- Project Content -->
+    <div class="project-content">
+        <!-- Overview -->
+        <section class="project-section">
+            <h2>Overview</h2>
+            <p>
+                I noticed that my dance teacher didn't have a website to showcase his work and connect with potential students. I wanted to surprise him with a platform that would not only highlight his expertise in Kathak but also provide an easy way for people to learn about the dance form and get in touch with him for classes.
+            </p>
+            <p>
+                His studio is based in Dharamshala, India, and he has been teaching Kathak for over 30 years. The goal of the website was to create a visually appealing and user-friendly platform that would attract students from around the world and provide them with all the necessary information about his classes, workshops, and performances.
+            </p>
+        </section>
+
+        <!-- Hero Image -->
+        <img src="intro.svg" alt="Project overview" class="project-image">
+
+        <!-- Challenge -->
+        <section class="project-section">
+            <h2>The Challenge</h2>
+            <p>
+                <ul>
+                    <li>How can I create a website that effectively showcases my teacher's expertise in Kathak and attracts potential students, while also being easy to navigate and visually appealing?</li>
+                    <li>Since my teacher is not tech-savvy and internet is limited in Dharamshala, how can I develop this website so that it's accessible and responsive across all devices?</li>
+                    <li>As the only designer, what system could I create that is scalable and adaptable for future growth - something that even my teacher can easily update and manage?</li>
+                </ul>
+            </p>
+        </section>
+
+        <img src="wireframe.png" alt="Final solution" class="project-image">
+
+        <!-- Process -->
+        <section class="project-section" style="content: none">
+            <h2>Process</h2>
+            <p>
+                I followed a user-centered design process that involved the following steps:
+            </p>
+            <ul>
+                <li>Deciding the goals of this project for my teacher: <br> What would he like to showcase the most? Is this feasible within the constraints of his limited technical knowledge and internet access?</li>
+                <li>Ideation: <br>Creating a low fidelity prototype and wireframe that I can show some of his students for feedback.</li>
+                <li>Design & Develop: <br>Developing the website with Squarespace.</li>
+                <li>Implementation and handoff: <br>Host the website and share with my teacher to ensure he can manage it easily.</li>
+            </ul>
+        </section>
+
+        <!-- Solution Image -->
+        <img src="MW.png" alt="Final solution" class="project-image">
+
+        <!-- Impact -->
+        <section class="project-section">
+        <h2>Impact & Outcomes</h2>
+        <p>
+            After developing the website, I shared it with my teacher and his students. The feedback was overwhelmingly positive, with many expressing excitement about the new platform and its potential to attract more students to his classes. My teacher was particularly pleased with how the website showcased his expertise and made it easy for people to learn about Kathak and get in touch with him.
+        </p>
+       <a href="#" target="_blank" rel="noopener">Link to KathakKalaKendra.com</a> 
+
+        </section>
+
+         <img src="MW app.png" alt="Final solution" class="project-image">
+
+        <!-- Reflections -->
+        <section class="project-section">
+            <h2>Reflections</h2>
+            <p>
+                I was very happy to be able to create this website for my teacher and provide him with a platform to showcase his work. It was a rewarding experience to see how the website could help him connect with potential students and share his passion for Kathak with a wider audience. This project also taught me a lot about user-centered design and the importance of considering the needs and constraints of the end user when developing a solution.
+            </p>
+        </section>
+
+        <!-- Navigation -->
+        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+            <a href="../index.html#work" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to All Projects
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>Uma Dhamija</h3>
+            <div class="footer-links">
+                <a href="mailto:umaracheldhamija@gmail.com">Email</a>
+                <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener">Medium</a>
+            </div>
+            <p class="footer-copyright">© 2026 Uma Dhamija. Designed with intention.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
