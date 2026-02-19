@@ -1,312 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Project Name - Uma Dhamija">
-    <title>Project Name - Uma Dhamija</title>
-    <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lancelot&display=swap" rel="stylesheet">
-    <style>
-        .project-hero {
-            padding: 8rem 2rem 4rem;
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: center;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="OpenMined capstone — designing use cases for privacy-preserving AI systems.">
+  <title>OpenMined Capstone — Uma Dhamija</title>
 
-        .project-hero h1 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: 1rem;
-            font-family: var(--font-mono);
-            letter-spacing: -0.05rem;
-        }
-
-        .project-meta {
-            display: flex;
-            gap: 3rem;
-            justify-content: center;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .meta-item {
-            text-align: center;
-        }
-
-        .meta-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        .meta-value {
-            font-size: 1.1rem;
-            color: var(--accent-cool);
-            font-weight: 600;
-        }
-
-        .project-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .project-section {
-            margin-bottom: 4rem;
-        }
-
-        .project-section h2 {
-            font-size: 2rem;
-            text-align: left;
-            margin-bottom: 1.5rem;
-            color: var(--accent-cool);
-            font-family: var(--font-mono);
-        }
-
-        .project-section p {
-            color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-
-        .project-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .project-section li {
-            color: var(--text-secondary);
-            padding: 0.5rem 0 0.5rem 1.5rem;
-            position: relative;
-            line-height: 1.7;
-        }
-
-        .project-section li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--accent-cool);
-        }
-
-        .project-image {
-            background-color: #0b0e17;
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-            border-radius: 12px;
-            margin: 2rem 0;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--accent-cool);
-            text-decoration: none;
-            margin: 2rem 0;
-            transition: gap 0.2s var(--transition-smooth);
-        }
-
-        .back-link:hover {
-            gap: 0.75rem;
-        }
-    </style>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <!-- Accessibility Controls -->
-    <div class="accessibility-controls" aria-label="Accessibility settings">
-        <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
-            <i class="fas fa-moon"></i>
-        </button>
-        <button class="control-btn" id="quiet-toggle" title="Quiet the storm" aria-label="Toggle animations">
-            <i class="fas fa-volume-mute"></i>
-        </button>
-        <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Toggle text size">
-            <i class="fas fa-text-height"></i>
-        </button>
+
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="light-cursor-glow" aria-hidden="true"></div>
+
+  <div class="bg-layer" aria-hidden="true">
+    <div class="storm-base"></div>
+    <div class="storm-reveal" id="storm-reveal"></div>
+    <div class="aurora-layer">
+      <div class="aurora-orb aurora-orb-1"></div>
+      <div class="aurora-orb aurora-orb-2"></div>
+      <div class="aurora-orb aurora-orb-3"></div>
     </div>
+  </div>
 
-    <!-- Navigation -->
-    <nav role="navigation">
-        <div class="nav-container">
-            <div class="logo"><a href="../index.html#hero">Uma Dhamija</a></div>
-            <ul class="nav-links">
-                <li><a href="../index.html#hero">Home</a></li>
-                <li><a href="../index.html#work">Work</a></li>
-                <li><a href="../index.html#explorations">Explorations</a></li>
-                <li><a href="../index.html#writing">Writing</a></li>
-                <li><a href="../index.html#contact">Contact</a></li>
-            </ul>
+  <div class="accessibility-controls" aria-label="Accessibility settings">
+    <button class="control-btn" id="theme-toggle" aria-label="Switch to light mode">
+      <i class="fas fa-moon" aria-hidden="true"></i>
+    </button>
+    <button class="control-btn" id="quiet-toggle" aria-label="Pause animations">
+      <i class="fas fa-volume-xmark" aria-hidden="true"></i>
+    </button>
+    <button class="control-btn" id="text-size-toggle" aria-label="Increase text size">
+      <i class="fas fa-text-height" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-container">
+      <a href="../index.html#hero" class="nav-logo">Uma Dhamija</a>
+
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        aria-controls="nav-links"
+        aria-expanded="false"
+        aria-label="Open navigation menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-links" id="nav-links" role="list">
+        <li><a href="../index.html#hero">Home</a></li>
+        <li><a href="../index.html#work" aria-current="true">Work</a></li>
+        <li><a href="../index.html#explorations">Explorations</a></li>
+        <li><a href="../index.html#writing">Writing</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+
+  <main class="project-page">
+    <header class="project-page-hero">
+      <a href="../index.html#work" class="back-link">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        Back to Work
+      </a>
+
+      <h1 class="project-page-title">OpenMined &mdash; Capstone</h1>
+
+      <p class="project-page-subtitle">
+        Exploring practical product opportunities for privacy-preserving AI through user-centric,
+        ethics-first use-case design.
+      </p>
+
+      <div class="project-meta-row" data-reveal>
+        <div class="meta-item">
+          <span class="meta-label">Role</span>
+          <span class="meta-value">UX Designer</span>
         </div>
-    </nav>
+        <div class="meta-item">
+          <span class="meta-label">Timeline</span>
+          <span class="meta-value">Ongoing</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Team</span>
+          <span class="meta-value">4 Members</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Year</span>
+          <span class="meta-value">2026</span>
+        </div>
+      </div>
 
-    <!-- Project Hero -->
-    <section class="project-hero">
-        <a href="../index.html#work" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i>Back to Work
-        </a>
-        
-        <h1>OpenMined</h1>
-        <p style="font-size: 1.2rem; color: var(--text-secondary);">
-            OpenMined is a community focused on building tools for privacy-preserving machine learning.
+      <div class="tools-used" aria-label="Tools used">
+        <span class="tool" data-tool="Figma"><i class="fab fa-figma" aria-hidden="true"></i></span>
+        <span class="tool" data-tool="Notion"><i class="fa-brands fa-notion" aria-hidden="true"></i></span>
+        <span class="tool" data-tool="System Mapping"><i class="fas fa-project-diagram" aria-hidden="true"></i></span>
+        <span class="tool" data-tool="AI Ethics"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
+      </div>
+    </header>
+
+    <div class="project-body-content">
+      <section class="case-section" aria-labelledby="om-overview" data-reveal>
+        <h2 class="case-section-title" id="om-overview">Context</h2>
+        <p class="project-lead">
+          Privacy-preserving machine learning is technically promising but difficult for non-specialists
+          to adopt. This capstone focused on translating complex privacy concepts into real product use
+          cases that teams can evaluate and build.
         </p>
-
-        <div class="project-meta">
-            <div class="meta-item">
-                <span class="meta-label">Role</span>
-                <span class="meta-value">Lead Designer</span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label">Timeline</span>
-                <span class="meta-value">8 Months</span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label">Team</span>
-                <span class="meta-value">3 People</span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label">Year</span>
-                <span class="meta-value">2024</span>
-            </div>
+        <div class="project-highlights">
+          <div class="project-highlight-item">
+            <strong>Problem Space</strong>
+            Users need AI utility without exposing sensitive data.
+          </div>
+          <div class="project-highlight-item">
+            <strong>Core Question</strong>
+            Where does privacy-preserving AI create immediate, practical value?
+          </div>
+          <div class="project-highlight-item">
+            <strong>Deliverable</strong>
+            Prioritised use-case concepts with UX and ethics implications.
+          </div>
         </div>
+      </section>
 
-        <div class="tools-used">
-            <span class="tool" data-tool="Figma"><i class="fab fa-figma"></i></span>
-            <span class="tool" data-tool="Notion"><i class="fas fa-database"></i></span>
-            <span class="tool" data-tool="UserTesting"><i class="fa-solid fa-users"></i></span>
-            <span class="tool" data-tool="Atlassian"><i class="fa-brands fa-atlassian"></i></span>
-            <span class="tool" data-tool="Flutter"><i class="fas fa-mobile-screen"></i></span>
-            <span class="tool" data-tool="Adobe"><i class="fas fa-image"></i></span>
-        </div>
-    </section>
+      <img
+        src="logo.jpg"
+        alt="OpenMined project identity"
+        class="case-img"
+        loading="lazy"
+        data-reveal
+      >
 
-    <!-- Project Content -->
-    <div class="project-content">
-        <!-- Overview -->
-        <section class="project-section">
-            <h2>Overview</h2>
-            <p>
-                As the Lead Designer, I was given the task to conceptualize and design the mobile design for MeditationWise. I applied the double-diamond design methodology - involving user research methods to ultimately construct an interactive UI for a mobile experience.
-            </p>
-            <p>
-                Analysing the old website of MeditationWise, I found that it lacked a cohesive user experience and visual appeal. My goal was to create a mobile app that not only provided guided meditation sessions but also improved user engagement through a more intuitive and visually appealing interface.
-            </p>
-        </section>
+      <section class="case-section" aria-labelledby="om-challenge" data-reveal>
+        <h2 class="case-section-title" id="om-challenge">Challenge</h2>
+        <ul>
+          <li>Bridge the language gap between technical privacy methods and product decisions.</li>
+          <li>Identify use cases where trust and compliance are as important as model accuracy.</li>
+          <li>Design concepts that feel usable, transparent, and ethically defensible.</li>
+        </ul>
+        <p>
+          A recurring issue was that privacy is usually communicated as a legal checkbox, not a user
+          experience. The project reframed privacy as a product quality: legible controls, clear data
+          boundaries, and predictable behavior under high-stakes conditions.
+        </p>
+      </section>
 
-        <!-- Hero Image -->
-        <img src="intro.svg" alt="Project overview" class="project-image">
+      <img
+        src="../images/friends.png"
+        alt="Conceptual exploration visual representing identity and privacy boundaries"
+        class="case-img"
+        loading="lazy"
+        data-reveal
+      >
 
-        <!-- Challenge -->
-        <section class="project-section">
-            <h2>The Challenge</h2>
-            <p>
-                <ul>
-                    <li>There are numerous meditation apps available - what differentiates MeditationWise?</li>
-                    <li>If our goal is to encourage people to meditate more and use their phones less, how does a mobile app fit into that vision?</li>
-                    <li>As the only designer, what system could I create that is scalable and adaptable for future growth?</li>
-                    <li>With so many UI patterns in the wellness space, how do I create a unique and memorable experience?</li>
-                </ul>
-                <br><br>
-                Current meditation tools provide generic content and only focus on only type of meditation - Mindfulness. And while mindfulness is a great technique, it overlooks users’ cultural and spiritual preferences. MeditationWise bridges this gap by connecting users with authentic practices from diverse traditions, led by genuine experts.
-                For the interface, I aimed to create a calming and intuitive experience that encourages regular practice without overwhelming the user - using soft colors, simple navigation, and personalized content.
-            </p>
-        </section>
+      <section class="case-section" aria-labelledby="om-solution" data-reveal>
+        <h2 class="case-section-title" id="om-solution">Approach &amp; Solution</h2>
+        <ul>
+          <li>Mapped high-risk domains where data sensitivity and trust are mission-critical.</li>
+          <li>Evaluated candidate scenarios across desirability, feasibility, and ethical risk.</li>
+          <li>Drafted UX concept flows showing how privacy guarantees are made understandable in-product.</li>
+        </ul>
+        <p>
+          The final direction emphasized explainable consent states, explicit sharing boundaries, and
+          low-friction decision points for users. Instead of treating privacy as invisible infrastructure,
+          the concepts made protection and control visible where it matters most.
+        </p>
+      </section>
 
-        <img src="wireframe.png" alt="Final solution" class="project-image">
+      <section class="case-section" aria-labelledby="om-outcomes" data-reveal>
+        <h2 class="case-section-title" id="om-outcomes">Outcomes</h2>
+        <ul>
+          <li>Produced a clearer framework for prioritising privacy-preserving AI use cases.</li>
+          <li>Aligned technical possibilities with user-facing product opportunities.</li>
+          <li>Strengthened my ability to design at the intersection of AI ethics and usability.</li>
+        </ul>
+      </section>
 
-        <!-- Process -->
-        <section class="project-section" style="content: none">
-            <h2>Process</h2>
-            <p>
-                Using the double-diamond design methodology, I worked through the phases of Discover, Define, Develop, and Deliver to create a user-centric mobile app.
-            </p>
-            <ul>
-                <li>User research and discovery: <br> Initial user interviews and surveys to understand product sentiment and usability analysis</li>
-                <li>Ideation and concept development: <br> User personas and journey mapping,  wireframing and low-fidelity prototype on Figma</li>
-                <li>Prototyping and testing: <br>Usability test and interviews with the same users for feedback and iteration</li>
-                <li>Design iteration based on feedback: <br>High fidelity prototyping and visual design refinement, design system implementation</li>
-                <li>Implementation and handoff: <br>Handoff to development team with design system and documentation</li>
-            </ul>
-        </section>
-
-        <!-- Process Image -->
-        <img src="design-draft.png" alt="Design process" class="project-image">
-
-
-        <!-- Solution -->
-        <section class="project-section">
-            <h2>Solution</h2>
-            <p>
-                My research revealed that Meditation Wise aims to provide its users with authentic, time-tested techniques from all traditions around the world with descriptions of the technique's history and benefits. Its mission is to provide all the necessary tools in order to allow its users to develop a meditation practice using their chosen technique, not just explore many options.
-                <br><br>
-                Both attitudinal and behavioral research methods—including user interviews, contextual inquiries, surveys, and usability testing with 9+ participants via Loop11—revealed that poor navigation and lack of relatability were the primary pain points of the existing website. 
-                <br><br>In response, the design prioritizes an immediately accessible search feature, reduced choice complexity (guided by Hick’s Law), and clear surfacing of key meditation techniques by need, level, and tradition, alongside features like favorites, scheduling, journaling, and progress tracking to support consistency and habit formation. 
-                <br><br>Content models and end-to-end user flows were developed in Miro, followed by paper sketches, wireframes, and multiple iterations leading to a low-fidelity, interactive prototype built in Adobe and Figma; while the design is ready to showcase, further usability and accessibility testing is planned.
-            </p>
-        </section>
-
-        <!-- Solution Image -->
-        <img src="MW.png" alt="Final solution" class="project-image">
-        <!-- Impact -->
-        <section class="project-section">
- <h2>Impact & Outcomes</h2>
-<p>
-    The redesign clarified key usability issues and demonstrated how a more structured, habit-focused experience could better support users in developing a consistent meditation practice.
-</p>
-<ul>
-    <li>Identified core usability failures in navigation and content discoverability through usability testing with 9+ participants</li>
-    <li>Users responded positively to simplified navigation, clear categorization by need, level, and tradition, and the addition of habit-supporting features such as scheduling and favorites</li>
-    <li>Established a clear product direction for Meditation Wise, aligning user needs with long-term engagement goals rather than one-off meditation sessions</li>
-    <li>Learned the importance of reducing cognitive load in spiritually oriented products and designing consistency across navigation and content to support habit formation</li>
-</ul>
-<br><br>
-        
-<a href="https://www.figma.com/proto/xyz123/MeditationWise-Prototype?node-id=1%3A2&scaling=scale-down&page-id=0%3A1" target="_blank" rel="noopener">Link to Figma Prototype</a> 
-
-        </section>
-
-         <img src="MW app.png" alt="Final solution" class="project-image">
-
-        <!-- Reflections
-        <section class="project-section">
-            <h2>Reflections</h2>
-            <p>
-                I wanted to develop a platform offering guided practices rooted in diverse spiritual traditions, led by authentic experts.
-
-            What did you learn? What would you do differently? 
-                This section shows growth and self-awareness.
-            </p>
-        </section> -->
-
-        <!-- Navigation -->
-        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
-            <a href="../index.html#work" class="back-link">
-                <i class="fas fa-arrow-left"></i> Back to All Projects
-            </a>
-        </div>
+      <div class="case-nav-footer" data-reveal>
+        <a href="../index.html#work" class="back-link">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          Back to All Projects
+        </a>
+        <a href="../northwestern/index.html" class="back-link next-link">
+          Next Project
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
     </div>
+  </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <h3>Uma Dhamija</h3>
-            <div class="footer-links">
-                <a href="mailto:umaracheldhamija@gmail.com">Email</a>
-                <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener">LinkedIn</a>
-                <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener">Medium</a>
-            </div>
-            <p class="footer-copyright">© 2026 Uma Dhamija. Designed with intention.</p>
-        </div>
-    </footer>
 
-    <script src="script.js"></script>
+  <footer>
+    <div class="footer-content">
+      <p class="footer-name">Uma Dhamija</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="mailto:umaracheldhamija@gmail.com">Email</a>
+        <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener noreferrer">Medium</a>
+      </nav>
+      <p class="footer-copy">&copy; 2026 Uma Dhamija. Designed with intention.</p>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
 </body>
 </html>
