@@ -37,7 +37,8 @@ const state = {
   // System preference — checked once at load
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   // User preferences (populated by loadPreferences())
-  theme:     'dark',
+  theme:     'light',
+  themeExplicit: false,
   quietMode: false,
   largeText: false,
 };
@@ -72,6 +73,26 @@ const dom = {
   projectImages:    [...document.querySelectorAll('.project-page .case-img')],
   sections:         [...document.querySelectorAll('section[id]')],
 };
+
+function applyTheme(theme) {
+  const nextTheme = theme === 'dark' ? 'dark' : 'light';
+  const isLight = nextTheme === 'light';
+
+  state.theme = nextTheme;
+  dom.html.setAttribute('data-theme', nextTheme);
+
+  if (!dom.themeToggle) return;
+
+  dom.themeToggle.classList.toggle('active', !isLight);
+
+  const icon = dom.themeToggle.querySelector('i');
+  if (icon) icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+
+  dom.themeToggle.setAttribute(
+    'aria-label',
+    isLight ? 'Switch to dark mode' : 'Switch to light mode'
+  );
+}
 
 
 /* ============================================
@@ -306,20 +327,8 @@ function setupAccessibilityControls() {
     dom.themeToggle.addEventListener('click', () => {
       const currentlyLight = dom.html.getAttribute('data-theme') === 'light';
       const newTheme = currentlyLight ? 'dark' : 'light';
-
-      dom.html.setAttribute('data-theme', newTheme);
-      state.theme = newTheme;
-      dom.themeToggle.classList.toggle('active', !currentlyLight);
-
-      // Update icon
-      const icon = dom.themeToggle.querySelector('i');
-      if (icon) icon.className = currentlyLight ? 'fas fa-moon' : 'fas fa-sun';
-
-      // Update aria-label for screen readers
-      dom.themeToggle.setAttribute(
-        'aria-label',
-        currentlyLight ? 'Switch to light mode' : 'Switch to dark mode'
-      );
+      state.themeExplicit = true;
+      applyTheme(newTheme);
 
       savePreferences();
     });
@@ -396,15 +405,26 @@ const PREF_KEY = 'uma-dhamija-prefs-v1';
 
 function savePreferences() {
   try {
-    localStorage.setItem(PREF_KEY, JSON.stringify({
-      theme:     state.theme,
+    const prefs = {
       quietMode: state.quietMode,
       largeText: state.largeText,
-    }));
+    };
+
+    // Persist theme only after an explicit user choice.
+    if (state.themeExplicit) {
+      prefs.theme = state.theme;
+      prefs.themeExplicit = true;
+    }
+
+    localStorage.setItem(PREF_KEY, JSON.stringify(prefs));
   } catch (_) { /* Fail silently */ }
 }
 
 function loadPreferences() {
+  // Hard default: light mode unless the user explicitly chose otherwise.
+  applyTheme('light');
+  state.themeExplicit = false;
+
   // System reduced-motion takes priority over any saved preference
   if (state.reducedMotion) {
     state.quietMode = true;
@@ -422,20 +442,13 @@ function loadPreferences() {
     const prefs = JSON.parse(raw);
 
     // Apply theme
-    if (prefs.theme && ['light', 'dark'].includes(prefs.theme)) {
-      state.theme = prefs.theme;
-      dom.html.setAttribute('data-theme', prefs.theme);
-
-      if (dom.themeToggle) {
-        const isLight = prefs.theme === 'light';
-        dom.themeToggle.classList.toggle('active', isLight);
-        const icon = dom.themeToggle.querySelector('i');
-        if (icon) icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        dom.themeToggle.setAttribute(
-          'aria-label',
-          isLight ? 'Switch to dark mode' : 'Switch to light mode'
-        );
-      }
+    if (
+      prefs.themeExplicit === true &&
+      prefs.theme &&
+      ['light', 'dark'].includes(prefs.theme)
+    ) {
+      state.themeExplicit = true;
+      applyTheme(prefs.theme);
     }
 
     // Apply quiet mode (don't override if reducedMotion already set it)
@@ -489,6 +502,35 @@ function setupSmoothScroll() {
   });
 }
 
+function setupContactSubmissionFlow() {
+  const contactForm = document.querySelector('.contact-form');
+
+  if (contactForm) {
+    let nextInput = contactForm.querySelector('input[name="_next"]');
+    if (!nextInput) {
+      nextInput = document.createElement('input');
+      nextInput.type = 'hidden';
+      nextInput.name = '_next';
+      contactForm.appendChild(nextInput);
+    }
+
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set('contact', 'sent');
+    nextUrl.hash = 'hero';
+    nextInput.value = nextUrl.toString();
+  }
+
+  const currentUrl = new URL(window.location.href);
+  if (currentUrl.searchParams.get('contact') !== 'sent') return;
+
+  // Clean URL first so refresh doesn't re-open the meme popup.
+  currentUrl.searchParams.delete('contact');
+  const cleanedUrl = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+  history.replaceState(null, '', cleanedUrl);
+
+  openModal('contact-success-modal', null);
+}
+
 
 /* ============================================
    11. MODALS (Blog posts)
@@ -537,16 +579,56 @@ function setupModals() {
     });
   });
 
-  // Close on Escape key
+  // Close on Escape key and trap Tab focus inside active modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       document.querySelectorAll('.modal.active').forEach(closeModal);
+      return;
+    }
+
+    if (e.key !== 'Tab' || !_activeModal) return;
+
+    const focusable = getFocusableElements(_activeModal);
+    if (!focusable.length) {
+      e.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
     }
   });
 }
 
 // Store the element that opened the modal to restore focus on close
 let _modalTrigger = null;
+let _activeModal = null;
+
+function getFocusableElements(container) {
+  const selector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([type="hidden"]):not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(', ');
+
+  return [...container.querySelectorAll(selector)].filter((el) => {
+    if (el.getAttribute('aria-hidden') === 'true') return false;
+    return el.offsetParent !== null || el === document.activeElement;
+  });
+}
 
 function openModal(id, triggerEl) {
   const modal = document.getElementById(id);
@@ -557,17 +639,20 @@ function openModal(id, triggerEl) {
   modal.classList.add('active');
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('role', 'dialog');
+  modal.removeAttribute('aria-hidden');
   dom.body.style.overflow = 'hidden';
+  _activeModal = modal;
 
   // Move focus into modal after animation frame
   requestAnimationFrame(() => {
-    const closeBtn = modal.querySelector('.modal-close');
-    if (closeBtn) closeBtn.focus();
+    const focusable = getFocusableElements(modal);
+    if (focusable.length) focusable[0].focus();
   });
 }
 
 function closeModal(modal) {
   modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
   dom.body.style.overflow = '';
 
   if (modal.id === 'exploration-image-modal' && dom.explorationModalImage) {
@@ -591,6 +676,8 @@ function closeModal(modal) {
     _modalTrigger.focus();
     _modalTrigger = null;
   }
+
+  _activeModal = document.querySelector('.modal.active');
 }
 
 function setupExplorationGallery() {
@@ -621,6 +708,9 @@ function setupProjectImageLightbox() {
     modal.className = 'modal modal-image';
     modal.id = 'project-image-modal';
     modal.setAttribute('aria-labelledby', 'project-image-title');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-hidden', 'true');
     modal.innerHTML = `
       <div class="modal-content exploration-modal-content" role="document">
         <button class="modal-close" aria-label="Close image">&times;</button>
@@ -720,6 +810,7 @@ function init() {
   setupSmoothScroll();
   setupProjectImageLightbox();
   setupModals();
+  setupContactSubmissionFlow();
   setupExplorationGallery();
   setupScrollTopButton();
   setupLiquidMetal(); // Pointer-aware glow on buttons, socials, and controls

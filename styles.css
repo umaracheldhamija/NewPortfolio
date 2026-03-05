@@ -13,14 +13,15 @@
    8. Hero Section
    9. Section Base + Scroll Reveal
    10. Work / Project Cards
-   11. Explorations
-   12. Writing / Blog Cards
-   13. Contact
-   14. Modals
-   15. Footer
-   16. Case Study / Project Pages
-   17. Responsive
-   18. Reduced Motion + Quiet Mode
+   11. Education
+   12. Explorations
+   13. Writing / Blog Cards
+   14. Contact
+   15. Modals
+   16. Footer
+   17. Case Study / Project Pages
+   18. Responsive
+   19. Reduced Motion + Quiet Mode
    ============================================ */
 
 
@@ -96,7 +97,7 @@
      --text-muted    #6d7498 → 3.1:1   ✓ AA (large text only — use carefully for body) */
   --text-primary:   #dde0f5;
   --text-secondary: #a8afdd;
-  --text-muted:     #6d7498;
+  --text-muted:     #747ca3;
   --text-on-accent: #ffffff;
 
   /* Accents */
@@ -145,12 +146,12 @@
   /* Text — warm near-black */
   --text-primary:   #1c1814;
   --text-secondary: #4a3f33;
-  --text-muted:     #8a7f73;
+  --text-muted:     #7a7065;
   --text-on-accent: #ffffff;
 
   /* Accents — warm indigo (readable on ivory) */
   --accent-primary:   #5046e5;
-  --accent-secondary: #8b5cf6;
+  --accent-secondary: #744ef0;
   --accent-subtle:    rgba(80, 70, 229, 0.07);
   --accent-glow:      rgba(80, 70, 229, 0.11);
   --accent-glow-lg:   rgba(80, 70, 229, 0.2);
@@ -209,6 +210,28 @@ body {
   overflow-x: hidden;
   /* Only transition color & bg — avoids all-property thrash */
   transition: background-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: 2000;
+  padding: 0.7rem 1rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--glass-border-hover);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transform: translateY(-140%);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 /* Fix: 100% not 100vw — prevents horizontal overflow
@@ -1291,7 +1314,96 @@ body:not([data-theme="light"]) .cursor-dot {
 
 
 /* ============================================
-   11. EXPLORATIONS
+   11. EDUCATION
+   ============================================ */
+
+#education {
+  padding-top: var(--sp-16);
+  padding-bottom: var(--sp-16);
+}
+
+#education .section-header {
+  margin-bottom: var(--sp-8);
+}
+
+#education .section-intro {
+  max-width: 520px;
+  font-size: var(--text-sm);
+}
+
+.education-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-4);
+}
+
+.education-panel::before {
+  content: none;
+}
+
+.education-item {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  gap: var(--sp-4);
+  align-items: center;
+  padding: var(--sp-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.education-logo-wrap {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border-hover);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--accent-subtle), 0 0 18px var(--accent-glow);
+}
+
+.education-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.education-body h3 {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.32;
+  margin-bottom: var(--sp-1);
+}
+
+.education-subline {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-1);
+  font-style: italic;
+}
+
+.education-school {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-1);
+}
+
+.education-meta {
+  color: var(--accent-primary);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+
+/* ============================================
+   12. EXPLORATIONS
    ============================================ */
 
 .explorations-grid {
@@ -1336,7 +1448,7 @@ body:not([data-theme="light"]) .cursor-dot {
 
 
 /* ============================================
-   12. WRITING / BLOG CARDS
+   13. WRITING / BLOG CARDS
    ============================================ */
 
 .writing-grid {
@@ -1417,7 +1529,7 @@ body:not([data-theme="light"]) .cursor-dot {
 
 
 /* ============================================
-   13. CONTACT
+   14. CONTACT
    ============================================ */
 
 .contact-layout {
@@ -1522,7 +1634,7 @@ body:not([data-theme="light"]) .cursor-dot {
 
 
 /* ============================================
-   14. BLOG MODALS
+   15. BLOG MODALS
    ============================================ */
 
 .modal {
@@ -1655,9 +1767,53 @@ body:not([data-theme="light"]) .cursor-dot {
   display: none;
 }
 
+.contact-success-modal-content {
+  text-align: center;
+}
+
+.success-meme {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(160deg, var(--bg-card), var(--bg-secondary));
+  margin: var(--sp-4) 0 var(--sp-6);
+}
+
+.success-meme-top,
+.success-meme-bottom {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .success-meme-top,
+[data-theme="light"] .success-meme-bottom {
+  background: rgba(80, 70, 229, 0.1);
+}
+
+.success-meme img {
+  width: 100%;
+  max-height: min(44vh, 380px);
+  object-fit: cover;
+}
+
+.success-meme-caption {
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-6);
+}
+
+.success-meme-cta {
+  margin: 0 auto;
+}
+
 
 /* ============================================
-   15. FOOTER
+   16. FOOTER
    ============================================ */
 
 footer {
@@ -1758,7 +1914,7 @@ footer {
 
 
 /* ============================================
-   16. CASE STUDY / PROJECT PAGES
+   17. CASE STUDY / PROJECT PAGES
    ============================================ */
 
 .project-page {
@@ -2034,7 +2190,7 @@ footer {
 
 
 /* ============================================
-   17. RESPONSIVE
+   18. RESPONSIVE
    ============================================ */
 
 @media (max-width: 1100px) {
@@ -2102,6 +2258,34 @@ footer {
     grid-template-columns: 1fr;
   }
 
+  #education {
+    padding-top: var(--sp-12);
+    padding-bottom: var(--sp-12);
+  }
+
+  #education .section-header {
+    margin-bottom: var(--sp-6);
+  }
+
+  .education-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .education-item {
+    grid-template-columns: 2.75rem 1fr;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .education-logo-wrap {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .education-body h3 {
+    font-size: 1rem;
+  }
+
   .hero-content {
     padding: var(--sp-8) var(--sp-6);
   }
@@ -2160,11 +2344,21 @@ footer {
   .footer-links { gap: var(--sp-4); }
 
   .social-links { gap: var(--sp-2); }
+
+  .education-item {
+    grid-template-columns: 2.5rem 1fr;
+    padding: var(--sp-3);
+  }
+
+  .education-logo-wrap {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 
 /* ============================================
-   18. REDUCED MOTION + QUIET MODE
+   19. REDUCED MOTION + QUIET MODE
 
    prefers-reduced-motion: system preference.
    quiet-mode: user-toggled via button.

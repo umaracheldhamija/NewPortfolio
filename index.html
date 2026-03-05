@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Uma Dhamija — UX Designer specialising in human-centred design and brain-computer interfaces.">
-  <meta name="theme-color" content="#0b0e17">
+  <meta name="theme-color" content="#fdf9f3">
   <meta property="og:title" content="Uma Dhamija — Experience Designer">
   <meta property="og:description" content="UX Advocate • Interface Designer • NeuroTech Enthusiast • Kathak Dancer">
   <meta property="og:type" content="website">
@@ -18,6 +18,7 @@
 </head>
 
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <!-- ============================================
        BACKGROUND SYSTEM
@@ -43,7 +44,7 @@
        ============================================ -->
 
   <div class="accessibility-controls" aria-label="Accessibility settings">
-    <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Switch to light mode">
+    <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Switch to dark mode">
       <i class="fas fa-moon" aria-hidden="true"></i>
     </button>
     <button class="control-btn" id="quiet-toggle" title="Pause animations" aria-label="Pause animations">
@@ -76,6 +77,7 @@
       <ul class="nav-links" id="nav-links" role="list">
         <li><a href="#hero" aria-current="true">Home</a></li>
         <li><a href="#work">Work</a></li>
+        <li><a href="#education">Education</a></li>
         <li><a href="#explorations">Explorations</a></li>
         <li><a href="#writing">Writing</a></li>
         <li><a href="#contact">Contact</a></li>
@@ -84,6 +86,7 @@
   </nav>
 
 
+  <main id="main-content">
   <!-- ============================================
        HERO SECTION
        ============================================ -->
@@ -253,6 +256,72 @@
         </div>
       </a>
 
+    </div>
+  </section>
+
+
+  <!-- ============================================
+       EDUCATION SECTION
+       ============================================ -->
+
+  <section class="section" id="education" aria-labelledby="education-title">
+    <div class="section-header" data-reveal>
+      <h2 class="section-title" id="education-title">Education</h2>
+      <p class="section-intro">But, of course, it doesn't end here</p>
+    </div>
+
+    <div class="education-panel" data-reveal-stagger>
+      <article class="education-item">
+        <div class="education-logo-wrap">
+          <img
+            class="education-logo"
+            src="https://www.cmu.edu/brand/brand-guidelines/images/seal-4c-600x600-min.jpg"
+            alt="Carnegie Mellon University seal"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        <div class="education-body">
+          <h3>Master of Human-Computer Interaction</h3>
+          <p class="education-school">Carnegie Mellon University</p>
+          <p class="education-meta">Sep 2025 &ndash; Aug 2026 &middot; Pittsburgh</p>
+        </div>
+      </article>
+
+      <article class="education-item">
+        <div class="education-logo-wrap">
+          <img
+            class="education-logo"
+            src="https://upload.wikimedia.org/wikipedia/commons/5/56/Northwestern_University_seal.svg"
+            alt="Northwestern University seal"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        <div class="education-body">
+          <h3>Master in Information Design &amp; Strategy</h3>
+          <p class="education-school">Northwestern University</p>
+          <p class="education-meta">Sep 2025 &ndash; Aug 2025 &middot; Remote</p>
+        </div>
+      </article>
+
+      <article class="education-item">
+        <div class="education-logo-wrap">
+          <img
+            class="education-logo"
+            src="https://upload.wikimedia.org/wikipedia/commons/1/16/New_York_University_Seal.svg"
+            alt="New York University seal"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        <div class="education-body">
+          <h3>Bachelor of Science in Integrated Digital Media</h3>
+          <p class="education-subline">Minor in Psychology</p>
+          <p class="education-school">New York University</p>
+          <p class="education-meta">Sep 2018 &ndash; Jul 2021 &middot; New York</p>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -486,6 +555,7 @@
       >
         <input type="hidden" name="_subject" value="New portfolio contact">
         <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="">
         <div class="form-group">
           <label for="name" class="form-label">Name</label>
           <input type="text" id="name" name="name" class="form-input" placeholder="Your name" autocomplete="name" required>
@@ -505,6 +575,7 @@
       </form>
     </div>
   </section>
+  </main>
 
 
   <!-- ============================================
@@ -525,7 +596,7 @@
           <i class="fas fa-download" aria-hidden="true"></i>
         </a>
       </div>
-      <p class="footer-copy">&copy; 2026 Uma Dhamija. Designed with intention.</p>
+      <p class="footer-copy">&copy; 2026 Uma Dhamija.</p>
     </div>
   </footer>
 
@@ -538,12 +609,29 @@
        EXPLORATION IMAGE MODAL
        ============================================ -->
 
-  <div class="modal modal-image" id="exploration-image-modal" aria-labelledby="exploration-image-title">
+  <div class="modal modal-image" id="exploration-image-modal" aria-labelledby="exploration-image-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content exploration-modal-content" role="document">
       <button class="modal-close" aria-label="Close image">&times;</button>
       <h2 id="exploration-image-title">Exploration</h2>
       <img id="exploration-modal-image" class="exploration-modal-image" src="" alt="">
       <p id="exploration-modal-caption" class="exploration-modal-caption"></p>
+    </div>
+  </div>
+
+  <div class="modal" id="contact-success-modal" aria-labelledby="contact-success-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content contact-success-modal-content" role="document">
+      <button class="modal-close" aria-label="Close success message">&times;</button>
+      <h2 id="contact-success-title">Message Sent</h2>
+      <div class="success-meme" role="img" aria-label="Meme: You hit send and it actually worked.">
+        <p class="success-meme-top">YOU HIT SEND</p>
+        <img src="images/Headshot.jpeg" alt="" aria-hidden="true">
+        <p class="success-meme-bottom">AND IT ACTUALLY WORKED</p>
+      </div>
+      <p class="success-meme-caption">Thanks for reaching out. I will get back to you soon.</p>
+      <a href="#hero" class="btn btn-primary success-meme-cta">
+        <span>Back Home</span>
+        <i class="fas fa-house" aria-hidden="true"></i>
+      </a>
     </div>
   </div>
 
@@ -558,7 +646,7 @@
        ============================================ -->
 
   <!-- blog-1: The Neural Interface -->
-  <div class="modal" id="blog-1" aria-labelledby="blog-1-title">
+  <div class="modal" id="blog-1" aria-labelledby="blog-1-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content" role="document">
       <button class="modal-close" aria-label="Close post">&times;</button>
       <h2 id="blog-1-title">The Neural Interface: Designing for the Mind</h2>
@@ -585,7 +673,7 @@
   </div>
 
   <!-- blog-2: The Paradox at the Heart of Design -->
-  <div class="modal" id="blog-2" aria-labelledby="blog-2-title">
+  <div class="modal" id="blog-2" aria-labelledby="blog-2-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content" role="document">
       <button class="modal-close" aria-label="Close post">&times;</button>
       <h2 id="blog-2-title">The Paradox at the Heart of Design</h2>
@@ -607,7 +695,7 @@
   </div>
 
   <!-- blog-3: Is AI replacing human creativity? -->
-  <div class="modal" id="blog-3" aria-labelledby="blog-3-title">
+  <div class="modal" id="blog-3" aria-labelledby="blog-3-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content" role="document">
       <button class="modal-close" aria-label="Close post">&times;</button>
       <h2 id="blog-3-title">Is AI replacing human creativity?</h2>
@@ -624,7 +712,7 @@
   </div>
 
   <!-- blog-4: Why Art Goes Underappreciated -->
-  <div class="modal" id="blog-4" aria-labelledby="blog-4-title">
+  <div class="modal" id="blog-4" aria-labelledby="blog-4-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content" role="document">
       <button class="modal-close" aria-label="Close post">&times;</button>
       <h2 id="blog-4-title">Why Art Goes Underappreciated</h2>
