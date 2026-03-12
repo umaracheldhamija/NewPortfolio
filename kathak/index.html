@@ -95,7 +95,7 @@
         }
 
         .project-image {
-            background-color: #0b0e17;
+            background-color: var(--bg-secondary);
             height: 100%;
             width: 100%;
             object-fit: cover;
@@ -121,13 +121,26 @@
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="light-cursor-glow" aria-hidden="true"></div>
+
+    <div class="bg-layer" aria-hidden="true">
+        <div class="storm-base"></div>
+        <div class="storm-reveal" id="storm-reveal"></div>
+        <div class="aurora-layer">
+            <div class="aurora-orb aurora-orb-1"></div>
+            <div class="aurora-orb aurora-orb-2"></div>
+            <div class="aurora-orb aurora-orb-3"></div>
+        </div>
+    </div>
     <!-- Accessibility Controls -->
     <div class="accessibility-controls" aria-label="Accessibility settings">
         <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Switch to dark mode">
             <i class="fas fa-moon" aria-hidden="true"></i>
         </button>
-        <button class="control-btn" id="quiet-toggle" title="Quiet the storm" aria-label="Pause animations">
-            <i class="fas fa-volume-mute" aria-hidden="true"></i>
+        <button class="control-btn" id="quiet-toggle" title="Pause animations" aria-label="Pause animations">
+            <i class="fa-solid fa-cloud-bolt" aria-hidden="true"></i>
         </button>
         <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Increase text size">
             <i class="fas fa-text-height" aria-hidden="true"></i>

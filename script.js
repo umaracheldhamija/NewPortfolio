@@ -12,12 +12,14 @@
    7.  Navigation — Active Link Tracking
    8.  Scroll Reveal (IntersectionObserver)
    9.  Accessibility Controls
-   10. Preferences (localStorage)
-   11. Smooth Scroll
-   12. Modals
-   13. Exploration Image Modal
-   14. Scroll-to-Top Button
-   15. Init
+   10. Button Glow Tracking
+   11. Project Tilt
+   12. Preferences (localStorage)
+   13. Smooth Scroll
+   14. Modals
+   15. Exploration Image Modal
+   16. Scroll-to-Top Button
+   17. Init
    ============================================ */
 
 'use strict';
@@ -73,6 +75,17 @@ const dom = {
   projectImages:    [...document.querySelectorAll('.project-page .case-img')],
   sections:         [...document.querySelectorAll('section[id]')],
 };
+
+// Tilt reset registry (used when quiet-mode toggles on)
+const tiltResetters = new Set();
+
+function registerTiltResetter(fn) {
+  if (typeof fn === 'function') tiltResetters.add(fn);
+}
+
+function resetTiltCards() {
+  tiltResetters.forEach((reset) => reset());
+}
 
 function applyTheme(theme) {
   const nextTheme = theme === 'dark' ? 'dark' : 'light';
@@ -344,6 +357,7 @@ function setupAccessibilityControls() {
         'aria-label',
         state.quietMode ? 'Resume animations' : 'Pause animations'
       );
+      resetTiltCards();
       savePreferences();
     });
   }
@@ -395,7 +409,84 @@ function setupLiquidMetal() {
 
 
 /* ============================================
-   11. PREFERENCES
+   11. PROJECT TILT (Cards + Panels)
+   Subtle parallax tilt + ambient gradient tracking.
+   Skips if reducedMotion or quietMode enabled.
+   ============================================ */
+
+function setupTiltCards() {
+  const cards = document.querySelectorAll('.tilt-card');
+  if (!cards.length) return;
+
+  if (!window.matchMedia || !window.matchMedia('(pointer: fine)').matches) {
+    return;
+  }
+
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  const supportsPointer = 'PointerEvent' in window;
+  const enterEvent = supportsPointer ? 'pointerenter' : 'mouseenter';
+  const moveEvent = supportsPointer ? 'pointermove' : 'mousemove';
+  const leaveEvent = supportsPointer ? 'pointerleave' : 'mouseleave';
+
+  cards.forEach(card => {
+    let rafId = null;
+    const parsedMax = Number(card.dataset.tiltMax);
+    const maxTilt = Number.isFinite(parsedMax) ? parsedMax : 8;
+
+    const reset = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+      card.style.setProperty('--glow-x', '50%');
+      card.style.setProperty('--glow-y', '50%');
+    };
+
+    registerTiltResetter(reset);
+
+    const update = (e) => {
+      if (state.reducedMotion || state.quietMode) {
+        reset();
+        return;
+      }
+
+      const rect = card.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = clamp(e.clientX - rect.left, 0, rect.width);
+      const y = clamp(e.clientY - rect.top, 0, rect.height);
+      const pctX = x / rect.width;
+      const pctY = y / rect.height;
+
+      const tiltY = (pctX - 0.5) * 2 * maxTilt;
+      const tiltX = (0.5 - pctY) * 2 * maxTilt;
+
+      if (rafId) cancelAnimationFrame(rafId);
+
+      rafId = requestAnimationFrame(() => {
+        card.style.setProperty('--tilt-x', `${tiltX.toFixed(2)}deg`);
+        card.style.setProperty('--tilt-y', `${tiltY.toFixed(2)}deg`);
+        card.style.setProperty('--glow-x', `${(pctX * 100).toFixed(1)}%`);
+        card.style.setProperty('--glow-y', `${(pctY * 100).toFixed(1)}%`);
+        rafId = null;
+      });
+    };
+
+    card.addEventListener(enterEvent, update, { passive: true });
+    card.addEventListener(moveEvent, update, { passive: true });
+    card.addEventListener(leaveEvent, reset, { passive: true });
+    if (supportsPointer) {
+      card.addEventListener('pointercancel', reset, { passive: true });
+    }
+    card.addEventListener('focusout', reset);
+  });
+}
+
+
+/* ============================================
+   12. PREFERENCES
    localStorage key namespaced to avoid collisions.
    Fails silently if storage is unavailable
    (private browsing, storage quota exceeded, etc.)
@@ -475,7 +566,7 @@ function loadPreferences() {
 
 
 /* ============================================
-   10. SMOOTH SCROLLING
+   13. SMOOTH SCROLLING
    JS-controlled to respect reducedMotion state.
    Falls back to CSS scroll-behavior: smooth (set on html).
    ============================================ */
@@ -533,7 +624,7 @@ function setupContactSubmissionFlow() {
 
 
 /* ============================================
-   11. MODALS (Blog posts)
+   14. MODALS (Blog posts)
    
    Focus management:
    - On open: focus moves to close button
@@ -790,7 +881,7 @@ function setupScrollTopButton() {
 
 
 /* ============================================
-   12. INIT
+   17. INIT
    Load → Apply prefs → Wire up all modules → Start loop.
    Order matters: prefs before controls, loop last.
    ============================================ */
@@ -813,6 +904,7 @@ function init() {
   setupContactSubmissionFlow();
   setupExplorationGallery();
   setupScrollTopButton();
+  setupTiltCards();
   setupLiquidMetal(); // Pointer-aware glow on buttons, socials, and controls
 
   // Start the single animation loop (storm + cursor + glow)
