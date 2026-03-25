@@ -1220,8 +1220,7 @@ body:not([data-theme="light"]) .cursor-dot {
   transform: perspective(1100px) translateY(calc(var(--lift) + var(--reveal-y))) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 80ms linear,
-              box-shadow var(--t-base),
+  transition: box-shadow var(--t-base),
               border-color var(--t-base);
 }
 

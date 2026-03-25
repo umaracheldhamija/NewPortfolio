@@ -423,6 +423,7 @@ function setupTiltCards() {
   }
 
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+  const lerp = (start, end, amt) => start + (end - start) * amt;
 
   const supportsPointer = 'PointerEvent' in window;
   const enterEvent = supportsPointer ? 'pointerenter' : 'mouseenter';
@@ -431,14 +432,37 @@ function setupTiltCards() {
 
   cards.forEach(card => {
     let rafId = null;
+    let rect = null;
+    let isActive = false;
     const parsedMax = Number(card.dataset.tiltMax);
     const maxTilt = Number.isFinite(parsedMax) ? parsedMax : 8;
+    const ease = 0.18;
+
+    let currentTiltX = 0;
+    let currentTiltY = 0;
+    let currentGlowX = 50;
+    let currentGlowY = 50;
+
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+    let targetGlowX = 50;
+    let targetGlowY = 50;
 
     const reset = () => {
       if (rafId) {
         cancelAnimationFrame(rafId);
         rafId = null;
       }
+      isActive = false;
+      rect = null;
+      currentTiltX = 0;
+      currentTiltY = 0;
+      currentGlowX = 50;
+      currentGlowY = 50;
+      targetTiltX = 0;
+      targetTiltY = 0;
+      targetGlowX = 50;
+      targetGlowY = 50;
       card.style.setProperty('--tilt-x', '0deg');
       card.style.setProperty('--tilt-y', '0deg');
       card.style.setProperty('--glow-x', '50%');
@@ -447,40 +471,87 @@ function setupTiltCards() {
 
     registerTiltResetter(reset);
 
-    const update = (e) => {
-      if (state.reducedMotion || state.quietMode) {
-        reset();
-        return;
-      }
-
-      const rect = card.getBoundingClientRect();
+    const updateTargetsFromEvent = (e) => {
+      if (!rect) rect = card.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
+
       const x = clamp(e.clientX - rect.left, 0, rect.width);
       const y = clamp(e.clientY - rect.top, 0, rect.height);
       const pctX = x / rect.width;
       const pctY = y / rect.height;
 
-      const tiltY = (pctX - 0.5) * 2 * maxTilt;
-      const tiltX = (0.5 - pctY) * 2 * maxTilt;
-
-      if (rafId) cancelAnimationFrame(rafId);
-
-      rafId = requestAnimationFrame(() => {
-        card.style.setProperty('--tilt-x', `${tiltX.toFixed(2)}deg`);
-        card.style.setProperty('--tilt-y', `${tiltY.toFixed(2)}deg`);
-        card.style.setProperty('--glow-x', `${(pctX * 100).toFixed(1)}%`);
-        card.style.setProperty('--glow-y', `${(pctY * 100).toFixed(1)}%`);
-        rafId = null;
-      });
+      targetTiltY = (pctX - 0.5) * 2 * maxTilt;
+      targetTiltX = (0.5 - pctY) * 2 * maxTilt;
+      targetGlowX = pctX * 100;
+      targetGlowY = pctY * 100;
     };
 
-    card.addEventListener(enterEvent, update, { passive: true });
-    card.addEventListener(moveEvent, update, { passive: true });
-    card.addEventListener(leaveEvent, reset, { passive: true });
+    const tick = () => {
+      if (state.reducedMotion || state.quietMode) {
+        reset();
+        return;
+      }
+
+      currentTiltX = lerp(currentTiltX, targetTiltX, ease);
+      currentTiltY = lerp(currentTiltY, targetTiltY, ease);
+      currentGlowX = lerp(currentGlowX, targetGlowX, ease);
+      currentGlowY = lerp(currentGlowY, targetGlowY, ease);
+
+      card.style.setProperty('--tilt-x', `${currentTiltX.toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${currentTiltY.toFixed(2)}deg`);
+      card.style.setProperty('--glow-x', `${currentGlowX.toFixed(1)}%`);
+      card.style.setProperty('--glow-y', `${currentGlowY.toFixed(1)}%`);
+
+      const tiltSettled = Math.abs(targetTiltX - currentTiltX) < 0.01
+        && Math.abs(targetTiltY - currentTiltY) < 0.01;
+      const glowSettled = Math.abs(targetGlowX - currentGlowX) < 0.1
+        && Math.abs(targetGlowY - currentGlowY) < 0.1;
+
+      if (!isActive && tiltSettled && glowSettled) {
+        reset();
+        return;
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (!rafId) rafId = requestAnimationFrame(tick);
+    };
+
+    const handleEnter = (e) => {
+      if (state.reducedMotion || state.quietMode) {
+        reset();
+        return;
+      }
+      rect = card.getBoundingClientRect();
+      isActive = true;
+      updateTargetsFromEvent(e);
+      start();
+    };
+
+    const handleMove = (e) => {
+      if (!isActive) return;
+      updateTargetsFromEvent(e);
+    };
+
+    const handleLeave = () => {
+      isActive = false;
+      rect = null;
+      targetTiltX = 0;
+      targetTiltY = 0;
+      targetGlowX = 50;
+      targetGlowY = 50;
+      start();
+    };
+
+    card.addEventListener(enterEvent, handleEnter, { passive: true });
+    card.addEventListener(moveEvent, handleMove, { passive: true });
+    card.addEventListener(leaveEvent, handleLeave, { passive: true });
     if (supportsPointer) {
-      card.addEventListener('pointercancel', reset, { passive: true });
+      card.addEventListener('pointercancel', handleLeave, { passive: true });
     }
-    card.addEventListener('focusout', reset);
+    card.addEventListener('focusout', handleLeave);
   });
 }
 

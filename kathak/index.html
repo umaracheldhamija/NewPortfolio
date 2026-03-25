@@ -3,54 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Project Name - Uma Dhamija">
-    <title>Project Name - Uma Dhamija</title>
+    <meta name="description" content="Kathak Kala Kendra — web design for a Kathak dance school in Dharamshala, India.">
+    <title>Kathak Kala Kendra — Uma Dhamija</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lancelot&display=swap" rel="stylesheet">
     <style>
-        .project-hero {
-            padding: 8rem 2rem 4rem;
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .project-hero h1 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: 1rem;
-            font-family: var(--font-display);
-            letter-spacing: -0.05rem;
-        }
-
-        .project-meta {
-            display: flex;
-            gap: 3rem;
-            justify-content: center;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .meta-item {
-            text-align: center;
-        }
-
-        .meta-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        .meta-value {
-            font-size: 1.1rem;
-            color: var(--accent-primary);
-            font-weight: 600;
-        }
-
         .project-content {
             max-width: 800px;
             margin: 0 auto;
@@ -94,6 +54,28 @@
             color: var(--accent-primary);
         }
 
+        .project-cta {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .process-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-secondary);
+        }
+
         .project-image {
             background-color: var(--bg-secondary);
             height: 100%;
@@ -102,20 +84,6 @@
             border-radius: 12px;
             margin: 2rem 0;
             border: 1px solid var(--border-subtle);
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--accent-primary);
-            text-decoration: none;
-            margin: 2rem 0;
-            transition: gap 0.2s var(--ease-smooth);
-        }
-
-        .back-link:hover {
-            gap: 0.75rem;
         }
     </style>
 </head>
@@ -148,10 +116,21 @@
     </div>
 
     <!-- Navigation -->
-    <nav aria-label="Primary navigation">
+    <nav class="site-nav" aria-label="Primary navigation">
         <div class="nav-container">
-            <div class="logo"><a href="../index.html#hero">Uma Dhamija</a></div>
-            <ul class="nav-links">
+            <a href="../index.html#hero" class="nav-logo">Uma Dhamija</a>
+
+            <button
+                class="nav-toggle"
+                id="nav-toggle"
+                aria-controls="nav-links"
+                aria-expanded="false"
+                aria-label="Open navigation menu"
+            >
+                <span></span><span></span><span></span>
+            </button>
+
+            <ul class="nav-links" id="nav-links" role="list">
                 <li><a href="../index.html#hero">Home</a></li>
                 <li><a href="../index.html#work" aria-current="true">Work</a></li>
                 <li><a href="../index.html#education">Education</a></li>
@@ -162,19 +141,19 @@
         </div>
     </nav>
 
-    <main id="main-content">
+    <main class="project-page" id="main-content">
     <!-- Project Hero -->
-    <section class="project-hero">
+    <header class="project-page-hero">
         <a href="../index.html#work" class="back-link">
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Back to Work
         </a>
         
-        <h1>Kathak Kala Kendra</h1>
-        <p style="font-size: 1.2rem; color: var(--text-secondary);">
+        <h1 class="project-page-title">Kathak Kala Kendra</h1>
+        <p class="project-page-subtitle">
             Designing a webpage for a Kathak dance school based in India. This was made to surprise my teacher of 15 years.
         </p>
 
-        <div class="project-meta">
+        <div class="project-meta-row">
             <div class="meta-item">
                 <span class="meta-label">Role</span>
                 <span class="meta-value">Web Developer & Designer</span>
@@ -193,13 +172,26 @@
             </div>
         </div>
 
-        <div class="tools-used">
+        <div class="tools-used" aria-label="Tools used">
             <span class="tool" data-tool="Figma"><i class="fab fa-figma" aria-hidden="true"></i></span>
             <span class="tool" data-tool="Notion"><i class="fas fa-database" aria-hidden="true"></i></span>
             <span class="tool" data-tool="Squarespace"><i class="fas fa-squarespace" aria-hidden="true"></i></span>
             <span class="tool" data-tool="Adobe"><i class="fas fa-image" aria-hidden="true"></i></span>
         </div>
-    </section>
+
+        <div class="project-cta">
+            <a
+                href="kathak-kala-kendra/index.html"
+                class="project-cta-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit the live Kathak Kala Kendra website (opens in new tab)"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                Visit Live Site
+            </a>
+        </div>
+    </header>
 
     <!-- Project Content -->
     <div class="project-content">
@@ -215,7 +207,7 @@
         </section>
 
         <!-- Hero Image -->
-        <img src="intro.svg" alt="Project overview" class="project-image">
+        <img src="photo.png" alt="Kathak Kala Kendra homepage preview" class="project-image" loading="lazy">
 
         <!-- Challenge -->
         <section class="project-section">
@@ -227,7 +219,7 @@
             </ul>
         </section>
 
-        <img src="wireframe.png" alt="Final solution" class="project-image">
+        <img src="kathak-kala-kendra/images/poster.jpg" alt="Visual direction poster for Kathak Kala Kendra" class="project-image" loading="lazy">
 
         <!-- Process -->
         <section class="project-section" style="content: none">
@@ -238,13 +230,20 @@
             <ul>
                 <li>Deciding the goals of this project for my teacher: <br> What would he like to showcase the most? Is this feasible within the constraints of his limited technical knowledge and internet access?</li>
                 <li>Ideation: <br>Creating a low fidelity prototype and wireframe that I can show some of his students for feedback.</li>
+                <li>Content curation: <br>Gathering studio photography, performance imagery, and class highlights to tell his story.</li>
                 <li>Design & Develop: <br>Developing the website with Squarespace.</li>
                 <li>Implementation and handoff: <br>Host the website and share with my teacher to ensure he can manage it easily.</li>
             </ul>
+
+            <div class="process-grid" aria-label="Process imagery">
+                <img src="kathak-kala-kendra/images/guruji2.jpg" alt="Portrait of Guru Dharmendra Jain for the about section" loading="lazy">
+                <img src="kathak-kala-kendra/images/kathak2.jpg" alt="Kathak class rehearsal photography used for class highlights" loading="lazy">
+                <img src="kathak-kala-kendra/images/studio.jpg" alt="The Kathak Kala Kendra studio interior" loading="lazy">
+            </div>
         </section>
 
         <!-- Solution Image -->
-        <img src="MW.png" alt="Final solution" class="project-image">
+        <img src="kathak-kala-kendra/images/performance.jpg" alt="Performance imagery featured on the live site" class="project-image" loading="lazy">
 
         <!-- Impact -->
         <section class="project-section">
@@ -252,11 +251,7 @@
         <p>
             After developing the website, I shared it with my teacher and his students. The feedback was overwhelmingly positive, with many expressing excitement about the new platform and its potential to attract more students to his classes. My teacher was particularly pleased with how the website showcased his expertise and made it easy for people to learn about Kathak and get in touch with him.
         </p>
-       <a href="../index.html#contact">Request KathakKalaKendra.com link</a> 
-
         </section>
-
-         <img src="MW app.png" alt="Final solution" class="project-image">
 
         <!-- Reflections -->
         <section class="project-section">
