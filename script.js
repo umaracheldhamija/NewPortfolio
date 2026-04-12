@@ -1137,6 +1137,111 @@ function setupViewportMaintenance() {
 
 
 /* ============================================
+   INTERACTIVE AURORA BLOBS
+   Listen for clicks on profile-image to create
+   fun, colorful expanding ripples behind the hero card.
+   ============================================ */
+
+function setupInteractiveAuroraBlobs() {
+  const profileImage = document.querySelector('.profile-image');
+  const blobsContainer = document.getElementById('aurora-blobs-container');
+
+  if (!profileImage || !blobsContainer) return;
+
+  // Warm aurora colors: deep orange, pink, golden yellow, magenta
+  const colors = ['blob-orange', 'blob-pink', 'blob-yellow', 'blob-magenta'];
+
+  // Create delicate wind chime-like sound with resonance
+  function playChime() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      const masterGain = audioCtx.createGain();
+      masterGain.connect(audioCtx.destination);
+      masterGain.gain.setValueAtTime(0.12, now);
+      masterGain.gain.exponentialRampToValueAtTime(0.01, now + 2);
+      
+      // Wind chime tones - pure, resonant bell-like notes
+      const chimes = [
+        { freq: 440, start: 0, duration: 1.5 },      // A4 - main tone
+        { freq: 660, start: 0.05, duration: 1.3 },   // E5 - harmonic
+        { freq: 293, start: 0.1, duration: 1.8 }     // D4 - bass resonance
+      ];
+      
+      chimes.forEach(({ freq, start, duration }) => {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + start);
+        
+        const oscillatorGain = audioCtx.createGain();
+        oscillatorGain.gain.setValueAtTime(0.3, now + start);
+        oscillatorGain.gain.exponentialRampToValueAtTime(0.05, now + start + duration);
+        
+        osc.connect(oscillatorGain);
+        oscillatorGain.connect(masterGain);
+        osc.start(now + start);
+        osc.stop(now + start + duration);
+      });
+    } catch (e) {
+      // Silently fail if audio context is not available
+    }
+  }
+
+  profileImage.addEventListener('click', () => {
+    if (state.quietMode) return; // Respect quiet mode
+    
+    // Play a subtle chime
+    playChime();
+    
+    // Get hero section dimensions for relative positioning
+    const hero = document.getElementById('hero');
+    if (!hero) return;
+    
+    const heroRect = hero.getBoundingClientRect();
+    
+    // Random position within the hero section (but keep blobs behind the card)
+    const randomX = Math.random() * heroRect.width;
+    const randomY = Math.random() * heroRect.height * 0.8; // Bias towards upper half
+    
+    // Random blob size (350-550px diameter for big splashes)
+    const blobSize = 350 + Math.random() * 200;
+    
+    // Pick a random color
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    // Create blob element
+    const blob = document.createElement('div');
+    blob.className = `aurora-blob ${randomColor}`;
+    blob.style.left = `${randomX}px`;
+    blob.style.top = `${randomY}px`;
+    blob.style.width = `${blobSize}px`;
+    blob.style.height = `${blobSize}px`;
+    
+    blobsContainer.appendChild(blob);
+    
+    // Remove blob after animation completes (2 seconds)
+    setTimeout(() => {
+      blob.remove();
+    }, 2000);
+  });
+
+  // Also allow mousedown for extra interactivity
+  profileImage.addEventListener('mousedown', (e) => {
+    // Visual feedback: slight scale down
+    profileImage.style.transform = 'scale(0.98)';
+  });
+
+  profileImage.addEventListener('mouseup', () => {
+    profileImage.style.transform = '';
+  });
+
+  profileImage.addEventListener('mouseleave', () => {
+    profileImage.style.transform = '';
+  });
+}
+
+
+/* ============================================
    17. INIT
    Load → Apply prefs → Wire up all modules → Start loop.
    Order matters: prefs before controls, loop last.
@@ -1164,6 +1269,7 @@ function init() {
   setupViewportMaintenance();
   setupTiltCards();
   setupLiquidMetal(); // Pointer-aware glow on buttons, socials, and controls
+  setupInteractiveAuroraBlobs(); // Interactive blobs on profile click
 
   // Start the single animation loop (storm + cursor + glow)
   // This replaces the two separate updateStormReveal() calls

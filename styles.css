@@ -414,6 +414,99 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   50%        { transform: translate(6%, -8%) scale(1.1); }
 }
 
+/* ============================================
+   INTERACTIVE AURORA BLOBS
+   Colorful expanding ripples behind glass card.
+   Triggered by profile-image clicks.
+   ============================================ */
+
+@keyframes blob-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+.aurora-blobs {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+  filter: blur(40px);
+  mix-blend-mode: screen;
+  animation: blob-expand 2000ms var(--ease-smooth) forwards;
+}
+
+/* Light mode: warm aurora colors (deep oranges, pinks, yellows, magentas) */
+[data-theme="light"] .aurora-blob {
+  --blob-base: 1;
+  background: radial-gradient(
+    circle at 30% 30%,
+    currentColor,
+    transparent 70%
+  ) !important;
+  opacity: 1;
+}
+
+/* Dark mode: same warm colors but slightly more opaque */
+[data-theme="dark"] .aurora-blob {
+  mix-blend-mode: lighten;
+  opacity: 0.95;
+}
+
+/* Warm color variations */
+.aurora-blob.blob-orange {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ff6b35 0%,
+    #ff4500 25%,
+    transparent 70%
+  ) !important;
+  opacity: 1;
+}
+
+.aurora-blob.blob-pink {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ff1493 0%,
+    #ff69b4 25%,
+    transparent 70%
+  ) !important;
+  opacity: 1;
+}
+
+.aurora-blob.blob-yellow {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ffed4e 0%,
+    #ffd700 25%,
+    transparent 70%
+  ) !important;
+  opacity: 0.9;
+}
+
+.aurora-blob.blob-magenta {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ff00ff 0%,
+    #d946ef 25%,
+    transparent 70%
+  ) !important;
+  opacity: 1;
+}
+
 /* --- Light mode: cursor radial warmth ---
    MUCH more visible than before — increased opacity,
    radius, and contrast. Uses a warm violet-peach mix
