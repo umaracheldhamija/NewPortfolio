@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
 <body>
@@ -74,14 +76,29 @@
         Back to Work
       </a>
 
-      <h1 class="project-page-title">OpenMined &mdash; Capstone</h1>
+      <h1 class="project-page-title">OpenMined</h1>
+      <h2 class="project-page-subtitle">MHCI Capstone</h2>
+
+      <div class="project-cta">
+        <a
+          href="https://openmined.org"
+          class="project-cta-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit OpenMined website (opens in new tab)"
+        >
+          <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+          Visit OpenMined
+        </a>
+        <br>
+        <br>
+      </div>
 
       <p class="project-page-subtitle">
-        Exploring practical product opportunities for privacy-preserving AI through user-centric,
-        ethics-first use-case design.
+        Exploring C2C use cases for privacy-preserving AI through ethics-first human-centered design.
       </p>
 
-      <div class="project-meta-row" data-reveal>
+      <div class="project-meta-row tilt-card" data-reveal>
         <div class="meta-item">
           <span class="meta-label">Role</span>
           <span class="meta-value">UX Designer</span>
@@ -102,10 +119,11 @@
 
       <div class="tools-used" aria-label="Tools used">
         <span class="tool" data-tool="Figma"><i class="fab fa-figma" aria-hidden="true"></i></span>
-        <span class="tool" data-tool="Notion"><i class="fa-brands fa-notion" aria-hidden="true"></i></span>
+        <span class="tool" data-tool="Notion" data-poem-trigger="random"><i class="fa-brands fa-notion"></i></span>
         <span class="tool" data-tool="System Mapping"><i class="fas fa-project-diagram" aria-hidden="true"></i></span>
         <span class="tool" data-tool="AI Ethics"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
       </div>
+
     </header>
 
     <div class="project-body-content">
@@ -113,21 +131,21 @@
         <h2 class="case-section-title" id="om-overview">Context</h2>
         <p class="project-lead">
           Privacy-preserving machine learning is technically promising but difficult for non-specialists
-          to adopt. This capstone focused on translating complex privacy concepts into real product use
-          cases that teams can evaluate and build.
+          to adopt. This capstone is focusing on translating complex <span data-poem-trigger="privacy">privacy</span> concepts into real product use
+          cases that the OpenMined team can evaluate and build.
         </p>
         <div class="project-highlights">
-          <div class="project-highlight-item">
+          <div class="project-highlight-item tilt-card">
             <strong>Problem Space</strong>
             Users need AI utility without exposing sensitive data.
           </div>
-          <div class="project-highlight-item">
+          <div class="project-highlight-item tilt-card">
             <strong>Core Question</strong>
-            Where does privacy-preserving AI create immediate, practical value?
+            Where does privacy-preserving AI create immediate, practical value for everyday people?
           </div>
-          <div class="project-highlight-item">
+          <div class="project-highlight-item tilt-card">
             <strong>Deliverable</strong>
-            Prioritised use-case concepts with UX and ethics implications.
+            Prioritize use-case concepts with UX and AI ethics implications.
           </div>
         </div>
       </section>
@@ -135,8 +153,11 @@
       <img
         src="logo.jpg"
         alt="OpenMined project identity"
-        class="case-img"
+        class="case-img tilt-card"
         loading="lazy"
+        decoding="async"
+        width="2560"
+        height="1440"
         data-reveal
       >
 
@@ -148,40 +169,143 @@
           <li>Design concepts that feel usable, transparent, and ethically defensible.</li>
         </ul>
         <p>
-          A recurring issue was that privacy is usually communicated as a legal checkbox, not a user
-          experience. The project reframed privacy as a product quality: legible controls, clear data
+          A recurring issue is that <span data-poem-trigger="privacy">privacy</span> is usually communicated as a legal checkbox, not a user
+          experience. The project aims to reframe privacy as a product quality: legible controls, clear data
           boundaries, and predictable behavior under high-stakes conditions.
         </p>
       </section>
 
-      <img
-        src="../images/friends.png"
-        alt="Conceptual exploration visual representing identity and privacy boundaries"
-        class="case-img"
-        loading="lazy"
-        data-reveal
-      >
+        <img
+          src="../images/friends.png"
+          alt="Conceptual exploration visual representing identity and privacy boundaries"
+          class="case-img tilt-card"
+          loading="lazy"
+          decoding="async"
+          width="500"
+          height="500"
+        >
+        <!-- <img
+          src="../images/fancy.JPEG"
+          alt="Fancy exploration"
+          class="case-img tilt-card"
+          loading="lazy"
+          decoding="async"
+          width="500"
+          height="500"
+        >
+        <img
+          src="../images/drinks.JPEG"
+          alt="Drinks exploration"
+          class="case-img tilt-card"
+          loading="lazy"
+          decoding="async"
+          width="500"
+          height="500"
+        > -->
+
+      <section class="case-section" aria-labelledby="om-research" data-reveal>
+        <h2 class="case-section-title" id="om-research">Research Methodology</h2>
+        <p>
+          Our research framework combines quantitative and qualitative methods to understand the privacy-preserving AI landscape:
+        </p>
+        <div class="project-highlights">
+          <div class="project-highlight-item tilt-card">
+            <strong>SME Interviews</strong>
+            Engage subject matter experts in privacy-enhancing technologies to ground our technical understanding.
+          </div>
+          <div class="project-highlight-item tilt-card">
+            <strong>Primary & Secondary Research</strong>
+            Synthesize academic literature, industry reports, and emerging use case documentation.
+          </div>
+          <div class="project-highlight-item tilt-card">
+            <strong>PESTLE Analysis</strong>
+            Mapping political, economic, social, technological, legal, and environmental factors shaping adoption.
+          </div>
+          <div class="project-highlight-item tilt-card">
+            <strong>Competitive Analysis</strong>
+            Evaluating existing privacy-preserving solutions and their go-to-market strategies.
+          </div>
+          <div class="project-highlight-item tilt-card">
+            <strong>Assumption Mapping</strong>
+            Identifying core beliefs underlying different privacy approaches and validated against evidence.
+          </div>
+          <div class="project-highlight-item tilt-card">
+            <strong>Use Case Studies</strong>
+            Developing detailed scenarios exploring how privacy-preserving AI could solve real problems across sectors.
+          </div>
+        </div>
+      </section>
+
+      <section class="case-section" aria-labelledby="om-process" data-reveal>
+        <h2 class="case-section-title" id="om-process">Design Process: Two-Week Sprints</h2>
+        <p>
+          Our approach is structured around iterative two-week design sprints, managed collaboratively in Notion. Each sprint is focused on a specific use case cluster, moving from research synthesis to concept validation:
+        </p>
+        <ul>
+          <li><strong>Week 1 - Discovery & Synthesis:</strong> Deep-dive research sessions, synthesis workshops, and preliminary concept ideation.</li>
+          <li><strong>Week 2 - Prototyping & Validation:</strong> UX flow development, low-fidelity prototypes, and stakeholder feedback sessions.</li>
+          <li><strong>Notion as Central Hub:</strong> All research artifacts, design decisions, feedback loops, and iteration history tracked in shared Notion workspace for full team alignment.</li>
+        </ul>
+        <p>
+          This rhythm enables rapid exploration while maintaining rigor in documentation. We could test ideas quickly, learn from OpenMined team feedback, and pivot informed by evidence rather than assumption.
+        </p>
+      </section>
+
+              <img
+          src="../images/selfie.png"
+          alt="Selfie exploration"
+          class="case-img tilt-card"
+          loading="lazy"
+          decoding="async"
+          width="500"
+          height="500"
+        >
 
       <section class="case-section" aria-labelledby="om-solution" data-reveal>
         <h2 class="case-section-title" id="om-solution">Approach &amp; Solution</h2>
         <ul>
-          <li>Mapped high-risk domains where data sensitivity and trust are mission-critical.</li>
-          <li>Evaluated candidate scenarios across desirability, feasibility, and ethical risk.</li>
-          <li>Drafted UX concept flows showing how privacy guarantees are made understandable in-product.</li>
+          <li>Mapping high-risk domains where data sensitivity and trust are mission-critical.</li>
+          <li>Evaluating candidate scenarios across desirability, feasibility, and ethical risk.</li>
+          <li>Drafting UX concept flows showing how privacy guarantees are made understandable in-product.</li>
         </ul>
         <p>
-          The final direction emphasized explainable consent states, explicit sharing boundaries, and
-          low-friction decision points for users. Instead of treating privacy as invisible infrastructure,
-          the concepts made protection and control visible where it matters most.
+          Instead of treating privacy as invisible infrastructure,
+          our solution will make protection and control visible where it matters most. 
         </p>
+      </section>
+
+      <section class="case-section" aria-labelledby="om-midterm" data-reveal>
+        <h2 class="case-section-title" id="om-midterm">Research Readout</h2>
+        <p>
+          Our deliverable captures the first phase of research synthesis, use case prioritization framework, and initial concept directions validated with OpenMined stakeholders.
+        </p>
+        <div style="margin-top: 2rem; margin-bottom: 2rem;">
+          <iframe
+            src="Midterm_Readout.pdf"
+            width="100%"
+            height="800"
+            style="border: 1px solid var(--border-subtle); border-radius: 8px;"
+            aria-label="Midterm Readout PDF document"
+          ></iframe>
+        </div>
+        <a
+          href="Midterm_Readout.pdf"
+          class="project-cta-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Download Midterm Readout PDF (opens in new tab)"
+        >
+          <i class="fas fa-file-pdf" aria-hidden="true"></i>
+          Download Full Readout
+        </a>
       </section>
 
       <section class="case-section" aria-labelledby="om-outcomes" data-reveal>
         <h2 class="case-section-title" id="om-outcomes">Outcomes</h2>
         <ul>
-          <li>Produced a clearer framework for prioritising privacy-preserving AI use cases.</li>
-          <li>Aligned technical possibilities with user-facing product opportunities.</li>
-          <li>Strengthened my ability to design at the intersection of AI ethics and usability.</li>
+          <li>Produce C2C use cases of privacy-preserving AI.</li>
+          <li>Align technical possibilities with user-facing product opportunities.</li>
+          <li>Strengthen my ability to design at the intersection of AI ethics, technology, and usability.</li>
         </ul>
       </section>
 
@@ -190,7 +314,7 @@
           <i class="fas fa-arrow-left" aria-hidden="true"></i>
           Back to All Projects
         </a>
-        <a href="../northwestern/index.html" class="back-link next-link">
+        <a href="../upmc/index.html" class="back-link next-link">
           Next Project
           <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
@@ -201,17 +325,290 @@
 
   <footer>
     <div class="footer-content">
-      <p class="footer-name">Uma Dhamija</p>
+      <p class="footer-name" data-poem-trigger="website">Uma Dhamija</p>
       <nav class="footer-links" aria-label="Footer links">
         <a href="mailto:umaracheldhamija@gmail.com">Email</a>
         <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.linkedin.com/in/uma-dhamija-5280ba48/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener noreferrer">Medium</a>
       </nav>
-      <p class="footer-copy">&copy; 2026 Uma Dhamija. Designed with intention.</p>
+      <p class="footer-copy">&copy; 2026 Uma Dhamija.</p>
     </div>
   </footer>
 
-  <script src="../script.js"></script>
+  <script defer src="../script.js"></script>
+  <script>
+    (() => {
+      const styleId = 'project-page-easter-egg-styles';
+      const poemLines = {
+        privacy: [
+          "privacy is not",
+          "the absence of data.",
+          "it's the presence",
+          "of control."
+        ],
+        website: [
+          "how you do one thing",
+          "is how you do everything"
+        ],
+        random: [
+          "ah, you found me",
+          "hidden in the quiet hours",
+          "where the shadows stretch and fold,",
+          "among the limitless, pressed-in pixels,",
+          "and the stories left untold."
+        ]
+      };
+      const secretPalette = ['#FFB3C6', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB', '#F9E4B7'];
+      let typedBuffer = '';
+      let cursorX = window.innerWidth / 2;
+      let cursorY = window.innerHeight / 2;
+      let activePoemOverlay = null;
+      let poemEscapeHandler = null;
+
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          @keyframes ripple-out {
+            0% { transform: scale(0); opacity: 0.7; }
+            100% { transform: scale(4); opacity: 0; }
+          }
+
+          @keyframes fadeInLine {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+
+          .easter-poem-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+          }
+
+          .easter-poem-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            text-align: center;
+          }
+
+          .easter-poem-line {
+            opacity: 0;
+            color: #F5F4F0;
+            font-size: 1.4rem;
+            line-height: 2.2;
+            font-style: italic;
+            animation: fadeInLine 0.8s ease forwards;
+          }
+
+          .easter-poem-close {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            opacity: 0.4;
+            color: #F5F4F0;
+          }
+
+          .secret-ripple {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: ripple-out 2s ease-out forwards;
+            transform-origin: center center;
+          }
+
+          .secret-found-note {
+            position: fixed;
+            left: 50%;
+            bottom: 2rem;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 9999;
+            pointer-events: none;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      const closePoemOverlay = () => {
+        if (!activePoemOverlay) return;
+        activePoemOverlay.remove();
+        activePoemOverlay = null;
+        if (poemEscapeHandler) {
+          document.removeEventListener('keydown', poemEscapeHandler);
+          poemEscapeHandler = null;
+        }
+      };
+
+      const openPoemOverlay = (poemKey) => {
+        const lines = poemLines[poemKey];
+        if (!lines) return;
+
+        closePoemOverlay();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'easter-poem-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+
+        const content = document.createElement('div');
+        content.className = 'easter-poem-content';
+
+        lines.forEach((line, index) => {
+          const lineEl = document.createElement('p');
+          lineEl.className = 'easter-poem-line';
+          lineEl.style.animationDelay = `${index * 0.6}s`;
+          lineEl.textContent = line;
+          content.appendChild(lineEl);
+        });
+
+        const hint = document.createElement('p');
+        hint.className = 'easter-poem-close';
+        hint.textContent = 'click anywhere to close';
+
+        overlay.appendChild(content);
+        overlay.appendChild(hint);
+        overlay.addEventListener('click', closePoemOverlay);
+
+        poemEscapeHandler = (event) => {
+          if (event.key === 'Escape') closePoemOverlay();
+        };
+
+        document.addEventListener('keydown', poemEscapeHandler);
+        document.body.appendChild(overlay);
+        activePoemOverlay = overlay;
+      };
+
+      const attachPoemTrigger = (element, poemKey) => {
+        if (!element) return;
+        element.style.cursor = 'pointer';
+        element.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openPoemOverlay(poemKey);
+        });
+      };
+
+      // Attach to all data-poem-trigger elements
+      document.querySelectorAll('[data-poem-trigger]').forEach((el) => {
+        const poemKey = el.getAttribute('data-poem-trigger');
+        attachPoemTrigger(el, poemKey);
+      });
+
+      // Attach to all .poem-trigger elements with data-poem attribute
+      document.querySelectorAll('.poem-trigger[data-poem]').forEach((el) => {
+        const poemKey = el.getAttribute('data-poem');
+        attachPoemTrigger(el, poemKey);
+      });
+
+      document.addEventListener('mousemove', (event) => {
+        cursorX = event.clientX;
+        cursorY = event.clientY;
+      }, { passive: true });
+
+      const playSecretChime = async () => {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        try {
+          const audioContext = playSecretChime.ctx || new AudioContextClass();
+          playSecretChime.ctx = audioContext;
+
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+          }
+
+          const notes = [
+            { frequency: 523, duration: 0.15, offset: 0 },
+            { frequency: 659, duration: 0.15, offset: 0.15 },
+            { frequency: 784, duration: 0.2, offset: 0.3 }
+          ];
+
+          const now = audioContext.currentTime;
+
+          notes.forEach(({ frequency, duration, offset }) => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            const startAt = now + offset;
+            gainNode.gain.setValueAtTime(0.0001, startAt);
+            gainNode.gain.linearRampToValueAtTime(0.08, startAt + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+
+            oscillator.start(startAt);
+            oscillator.stop(startAt + duration);
+          });
+        } catch (_) {
+          /* Audio is optional for the easter egg. */
+        }
+      };
+
+      const showSecretFoundNote = () => {
+        const note = document.createElement('p');
+        note.className = 'secret-found-note';
+        note.textContent = 'you found it';
+        document.body.appendChild(note);
+
+        requestAnimationFrame(() => {
+          note.style.opacity = '1';
+        });
+
+        window.setTimeout(() => {
+          note.style.opacity = '0';
+        }, 2000);
+
+        window.setTimeout(() => {
+          note.remove();
+        }, 2400);
+      };
+
+      const triggerSecretExplosion = () => {
+        for (let index = 0; index < 12; index += 1) {
+          window.setTimeout(() => {
+            const ripple = document.createElement('span');
+            ripple.className = 'secret-ripple';
+            ripple.style.left = `${cursorX - 60}px`;
+            ripple.style.top = `${cursorY - 60}px`;
+            ripple.style.background = secretPalette[Math.floor(Math.random() * secretPalette.length)];
+            document.body.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+          }, index * 80);
+        }
+
+        playSecretChime();
+        window.setTimeout(showSecretFoundNote, 2200);
+      };
+
+      document.addEventListener('keydown', (event) => {
+        if (!event.key || event.key.length !== 1) return;
+        typedBuffer = `${typedBuffer}${event.key.toLowerCase()}`.slice(-6);
+        if (typedBuffer === 'secret') {
+          triggerSecretExplosion();
+          typedBuffer = '';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

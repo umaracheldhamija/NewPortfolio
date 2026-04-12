@@ -87,6 +87,17 @@ function resetTiltCards() {
   tiltResetters.forEach((reset) => reset());
 }
 
+function debounce(fn, delay = 100) {
+  let timeoutId = null;
+
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
 function applyTheme(theme) {
   const nextTheme = theme === 'dark' ? 'dark' : 'light';
   const isLight = nextTheme === 'light';
@@ -195,16 +206,12 @@ function setupHeroObserver() {
 function setupNavScroll() {
   if (!dom.nav) return;
 
-  let pending = false;
+  const updateNavState = () => {
+    dom.nav.classList.toggle('scrolled', window.scrollY > 16);
+  };
 
-  window.addEventListener('scroll', () => {
-    if (pending) return;
-    pending = true;
-    requestAnimationFrame(() => {
-      dom.nav.classList.toggle('scrolled', window.scrollY > 16);
-      pending = false;
-    });
-  }, { passive: true });
+  window.addEventListener('scroll', debounce(updateNavState, 100), { passive: true });
+  updateNavState();
 }
 
 
@@ -453,6 +460,7 @@ function setupTiltCards() {
         cancelAnimationFrame(rafId);
         rafId = null;
       }
+      card.classList.remove('is-tilting');
       isActive = false;
       rect = null;
       currentTiltX = 0;
@@ -524,6 +532,7 @@ function setupTiltCards() {
         reset();
         return;
       }
+      card.classList.add('is-tilting');
       rect = card.getBoundingClientRect();
       isActive = true;
       updateTargetsFromEvent(e);
@@ -842,22 +851,199 @@ function closeModal(modal) {
   _activeModal = document.querySelector('.modal.active');
 }
 
+function setupCarousel(carouselElement, cardSelector, onCardClick) {
+  const track = carouselElement?.querySelector('.carousel-track');
+  const prevBtn = carouselElement?.querySelector('.prev-btn');
+  const nextBtn = carouselElement?.querySelector('.next-btn');
+  const dots = carouselElement?.querySelector('.carousel-dots');
+  const cards = [...carouselElement.querySelectorAll(cardSelector)];
+
+  if (!carouselElement || !track || !dots || !cards.length) return;
+
+  let activeIndex = Math.max(cards.findIndex(card => card.classList.contains('active')), 0);
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  const normalizedDistance = (index) => {
+    let distance = index - activeIndex;
+    const halfway = Math.floor(cards.length / 2);
+
+    if (distance > halfway) distance -= cards.length;
+    if (distance < -halfway) distance += cards.length;
+
+    return distance;
+  };
+
+  const setActiveIndex = (index) => {
+    activeIndex = (index + cards.length) % cards.length;
+
+    cards.forEach((card, cardIndex) => {
+      const distance = normalizedDistance(cardIndex);
+      const isActive = distance === 0;
+
+      card.classList.remove('active', 'prev', 'prev2', 'next', 'next2', 'hidden');
+
+      if (distance === 0) {
+        card.classList.add('active');
+      } else if (distance === -1) {
+        card.classList.add('prev');
+      } else if (distance === -2) {
+        card.classList.add('prev2');
+      } else if (distance === 1) {
+        card.classList.add('next');
+      } else if (distance === 2) {
+        card.classList.add('next2');
+      } else {
+        card.classList.add('hidden');
+      }
+
+      card.setAttribute('tabindex', isActive ? '0' : '-1');
+      card.setAttribute('aria-hidden', Math.abs(distance) > 2 ? 'true' : 'false');
+      card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+
+    [...dots.children].forEach((dot, dotIndex) => {
+      const isActive = dotIndex === activeIndex;
+      dot.classList.toggle('active', isActive);
+      dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      dot.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+  };
+
+  dots.innerHTML = '';
+  cards.forEach((card, index) => {
+    const label = card.getAttribute('data-image-alt') ?? card.getAttribute('aria-label') ?? `Item ${index + 1}`;
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'carousel-dot';
+    dot.setAttribute('role', 'tab');
+    dot.setAttribute('aria-label', `Go to ${label}`);
+    dot.addEventListener('click', () => setActiveIndex(index));
+    dots.appendChild(dot);
+
+    card.addEventListener('click', (event) => {
+      if (index !== activeIndex) {
+        event.preventDefault();
+        setActiveIndex(index);
+        return;
+      }
+
+      if (onCardClick) {
+        onCardClick(card, event);
+      }
+    });
+
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        setActiveIndex(activeIndex - 1);
+        return;
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        setActiveIndex(activeIndex + 1);
+        return;
+      }
+
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (index === activeIndex) {
+          if (onCardClick) {
+            onCardClick(card, event);
+          }
+        } else {
+          setActiveIndex(index);
+        }
+      }
+    });
+  });
+
+  prevBtn?.addEventListener('click', () => setActiveIndex(activeIndex - 1));
+  nextBtn?.addEventListener('click', () => setActiveIndex(activeIndex + 1));
+
+  track.addEventListener('touchstart', (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  track.addEventListener('touchend', (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+    setActiveIndex(deltaX < 0 ? activeIndex + 1 : activeIndex - 1);
+  }, { passive: true });
+
+  setActiveIndex(activeIndex);
+}
+
 function setupExplorationGallery() {
   if (!dom.explorationTriggers.length || !dom.explorationModalImage) return;
 
-  dom.explorationTriggers.forEach(trigger => {
-    trigger.addEventListener('click', () => {
-      const imageSrc = trigger.getAttribute('data-image-src');
-      const imageAlt = trigger.getAttribute('data-image-alt') ?? 'Exploration image';
-      if (!imageSrc) return;
+  const carousel = document.querySelector('#explorations .carousel-3d');
 
-      dom.explorationModalImage.src = imageSrc;
-      dom.explorationModalImage.alt = imageAlt;
-      if (dom.explorationModalCaption) dom.explorationModalCaption.textContent = imageAlt;
+  if (!carousel) {
+    // Fallback for non-carousel layout
+    dom.explorationTriggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const imageSrc = trigger.getAttribute('data-image-src');
+        const imageAlt = trigger.getAttribute('data-image-alt') ?? 'Exploration image';
+        if (!imageSrc) return;
 
-      openModal('exploration-image-modal', trigger);
+        dom.explorationModalImage.src = imageSrc;
+        dom.explorationModalImage.alt = imageAlt;
+        if (dom.explorationModalCaption) dom.explorationModalCaption.textContent = imageAlt;
+
+        openModal('exploration-image-modal', trigger);
+      });
     });
-  });
+
+    return;
+  }
+
+  const openExplorationImage = (trigger) => {
+    const imageSrc = trigger.getAttribute('data-image-src');
+    const imageAlt = trigger.getAttribute('data-image-alt') ?? 'Exploration image';
+    if (!imageSrc) return;
+
+    dom.explorationModalImage.src = imageSrc;
+    dom.explorationModalImage.alt = imageAlt;
+    if (dom.explorationModalCaption) dom.explorationModalCaption.textContent = imageAlt;
+
+    openModal('exploration-image-modal', trigger);
+  };
+
+  setupCarousel(carousel, '.exploration-trigger', openExplorationImage);
+}
+
+function setupWritingCarousel() {
+  const carousel = document.querySelector('#writing .carousel-3d');
+
+  if (!carousel) return;
+
+  const onWritingCardClick = (card) => {
+    // Check if it's an external link
+    const externalUrl = card.getAttribute('data-external');
+    if (externalUrl) {
+      window.open(externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Otherwise trigger the modal (handled by setupModals via data-modal)
+    const modalId = card.getAttribute('data-modal');
+    if (modalId) {
+      openModal(modalId, card);
+    }
+  };
+
+  setupCarousel(carousel, '.writing-trigger', onWritingCardClick);
 }
 
 function setupProjectImageLightbox() {
@@ -877,7 +1063,7 @@ function setupProjectImageLightbox() {
       <div class="modal-content exploration-modal-content" role="document">
         <button class="modal-close" aria-label="Close image">&times;</button>
         <h2 id="project-image-title">Project image</h2>
-        <img id="project-modal-image" class="exploration-modal-image" src="" alt="">
+        <img id="project-modal-image" class="exploration-modal-image" src="" alt="" loading="lazy" decoding="async" width="1200" height="900">
         <p id="project-modal-caption" class="exploration-modal-caption"></p>
       </div>
     `;
@@ -927,18 +1113,11 @@ function setupScrollTopButton() {
 
   if (!dom.scrollTopBtn) return;
 
-  let pending = false;
-
   const updateVisibility = () => {
     dom.scrollTopBtn.classList.toggle('visible', window.scrollY > 420);
-    pending = false;
   };
 
-  window.addEventListener('scroll', () => {
-    if (pending) return;
-    pending = true;
-    requestAnimationFrame(updateVisibility);
-  }, { passive: true });
+  window.addEventListener('scroll', debounce(updateVisibility, 100), { passive: true });
 
   updateVisibility();
 
@@ -948,6 +1127,12 @@ function setupScrollTopButton() {
       behavior: state.reducedMotion ? 'auto' : 'smooth',
     });
   });
+}
+
+function setupViewportMaintenance() {
+  window.addEventListener('resize', debounce(() => {
+    resetTiltCards();
+  }, 100));
 }
 
 
@@ -974,7 +1159,9 @@ function init() {
   setupModals();
   setupContactSubmissionFlow();
   setupExplorationGallery();
+  setupWritingCarousel();
   setupScrollTopButton();
+  setupViewportMaintenance();
   setupTiltCards();
   setupLiquidMetal(); // Pointer-aware glow on buttons, socials, and controls
 

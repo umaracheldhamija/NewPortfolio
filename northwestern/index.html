@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
 <body>
@@ -81,7 +83,7 @@
         development and healthier visual habits for children.
       </p>
 
-      <div class="project-meta-row" data-reveal>
+      <div class="project-meta-row tilt-card" data-reveal>
         <div class="meta-item">
           <span class="meta-label">Role</span>
           <span class="meta-value">Research + Experience Design</span>
@@ -117,15 +119,15 @@
           eye exercises more engaging and easier to sustain.
         </p>
         <div class="project-highlights">
-          <div class="project-highlight-item">
+          <div class="project-highlight-item tilt-card">
             <strong>Audience</strong>
             Children with early oculomotor challenges and their caregivers.
           </div>
-          <div class="project-highlight-item">
+          <div class="project-highlight-item tilt-card">
             <strong>Problem</strong>
             Existing exercises are repetitive, hard to track, and easy to abandon.
           </div>
-          <div class="project-highlight-item">
+          <div class="project-highlight-item tilt-card">
             <strong>Goal</strong>
             Turn clinical intent into playful routines children will actually complete.
           </div>
@@ -135,8 +137,11 @@
       <img
         src="photo.jpg"
         alt="Child engaging with immersive visual interaction technology"
-        class="case-img"
+        class="case-img tilt-card"
         loading="lazy"
+        decoding="async"
+        width="1024"
+        height="1024"
         data-reveal
       >
 
@@ -157,8 +162,11 @@
       <img
         src="../images/Girl Scouts STEM.jpg"
         alt="Children participating in hands-on STEM activity"
-        class="case-img"
+        class="case-img tilt-card"
         loading="lazy"
+        decoding="async"
+        width="4032"
+        height="3024"
         data-reveal
       >
 
@@ -212,6 +220,274 @@
     </div>
   </footer>
 
-  <script src="../script.js"></script>
+  <script defer src="../script.js"></script>
+  <script>
+    (() => {
+      const styleId = 'project-page-easter-egg-styles';
+      const poemLines = {
+        therapy: [
+          "healing is not",
+          "a straight line.",
+          "it's a practice",
+          "of showing up,",
+          "even when progress",
+          "feels invisible."
+        ],
+        website: [
+          "how you do one thing",
+          "is how you do everything"
+        ]
+      };
+      const secretPalette = ['#FFB3C6', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB', '#F9E4B7'];
+      let typedBuffer = '';
+      let cursorX = window.innerWidth / 2;
+      let cursorY = window.innerHeight / 2;
+      let activePoemOverlay = null;
+      let poemEscapeHandler = null;
+
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          @keyframes ripple-out {
+            0% { transform: scale(0); opacity: 0.7; }
+            100% { transform: scale(4); opacity: 0; }
+          }
+
+          @keyframes fadeInLine {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+
+          .easter-poem-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+          }
+
+          .easter-poem-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            text-align: center;
+          }
+
+          .easter-poem-line {
+            opacity: 0;
+            color: #F5F4F0;
+            font-size: 1.4rem;
+            line-height: 2.2;
+            font-style: italic;
+            animation: fadeInLine 0.8s ease forwards;
+          }
+
+          .easter-poem-close {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            opacity: 0.4;
+            color: #F5F4F0;
+          }
+
+          .secret-ripple {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: ripple-out 2s ease-out forwards;
+            transform-origin: center center;
+          }
+
+          .secret-found-note {
+            position: fixed;
+            left: 50%;
+            bottom: 2rem;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 9999;
+            pointer-events: none;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      const closePoemOverlay = () => {
+        if (!activePoemOverlay) return;
+        activePoemOverlay.remove();
+        activePoemOverlay = null;
+        if (poemEscapeHandler) {
+          document.removeEventListener('keydown', poemEscapeHandler);
+          poemEscapeHandler = null;
+        }
+      };
+
+      const openPoemOverlay = (poemKey) => {
+        const lines = poemLines[poemKey];
+        if (!lines) return;
+
+        closePoemOverlay();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'easter-poem-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+
+        const content = document.createElement('div');
+        content.className = 'easter-poem-content';
+
+        lines.forEach((line, index) => {
+          const lineEl = document.createElement('p');
+          lineEl.className = 'easter-poem-line';
+          lineEl.style.animationDelay = `${index * 0.6}s`;
+          lineEl.textContent = line;
+          content.appendChild(lineEl);
+        });
+
+        const hint = document.createElement('p');
+        hint.className = 'easter-poem-close';
+        hint.textContent = 'click anywhere to close';
+
+        overlay.appendChild(content);
+        overlay.appendChild(hint);
+        overlay.addEventListener('click', closePoemOverlay);
+
+        poemEscapeHandler = (event) => {
+          if (event.key === 'Escape') closePoemOverlay();
+        };
+
+        document.addEventListener('keydown', poemEscapeHandler);
+        document.body.appendChild(overlay);
+        activePoemOverlay = overlay;
+      };
+
+      const attachPoemTrigger = (element, poemKey) => {
+        if (!element) return;
+        element.style.cursor = 'pointer';
+        element.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openPoemOverlay(poemKey);
+        });
+      };
+
+      // Attach to all data-poem-trigger elements
+      document.querySelectorAll('[data-poem-trigger]').forEach((el) => {
+        const poemKey = el.getAttribute('data-poem-trigger');
+        attachPoemTrigger(el, poemKey);
+      });
+
+      // Attach to all .poem-trigger elements with data-poem attribute
+      document.querySelectorAll('.poem-trigger[data-poem]').forEach((el) => {
+        const poemKey = el.getAttribute('data-poem');
+        attachPoemTrigger(el, poemKey);
+      });
+
+      document.addEventListener('mousemove', (event) => {
+        cursorX = event.clientX;
+        cursorY = event.clientY;
+      }, { passive: true });
+
+      const playSecretChime = async () => {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        try {
+          const audioContext = playSecretChime.ctx || new AudioContextClass();
+          playSecretChime.ctx = audioContext;
+
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+          }
+
+          const notes = [
+            { frequency: 523, duration: 0.15, offset: 0 },
+            { frequency: 659, duration: 0.15, offset: 0.15 },
+            { frequency: 784, duration: 0.2, offset: 0.3 }
+          ];
+
+          const now = audioContext.currentTime;
+
+          notes.forEach(({ frequency, duration, offset }) => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            const startAt = now + offset;
+            gainNode.gain.setValueAtTime(0.0001, startAt);
+            gainNode.gain.linearRampToValueAtTime(0.08, startAt + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+
+            oscillator.start(startAt);
+            oscillator.stop(startAt + duration);
+          });
+        } catch (_) {
+          /* Audio is optional for the easter egg. */
+        }
+      };
+
+      const showSecretFoundNote = () => {
+        const note = document.createElement('p');
+        note.className = 'secret-found-note';
+        note.textContent = 'you found it';
+        document.body.appendChild(note);
+
+        requestAnimationFrame(() => {
+          note.style.opacity = '1';
+        });
+
+        window.setTimeout(() => {
+          note.style.opacity = '0';
+        }, 2000);
+
+        window.setTimeout(() => {
+          note.remove();
+        }, 2400);
+      };
+
+      const triggerSecretExplosion = () => {
+        for (let index = 0; index < 12; index += 1) {
+          window.setTimeout(() => {
+            const ripple = document.createElement('span');
+            ripple.className = 'secret-ripple';
+            ripple.style.left = `${cursorX - 60}px`;
+            ripple.style.top = `${cursorY - 60}px`;
+            ripple.style.background = secretPalette[Math.floor(Math.random() * secretPalette.length)];
+            document.body.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+          }, index * 80);
+        }
+
+        playSecretChime();
+        window.setTimeout(showSecretFoundNote, 2200);
+      };
+
+      document.addEventListener('keydown', (event) => {
+        if (!event.key || event.key.length !== 1) return;
+        typedBuffer = `${typedBuffer}${event.key.toLowerCase()}`.slice(-6);
+        if (typedBuffer === 'secret') {
+          triggerSecretExplosion();
+          typedBuffer = '';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

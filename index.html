@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Uma Dhamija — UX Designer specialising in human-centred design and brain-computer interfaces.">
-  <meta name="theme-color" content="#fdf9f3">
+  <meta name="theme-color" content="#F5F4F0">
   <meta property="og:title" content="Uma Dhamija — Experience Designer">
   <meta property="og:description" content="UX Advocate • Interface Designer • NeuroTech Enthusiast • Kathak Dancer">
   <meta property="og:type" content="website">
@@ -15,6 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
 <body>
@@ -107,7 +109,7 @@
 
       <h1 class="hero-name">Uma Dhamija</h1>
       <!-- Original bio text preserved exactly -->
-      <p class="hero-role">ux advocate &bull; interface designer &bull; neurotech enthusiast &bull; kathak dancer</p>
+      <p class="hero-role">ai ux &bull; interaction designer &bull; neurotech enthusiast &bull; kathak dancer</p>
 
       <!-- Social links — original URLs preserved -->
       <div class="social-links" aria-label="Social links">
@@ -140,7 +142,7 @@
 
     </div>
 
-    <div class="scroll-indicator" aria-hidden="true">Scroll</div>
+    <div class="scroll-indicator" data-poem-trigger="scroll" aria-hidden="true">Scroll</div>
   </section>
 
 
@@ -155,15 +157,69 @@
       <!-- <span class="section-label">Selected Work</span> -->
       <h2 class="section-title" id="work-title">Featured Work</h2>
       <!-- Original section intro preserved -->
-      <p class="section-intro">Creating this website was also fun ;)</p>
+      <p class="section-intro" data-poem-trigger="website">Creating this website was also fun ;)</p>
     </div>
 
     <div class="projects-grid" data-reveal-stagger>
 
-      <!-- 1. MeditationWise -->
+      <!-- 1. OpenMined Capstone -->
+      <a href="openmined/index.html" class="project-card tilt-card">
+        <div class="project-thumb">
+          <img
+            src="openmined/logo.jpg"
+            alt="OpenMined logo"
+            loading="lazy"
+            decoding="async"
+            width="2560"
+            height="1440"
+          >
+        </div>
+        <div class="project-body">
+          <h3>OpenMined - Capstone</h3>
+          <p>Developing use cases for privacy-preserving Artificial Intelligence Technology.</p>
+          <div class="project-tags">
+            <span class="tag">User Research</span>
+            <span class="tag">AI Ethics</span>
+            <span class="tag">UX Design</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 2. UPMC Magee Hospital — Designing w/CARE -->
+      <a href="upmc/index.html" class="project-card tilt-card">
+        <div class="project-thumb">
+          <img
+            src="upmc/logo.jpg"
+            alt="UPMC Magee Hospital Gynaecological Oncology Unit"
+            loading="lazy"
+            decoding="async"
+            width="2046"
+            height="949"
+          >
+        </div>
+        <div class="project-body">
+          <h3>Designing w/CARE</h3>
+          <p>Creating design solutions for Magee Hospital's Gynaecological Oncology Unit.</p>
+          <div class="project-tags">
+            <span class="tag">Research</span>
+            <span class="tag">User Experience</span>
+            <span class="tag">Interface Design</span>
+            <span class="tag">Service Design</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 3. MeditationWise -->
       <a href="meditationwise/index.html" class="project-card tilt-card">
         <div class="project-thumb">
-          <img src="meditationwise/logo.png" alt="MeditationWise app interface" loading="lazy">
+          <img
+            src="meditationwise/logo.png"
+            alt="MeditationWise app interface"
+            loading="lazy"
+            decoding="async"
+            width="1368"
+            height="1068"
+          >
         </div>
         <div class="project-body">
           <h3>MeditationWise</h3>
@@ -176,42 +232,17 @@
         </div>
       </a>
 
-      <!-- 2. UPMC Magee Hospital — Designing w/CARE -->
-      <a href="upmc/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img src="upmc/logo.jpg" alt="UPMC Magee Hospital Gynaecological Oncology Unit" loading="lazy">
-        </div>
-        <div class="project-body">
-          <h3>Designing w/CARE</h3>
-          <p>Creating design solutions for Magee Hospital — Gynaecological Oncology Unit.</p>
-          <div class="project-tags">
-            <span class="tag">Research</span>
-            <span class="tag">VR Design</span>
-            <span class="tag">Conceptualisation</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- 3. OpenMined Capstone -->
-      <a href="openmined/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img src="openmined/logo.jpg" alt="OpenMined logo" loading="lazy">
-        </div>
-        <div class="project-body">
-          <h3>OpenMined &mdash; Capstone</h3>
-          <p>Developing use cases for privacy-preserving Artificial Intelligence Technology.</p>
-          <div class="project-tags">
-            <span class="tag">Research</span>
-            <span class="tag">AI Ethics</span>
-            <span class="tag">Conceptualization</span>
-          </div>
-        </div>
-      </a>
-
       <!-- 4. Northwestern Capstone — GlowUp Eye Care -->
       <a href="northwestern/index.html" class="project-card tilt-card">
         <div class="project-thumb">
-          <img src="northwestern/photo.jpg" alt="GlowUp Eye Care VR project" loading="lazy">
+          <img
+            src="northwestern/photo.jpg"
+            alt="GlowUp Eye Care VR project"
+            loading="lazy"
+            decoding="async"
+            width="1024"
+            height="1024"
+          >
         </div>
         <div class="project-body">
           <h3>GlowUp Eye Care</h3>
@@ -227,7 +258,14 @@
       <!-- 5. Electric Scooters for Kids -->
       <a href="scooter/index.html" class="project-card tilt-card">
         <div class="project-thumb">
-          <img src="scooter/photo.png" alt="Electric scooter prototype for kids" loading="lazy">
+          <img
+            src="scooter/photo.png"
+            alt="Electric scooter prototype for kids"
+            loading="lazy"
+            decoding="async"
+            width="822"
+            height="566"
+          >
         </div>
         <div class="project-body">
           <h3>Electric Scooters for Kids</h3>
@@ -235,7 +273,7 @@
           <div class="project-tags">
             <span class="tag">Wireframing</span>
             <span class="tag">Prototyping</span>
-            <span class="tag">Research</span>
+            <span class="tag">User Experience Design</span>
           </div>
         </div>
       </a>
@@ -243,11 +281,18 @@
       <!-- 6. Kathak Kala Kendra -->
       <a href="kathak/index.html" class="project-card tilt-card">
         <div class="project-thumb">
-          <img src="kathak/photo.png" alt="Kathak Kala Kendra dance school website" loading="lazy">
+          <img
+            src="kathak/photo.png"
+            alt="Kathak Kala Kendra dance school website"
+            loading="lazy"
+            decoding="async"
+            width="1264"
+            height="842"
+          >
         </div>
         <div class="project-body">
           <h3>Kathak Kala Kendra</h3>
-          <p>A website for a Kathak dance school based in India, made for my teacher of 15 years.</p>
+          <p>A website for a Kathak dance school based in India - made for my teacher of 15 years.</p>
           <div class="project-tags">
             <span class="tag">Product Design</span>
             <span class="tag">Conceptualisation</span>
@@ -267,7 +312,7 @@
   <section class="section" id="education" aria-labelledby="education-title">
     <div class="section-header" data-reveal>
       <h2 class="section-title" id="education-title">Education</h2>
-      <p class="section-intro">But, of course, it doesn't end here.</p>
+      <p class="section-intro" data-poem-trigger="website">But, of course, it doesn't end here.</p>
     </div>
 
     <div class="education-panel" data-reveal-stagger>
@@ -279,6 +324,8 @@
             alt="Carnegie Mellon University seal"
             loading="lazy"
             decoding="async"
+            width="600"
+            height="600"
           >
         </div>
         <div class="education-body">
@@ -296,6 +343,8 @@
             alt="Northwestern University seal"
             loading="lazy"
             decoding="async"
+            width="512"
+            height="512"
           >
         </div>
         <div class="education-body">
@@ -313,6 +362,8 @@
             alt="New York University seal"
             loading="lazy"
             decoding="async"
+            width="512"
+            height="512"
           >
         </div>
         <div class="education-body">
@@ -338,61 +389,126 @@
       <p class="section-intro">A collection of paintings, sketches, and select photography.</p>
     </div>
 
-    <div class="explorations-grid" data-reveal-stagger>
-      <button
-        class="exploration-item exploration-trigger tilt-card"
-        type="button"
-        data-image-src="images/paintings.png"
-        data-image-alt="Painting collection"
-        aria-label="Expand image: Painting collection"
-      >
-        <img src="images/paintings.png" alt="Painting collection" loading="lazy">
-      </button>
-      <button
-        class="exploration-item exploration-trigger tilt-card"
-        type="button"
-        data-image-src="images/drawings.png"
-        data-image-alt="Sketch collection"
-        aria-label="Expand image: Sketch collection"
-      >
-        <img src="images/drawings.png" alt="Sketch collection" loading="lazy">
-      </button>
-      <button
-        class="exploration-item exploration-trigger tilt-card"
-        type="button"
-        data-image-src="images/uma kathak.jpg"
-        data-image-alt="Kathak dance performance"
-        aria-label="Expand image: Kathak dance performance"
-      >
-        <img src="images/uma kathak.jpg" alt="Kathak dance performance" loading="lazy">
-      </button>
-      <button
-        class="exploration-item exploration-trigger tilt-card"
-        type="button"
-        data-image-src="images/Diptychs.jpg"
-        data-image-alt="Photography diptych"
-        aria-label="Expand image: Photography diptych"
-      >
-        <img src="images/Diptychs.jpg" alt="Photography diptych" loading="lazy">
-      </button>
-      <button
-        class="exploration-item exploration-trigger tilt-card"
-        type="button"
-        data-image-src="images/michellegroup.jpg"
-        data-image-alt="Group photograph"
-        aria-label="Expand image: Group photograph"
-      >
-        <img src="images/michellegroup.jpg" alt="Group photograph" loading="lazy">
-      </button>
-      <button
-        class="exploration-item exploration-trigger tilt-card"
-        type="button"
-        data-image-src="images/oldman.jpg"
-        data-image-alt="Portrait photograph"
-        aria-label="Expand image: Portrait photograph"
-      >
-        <img src="images/oldman.jpg" alt="Portrait photograph" loading="lazy">
-      </button>
+    <div class="carousel-3d" data-reveal>
+      <div class="carousel-track">
+        <button
+          class="carousel-card exploration-trigger active"
+          type="button"
+          data-image-src="images/paintings.png"
+          data-image-alt="Painting collection"
+          aria-label="Expand image: Painting collection"
+        >
+          <span class="carousel-card-media">
+            <img
+              src="images/paintings.png"
+              alt="Painting collection"
+              loading="lazy"
+              decoding="async"
+              width="2142"
+              height="2111"
+            >
+          </span>
+          <span class="card-label">Paintings</span>
+        </button>
+        <button
+          class="carousel-card exploration-trigger"
+          type="button"
+          data-image-src="images/drawings.png"
+          data-image-alt="Sketch collection"
+          aria-label="Expand image: Sketch collection"
+        >
+          <span class="carousel-card-media">
+            <img
+              src="images/drawings.png"
+              alt="Sketch collection"
+              loading="lazy"
+              decoding="async"
+              width="1168"
+              height="1138"
+            >
+          </span>
+          <span class="card-label">Sketches</span>
+        </button>
+        <button
+          class="carousel-card exploration-trigger"
+          type="button"
+          data-image-src="images/uma kathak.jpg"
+          data-image-alt="Kathak dance performance"
+          aria-label="Expand image: Kathak dance performance"
+        >
+          <span class="carousel-card-media">
+            <img
+              src="images/uma kathak.jpg"
+              alt="Kathak dance performance"
+              loading="lazy"
+              decoding="async"
+              width="3648"
+              height="5472"
+            >
+          </span>
+          <span class="card-label">Kathak</span>
+        </button>
+        <button
+          class="carousel-card exploration-trigger"
+          type="button"
+          data-image-src="images/Diptychs.jpg"
+          data-image-alt="Photography diptych"
+          aria-label="Expand image: Photography diptych"
+        >
+          <span class="carousel-card-media">
+            <img
+              src="images/Diptychs.jpg"
+              alt="Photography diptych"
+              loading="lazy"
+              decoding="async"
+              width="3000"
+              height="4050"
+            >
+          </span>
+          <span class="card-label">Diptychs</span>
+        </button>
+        <button
+          class="carousel-card exploration-trigger"
+          type="button"
+          data-image-src="images/michellegroup.jpg"
+          data-image-alt="Group photograph"
+          aria-label="Expand image: Group photograph"
+        >
+          <span class="carousel-card-media">
+            <img
+              src="images/michellegroup.jpg"
+              alt="Group photograph"
+              loading="lazy"
+              decoding="async"
+              width="4032"
+              height="3024"
+            >
+          </span>
+          <span class="card-label">Group Photograph</span>
+        </button>
+        <button
+          class="carousel-card exploration-trigger"
+          type="button"
+          data-image-src="images/oldman.jpg"
+          data-image-alt="Portrait photograph"
+          aria-label="Expand image: Portrait photograph"
+        >
+          <span class="carousel-card-media">
+            <img
+              src="images/oldman.jpg"
+              alt="Portrait photograph"
+              loading="lazy"
+              decoding="async"
+              width="3024"
+              height="4032"
+            >
+          </span>
+          <span class="card-label">Portrait Photograph</span>
+        </button>
+      </div>
+      <button class="carousel-btn prev-btn" type="button" aria-label="Previous">&#8249;</button>
+      <button class="carousel-btn next-btn" type="button" aria-label="Next">&#8250;</button>
+      <div class="carousel-dots" role="tablist" aria-label="Exploration slides"></div>
     </div>
   </section>
 
@@ -409,105 +525,85 @@
     <div class="section-header" data-reveal>
       <!-- <span class="section-label">Thinking Out Loud</span> -->
       <h2 class="section-title" id="writing-title">Writing</h2>
-      <p class="section-intro">Thoughts on design, technology, and human experience.</p>
+      <p class="section-intro">Thoughts on design, technology, and the human experience.</p>
     </div>
 
-    <div class="writing-grid" data-reveal-stagger>
-
-      <!-- 1. The Neural Interface -->
-      <article
-        class="writing-card tilt-card"
-        data-modal="blog-1"
-        role="button"
-        tabindex="0"
-        aria-label="Read: The Neural Interface — Designing for the Mind"
-      >
-        <div class="writing-meta">
-          <span class="writing-date">Dec 2025</span>
-          <span class="writing-read-time">On-site</span>
-        </div>
-        <h3>The Neural Interface: Designing for the Mind</h3>
-        <p>Exploring the intersection of brain-computer interfaces and human-centred design principles.</p>
-        <button class="read-more" aria-hidden="true" tabindex="-1">
-          Read more <i class="fas fa-arrow-right" aria-hidden="true"></i>
+    <div class="carousel-3d" data-reveal>
+      <div class="carousel-track">
+        <!-- 1. The Neural Interface -->
+        <button
+          class="carousel-card writing-trigger active"
+          type="button"
+          data-modal="blog-1"
+          aria-label="Read: The Neural Interface — Designing for the Mind"
+        >
+          <span class="carousel-card-media writing-card">
+            <div class="writing-meta">
+              <span class="writing-date">Dec 2025</span>
+              <span class="writing-read-time">On-site</span>
+            </div>
+            <h3>The Neural Interface: Designing for the Mind</h3>
+            <p>Exploring the intersection of brain-computer interfaces and human-centred design principles.</p>
+          </span>
+          <span class="card-label">The Neural Interface</span>
         </button>
-      </article>
 
-      <!-- 2. Beyond the Screen — external Medium link (no modal) -->
-      <article class="writing-card tilt-card">
-        <div class="writing-meta">
-          <span class="writing-date">Medium</span>
-        </div>
-        <h3>Beyond the Screen</h3>
-        <p>User-Centred Design in Urban Bike-Sharing Systems.</p>
-        <a
-          href="https://medium.com/@umaracheldhamija/beyond-the-screen-user-centered-design-in-urban-bike-sharing-systems-7b118196a82d"
-          class="read-more"
-          target="_blank"
-          rel="noopener noreferrer"
+        <!-- 2. Beyond the Screen -->
+        <button
+          class="carousel-card writing-trigger"
+          type="button"
+          data-external="https://medium.com/@umaracheldhamija/beyond-the-screen-user-centered-design-in-urban-bike-sharing-systems-7b118196a82d"
           aria-label="Read Beyond the Screen on Medium (opens in new tab)"
         >
-          Read on Medium <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
-        </a>
-      </article>
-
-      <!-- 3. The Paradox at the Heart of Design -->
-      <article
-        class="writing-card tilt-card"
-        data-modal="blog-2"
-        role="button"
-        tabindex="0"
-        aria-label="Read: The Paradox at the Heart of Design"
-      >
-        <div class="writing-meta">
-          <span class="writing-date">Dec 2025</span>
-          <span class="writing-read-time">On-site</span>
-        </div>
-        <h3>The Paradox at the Heart of Design</h3>
-        <p>The deepest paradox in design is this: the best design often disappears.</p>
-        <button class="read-more" aria-hidden="true" tabindex="-1">
-          Read more <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          <span class="carousel-card-media writing-card">
+            <div class="writing-meta">
+              <span class="writing-date">Medium</span>
+            </div>
+            <h3>Beyond the Screen</h3>
+            <p>User-Centred Design in Urban Bike-Sharing Systems.</p>
+          </span>
+          <span class="card-label">Beyond the Screen</span>
         </button>
-      </article>
 
-      <!-- 4. Is AI replacing human creativity? -->
-      <article
-        class="writing-card tilt-card"
-        data-modal="blog-3"
-        role="button"
-        tabindex="0"
-        aria-label="Read: Is AI replacing human creativity?"
-      >
-        <div class="writing-meta">
-          <span class="writing-date">Jan 2026</span>
-          <span class="writing-read-time">On-site</span>
-        </div>
-        <h3>Is AI replacing human creativity?</h3>
-        <p>A developing essay on authorship, taste, and what meaningful human craft should look like in AI-assisted workflows.</p>
-        <button class="read-more" aria-hidden="true" tabindex="-1">
-          Read more <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        <!-- 3. The Paradox at the Heart of Design -->
+        <button
+          class="carousel-card writing-trigger"
+          type="button"
+          data-modal="blog-2"
+          aria-label="Read: The Paradox at the Heart of Design"
+        >
+          <span class="carousel-card-media writing-card">
+            <div class="writing-meta">
+              <span class="writing-date">Dec 2025</span>
+              <span class="writing-read-time">On-site</span>
+            </div>
+            <h3>The Paradox at the Heart of Design</h3>
+            <p>The deepest paradox in design is this: the best design often disappears.</p>
+          </span>
+          <span class="card-label">The Paradox</span>
         </button>
-      </article>
 
-      <!-- 5. Why Art Goes Underappreciated -->
-      <article
-        class="writing-card tilt-card"
-        data-modal="blog-4"
-        role="button"
-        tabindex="0"
-        aria-label="Read: Why Art Goes Underappreciated"
-      >
-        <div class="writing-meta">
-          <span class="writing-date">Feb 2026</span>
-          <span class="writing-read-time">On-site</span>
-        </div>
-        <h3>Why Art Goes Underappreciated</h3>
-        <p>An in-progress reflection on creative labor, cultural memory, and why artistic work is often valued last but felt first.</p>
-        <button class="read-more" aria-hidden="true" tabindex="-1">
-          Read more <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        <!-- 4. Is AI replacing human creativity? -->
+        <button
+          class="carousel-card writing-trigger"
+          type="button"
+          data-modal="blog-3"
+          aria-label="Read: Is AI replacing human creativity?"
+        >
+          <span class="carousel-card-media writing-card">
+            <div class="writing-meta">
+              <span class="writing-date">Jan 2026</span>
+              <span class="writing-read-time">On-site</span>
+            </div>
+            <h3>Is AI replacing human creativity?</h3>
+            <p>A developing essay on authorship, taste, and what meaningful human craft should look like in AI-assisted workflows.</p>
+          </span>
+          <span class="card-label">AI & Creativity</span>
         </button>
-      </article>
-
+      </div>
+      <button class="carousel-btn prev-btn" type="button" aria-label="Previous">&#8249;</button>
+      <button class="carousel-btn next-btn" type="button" aria-label="Next">&#8250;</button>
+      <div class="carousel-dots" role="tablist" aria-label="Writing articles slides"></div>
     </div>
   </section>
 
@@ -527,8 +623,8 @@
     <div class="contact-layout" data-reveal>
       <div class="contact-info">
         <h3>Let's make technology to improve lives.</h3>
-        <p>Whether you have a question or just want to say hello, I'd love to hear from you!</p>
-        <p>I'm always interested in hearing about new projects, collaboration opportunities, and thoughtful conversations about design and technology.</p>
+        <p>Say hello :)</p>
+        <p>I'm always interested in hearing about new projects, collaboration opportunities, and thoughtful conversations about design, technology, and the human experience.</p>
         <a href="mailto:umaracheldhamija@gmail.com" class="contact-email">
           <i class="fas fa-envelope" aria-hidden="true"></i>
           umaracheldhamija@gmail.com
@@ -584,7 +680,7 @@
 
   <footer>
     <div class="footer-content">
-      <p class="footer-name">Uma Dhamija</p>
+      <p class="footer-name" data-poem-trigger="name">Uma Dhamija</p>
       <nav class="footer-links" aria-label="Footer links">
         <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.linkedin.com/in/uma-dhamija" target="_blank" rel="noopener noreferrer">LinkedIn</a>
@@ -613,7 +709,7 @@
     <div class="modal-content exploration-modal-content" role="document">
       <button class="modal-close" aria-label="Close image">&times;</button>
       <h2 id="exploration-image-title">Exploration</h2>
-      <img id="exploration-modal-image" class="exploration-modal-image" src="" alt="">
+      <img id="exploration-modal-image" class="exploration-modal-image" src="" alt="" loading="lazy" decoding="async" width="1200" height="1200">
       <p id="exploration-modal-caption" class="exploration-modal-caption"></p>
     </div>
   </div>
@@ -624,7 +720,15 @@
       <h2 id="contact-success-title">Message Sent</h2>
       <div class="success-meme" role="img" aria-label="Meme: You hit send and it actually worked.">
         <p class="success-meme-top">YOU HIT SEND</p>
-        <img src="images/Headshot.jpeg" alt="" aria-hidden="true">
+        <img
+          src="images/Headshot.jpeg"
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          width="3592"
+          height="3403"
+        >
         <p class="success-meme-bottom">AND IT ACTUALLY WORKED</p>
       </div>
       <p class="success-meme-caption">Thanks for reaching out. I will get back to you soon.</p>
@@ -654,19 +758,19 @@
         <span class="blog-date">Uma Dhamija &middot; December 2025</span>
       </div>
       <div class="blog-body">
-        <p>For decades, designers have focused on shaping interfaces for hands and eyes — screens, buttons, gestures, and voice. Today, a quieter but more radical shift is underway: interfaces that bypass traditional input altogether and connect directly with the human brain. Brain-computer interfaces (BCIs) promise new forms of interaction, accessibility, and augmentation — but they also challenge the very foundations of human-centred design.</p>
+        <p>For decades, designers have focused on shaping interfaces for hands and eyes - screens, buttons, gestures, and voice. Today, a quieter but more radical shift is underway: interfaces that bypass traditional input altogether and connect directly with the human brain. Brain-computer interfaces (BCIs) promise new forms of interaction, accessibility, and augmentation... but they also challenge the very foundations of human-centred design.</p>
         <p>When the interface is the mind, what does it mean to design responsibly?</p>
         <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--accent-primary);margin:1.5rem 0 0.75rem;">What Is a Neural Interface?</h3>
-        <p>A neural interface, often referred to as a brain-computer interface, is a system that enables direct communication between the brain and a computer. By reading neural signals (and in some cases writing signals back), BCIs can translate brain activity into actions — moving a cursor, typing text, controlling a prosthetic, or even modulating emotional states.</p>
-        <p>While early BCI research was rooted in clinical and assistive contexts — helping people with paralysis communicate or regain mobility — recent advances in machine learning, sensor technology, and neuroscience have pushed BCIs into broader consumer and experimental spaces. From non-invasive EEG headsets to implantable devices, the line between user and system is beginning to blur. For designers, this isn't just a new interface. It's a new relationship between humans and technology.</p>
+        <p>A neural interface, often referred to as a brain-computer interface, is a system that enables direct communication between the brain and a computer. By reading neural signals (and in some cases writing signals back), BCIs can translate brain activity into actions: moving a cursor, typing text, controlling a prosthetic, or even modulating emotional states.</p>
+        <p>While early BCI research was rooted in clinical and assistive contexts like helping people with paralysis communicate or regain mobility, recent advances in machine learning, sensor technology, and neuroscience have pushed BCIs into broader consumer and experimental spaces. From non-invasive EEG headsets to implantable devices, the line between user and system is beginning to blur. For designers, this isn't just a new interface... it's a new relationship between humans and technology.</p>
         <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--accent-primary);margin:1.5rem 0 0.75rem;">From User-Centred to Mind-Centred Design</h3>
-        <p>Human-centred design has always emphasised empathy: understanding user needs, limitations, motivations, and contexts. Neural interfaces complicate this approach. The user is no longer simply interacting with a tool — they are co-adapting with a system that learns from their neural patterns over time. Users may not have conscious awareness of what inputs they're providing; feedback loops can shape cognition, attention, and emotion; errors may feel internal rather than external. Designing for neural interfaces requires a shift from usability to mental integrity.</p>
+        <p>Human-centred design has always emphasised empathy: understanding user needs, limitations, motivations, and contexts. Neural interfaces complicate this approach. The user is no longer simply interacting with a tool, they're co-adapting with a system that learns from their neural patterns over time. Users may not have conscious awareness of what inputs they're providing; feedback loops can shape cognition, attention, and emotion; errors may feel internal rather than external. Designing for neural interfaces requires a shift from usability to mental integrity.</p>
         <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--accent-primary);margin:1.5rem 0 0.75rem;">Agency, Consent, and Control</h3>
-        <p>One of the most critical challenges in BCI design is preserving user agency. When systems interpret neural signals, intent becomes ambiguous. Consent cannot be a one-time action — it must be continuous, legible, and reversible. Designers must ask: How does a user know when the system is listening? Can they pause or disengage safely? What happens when the system misinterprets a thought?</p>
-        <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--accent-primary);margin:1.5rem 0 0.75rem;">Ethics Is Not a Layer — It's the Interface</h3>
-        <p>With BCIs, ethics cannot be deferred to policy alone. Design decisions determine what data is collected, how it is framed, and how users perceive their own minds. Questions of privacy, normalisation, and power are embedded directly into the interface. Ethical neural design is not just about avoiding harm — it is about protecting human dignity.</p>
+        <p>One of the most critical challenges in BCI design is preserving user agency. When systems interpret neural signals, intent becomes ambiguous. Consent cannot be a one-time action, it must be continuous, legible, and reversible. Designers must ask... How does a user know when the system is listening? Can they pause or disengage safely? What happens when the system misinterprets a thought?</p>
+        <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--accent-primary);margin:1.5rem 0 0.75rem;">Ethics Is Not a Layer; It's the Interface</h3>
+        <p>With BCIs, ethics cannot be deferred to policy alone. Design decisions determine what data is collected, how it is framed, and how users perceive their own minds. Questions of privacy, normalisation, and power are embedded directly into the interface. Ethical neural design is not just about avoiding harm; it's about protecting human dignity.</p>
         <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--accent-primary);margin:1.5rem 0 0.75rem;">Designing with Humility</h3>
-        <p>The human brain is not a predictable input device. Good neural design embraces uncertainty, communicates limitations, and treats users as partners rather than data sources. As brain-computer interfaces move into everyday life, designers will shape whether these technologies feel empowering or invasive. The interface is no longer just something we use. It is something we become entangled with — and that demands care.</p>
+        <p>The human brain is not a predictable input device. Good neural design embraces uncertainty, communicates limitations, and treats users as partners rather than data sources. As brain-computer interfaces move into everyday life, designers will shape whether these technologies feel empowering or invasive. The interface is no longer just something we use. It is something we become entangled with... and that demands care.</p>
         <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
       </div>
     </div>
@@ -681,14 +785,15 @@
         <span class="blog-date">Uma Dhamija &middot; December 2025</span>
       </div>
       <div class="blog-body">
-        <p>Paradox exists everywhere in life. Beauty often requires pain. Discipline, strangely, creates freedom. These ideas feel contradictory at first, yet they ring true through lived experience. Design, too, is built on paradox — not as a flaw, but as a fundamental condition of making things that actually work in the world.</p>
-        <p>At its core, design is about constraint. Designers do not create in infinite space; they work within limits of time, technology, budget, ethics, and human behaviour. Yet it is precisely these constraints that enable creativity. Without limits, design becomes vague and indulgent. With them, clarity emerges. Much like discipline in life, constraint in design doesn't suffocate possibility — it sharpens it.</p>
+        <p>Paradox exists everywhere in life. Beauty often requires pain. Discipline, strangely, creates freedom. These ideas feel contradictory at first, yet they ring true through lived experience. Design, too, is built on paradox... not as a flaw, but as a fundamental condition of making things that actually work in the world.</p>
+        <p>At its core, design is about constraint. Designers do not create in infinite space; they work within limits of time, technology, budget, ethics, and human behaviour. Yet it's precisely these constraints that enable creativity. Without limits, design becomes vague and abstract. With them, clarity emerges. Much like discipline in life, constraint in design doesn't suffocate possibility... it sharpens it.</p>
         <p>Another paradox lies in simplicity. Good design often looks effortless, even obvious. But that apparent ease is the result of immense effort: research, iteration, debate, failure, and refinement. Complexity is easy to produce; simplicity is not. The designer's work is often to absorb complexity so that the user doesn't have to. In this way, designers take on cognitive burden so others may experience relief.</p>
-        <p>There is also a tension between control and surrender. Designers are trained to be intentional — to define flows, anticipate behaviours, and shape outcomes. Yet the most successful designs accept that users will reinterpret, misuse, and adapt what is given to them. Designing for humans means designing for unpredictability. Control creates structure; surrender creates resilience. Both are necessary.</p>
-        <p>User-centred design itself contains a paradox. To design well for others, designers must empathise deeply — yet not project themselves onto the user. They must care, but also remain detached enough to see patterns beyond individual stories. Too much distance leads to cold systems; too much closeness leads to biased decisions. Good design lives in the narrow space between empathy and objectivity.</p>
-        <p>Even innovation carries contradiction. Novelty is celebrated, yet familiarity is what makes products usable. Users crave new possibilities but rely on mental models built from past experiences. Designers must introduce change without disorientation — pushing forward while anchoring backward. Innovation, then, is less about disruption and more about careful translation.</p>
-        <p>Perhaps the deepest paradox in design is this: the best design often disappears. When something works seamlessly, it fades into the background of daily life. Designers labour for years so that users barely notice the result. Visibility is not the measure of success; impact is. Like good infrastructure or good care, good design is felt more than seen.</p>
-        <p>Paradox in design is not something to resolve. It is something to hold. Designing is the practice of balancing opposing forces — freedom and constraint, empathy and distance, novelty and familiarity — without collapsing into extremes. In embracing these tensions, designers don't just make better products; they reflect a deeper truth about life itself: meaning is often found not in certainty, but in the space between opposites.</p>
+        <p>There is also a tension between control and surrender. Designers are trained to be intentional; to define flows, anticipate behaviours, and shape outcomes. Yet the most successful designs accept that users will reinterpret, misuse, and adapt what is given to them. Designing for humans means designing for unpredictability. Control creates structure; surrender creates resilience. Both are necessary.</p>
+        <p>User-centred design itself contains a paradox. To design well for others, designers must empathise deeply... yet not project themselves onto the user. They must care, but also remain detached enough to see patterns beyond individual stories. Too much distance leads to cold systems; too much closeness leads to biased decisions. Good design lives in the narrow space between empathy and objectivity.</p>
+        <p>Even innovation carries contradiction. Novelty is celebrated, yet familiarity is what makes products usable. Users crave new possibilities but rely on mental models built from past experiences. Designers must introduce change without disorientation; pushing forward while anchoring backward. Innovation, then, is less about disruption and more about careful translation.</p>
+        <p>Perhaps the deepest paradox in design is this: the best design often <span class="poem-trigger" data-poem="paradox">disappears</span>. When something works seamlessly, it fades into the background of daily life. Designers labor for years so that users barely notice the result. Visibility is not the measure of success; impact is. Like good infrastructure or good care, good design is felt more than seen.</p>
+        <p>Paradox in design is not something to resolve. It is something to hold. Designing is the practice of balancing opposing forces... freedom and constraint, empathy and distance, novelty and familiarity; all without collapsing into extremes. In embracing these tensions, designers don't just make better products; they reflect a deeper truth about life itself: meaning is often found not in certainty, but in the space between opposites.</p>
+        <p>Paradox in design is not something to resolve. It is something to hold. Designing is the practice of balancing opposing forces... freedom and constraint, empathy and distance, novelty and familiarity; all without collapsing into extremes. In embracing these tensions, designers don't just make better products; they reflect a deeper truth about life itself: meaning is often found not in certainty, but in the space between opposites.</p>
         <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
       </div>
     </div>
@@ -711,7 +816,7 @@
     </div>
   </div>
 
-  <!-- blog-4: Why Art Goes Underappreciated -->
+  <!-- blog-4: Why Art Goes Underappreciated
   <div class="modal" id="blog-4" aria-labelledby="blog-4-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content" role="document">
       <button class="modal-close" aria-label="Close post">&times;</button>
@@ -726,10 +831,353 @@
         <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
       </div>
     </div>
-  </div>
+  </div> -->
 
 
-  <script src="script.js"></script>
+  <script defer src="script.js"></script>
+  <script>
+    (() => {
+      const styleId = 'index-easter-egg-styles';
+      const poemLines = {
+        scroll: [
+          "what you're looking for",
+          "isn't below the fold.",
+          "it's in the looking itself."
+        ],
+        nyu: [
+          "the city taught me",
+          "more than any syllabus ",
+          "how to see people",
+          "as complete, complex things."
+        ],
+        paradox: [
+          "the best things",
+          "leave no fingerprints.",
+          "you only notice them",
+          "when they're gone."
+        ],
+        name: [
+          "a name is the first illusion of identity,",
+          "yet you're still in search of it.",
+        ],
+        website: [
+          "how you do one thing",
+          "is how you do everything"
+        ]
+      };
+      const secretPalette = ['#FFB3C6', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB', '#F9E4B7'];
+      let typedBuffer = '';
+      let cursorX = window.innerWidth / 2;
+      let cursorY = window.innerHeight / 2;
+      let activePoemOverlay = null;
+      let poemEscapeHandler = null;
+
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          @keyframes ripple-out {
+            0% { transform: scale(0); opacity: 0.7; }
+            100% { transform: scale(4); opacity: 0; }
+          }
+
+          @keyframes fadeInLine {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+
+          .easter-poem-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+          }
+
+          .easter-poem-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            text-align: center;
+          }
+
+          .easter-poem-line {
+            opacity: 0;
+            color: #F5F4F0;
+            font-size: 1.4rem;
+            line-height: 2.2;
+            font-style: italic;
+            animation: fadeInLine 0.8s ease forwards;
+          }
+
+          .easter-poem-close {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            opacity: 0.4;
+            color: #F5F4F0;
+          }
+
+          .secret-ripple {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: ripple-out 2s ease-out forwards;
+            transform-origin: center center;
+          }
+
+          .secret-found-note {
+            position: fixed;
+            left: 50%;
+            bottom: 2rem;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 9999;
+            pointer-events: none;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      const setTriggerPointer = (element, poemKey) => {
+        if (!element) return;
+        element.dataset.poemKey = poemKey;
+        element.style.cursor = 'pointer';
+      };
+
+      const closePoemOverlay = () => {
+        if (!activePoemOverlay) return;
+        activePoemOverlay.remove();
+        activePoemOverlay = null;
+        if (poemEscapeHandler) {
+          document.removeEventListener('keydown', poemEscapeHandler);
+          poemEscapeHandler = null;
+        }
+      };
+
+      const openPoemOverlay = (poemKey) => {
+        const lines = poemLines[poemKey];
+        if (!lines) return;
+
+        closePoemOverlay();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'easter-poem-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+
+        const content = document.createElement('div');
+        content.className = 'easter-poem-content';
+
+        lines.forEach((line, index) => {
+          const lineEl = document.createElement('p');
+          lineEl.className = 'easter-poem-line';
+          lineEl.style.animationDelay = `${index * 0.6}s`;
+          lineEl.textContent = line;
+          content.appendChild(lineEl);
+        });
+
+        const hint = document.createElement('p');
+        hint.className = 'easter-poem-close';
+        hint.textContent = 'click anywhere to close';
+
+        overlay.appendChild(content);
+        overlay.appendChild(hint);
+        overlay.addEventListener('click', closePoemOverlay);
+
+        poemEscapeHandler = (event) => {
+          if (event.key === 'Escape') closePoemOverlay();
+        };
+
+        document.addEventListener('keydown', poemEscapeHandler);
+        document.body.appendChild(overlay);
+        activePoemOverlay = overlay;
+      };
+
+      const attachPoemTrigger = (element, poemKey) => {
+        if (!element) return;
+        setTriggerPointer(element, poemKey);
+        element.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openPoemOverlay(poemKey);
+        });
+      };
+
+      attachPoemTrigger(document.querySelector('[data-poem-trigger="scroll"]'), 'scroll');
+      attachPoemTrigger(document.querySelector('img[src*="New_York_University"]'), 'nyu');
+      attachPoemTrigger(document.querySelector('.poem-trigger[data-poem="paradox"]'), 'paradox');
+      attachPoemTrigger(document.querySelector('[data-poem-trigger="name"]'), 'name');
+      attachPoemTrigger(document.querySelector('[data-poem-trigger="website"]'), 'website');
+
+      document.addEventListener('mousemove', (event) => {
+        cursorX = event.clientX;
+        cursorY = event.clientY;
+      }, { passive: true });
+
+      const playSecretChime = async () => {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        try {
+          const audioContext = playSecretChime.ctx || new AudioContextClass();
+          playSecretChime.ctx = audioContext;
+
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+          }
+
+          const notes = [
+            { frequency: 523, duration: 0.15, offset: 0 },
+            { frequency: 659, duration: 0.15, offset: 0.15 },
+            { frequency: 784, duration: 0.2, offset: 0.3 }
+          ];
+
+          const now = audioContext.currentTime;
+
+          notes.forEach(({ frequency, duration, offset }) => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            const startAt = now + offset;
+            gainNode.gain.setValueAtTime(0.0001, startAt);
+            gainNode.gain.linearRampToValueAtTime(0.08, startAt + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+
+            oscillator.start(startAt);
+            oscillator.stop(startAt + duration);
+          });
+        } catch (_) {
+          /* Audio is optional for the easter egg. */
+        }
+      };
+
+      const showSecretFoundNote = () => {
+        const note = document.createElement('p');
+        note.className = 'secret-found-note';
+        note.textContent = 'you found it';
+        document.body.appendChild(note);
+
+        requestAnimationFrame(() => {
+          note.style.opacity = '1';
+        });
+
+        window.setTimeout(() => {
+          note.style.opacity = '0';
+        }, 2000);
+
+        window.setTimeout(() => {
+          note.remove();
+        }, 2400);
+      };
+
+      const triggerSecretExplosion = () => {
+        for (let index = 0; index < 12; index += 1) {
+          window.setTimeout(() => {
+            const ripple = document.createElement('span');
+            ripple.className = 'secret-ripple';
+            ripple.style.left = `${cursorX - 60}px`;
+            ripple.style.top = `${cursorY - 60}px`;
+            ripple.style.background = secretPalette[Math.floor(Math.random() * secretPalette.length)];
+            document.body.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+          }, index * 80);
+        }
+
+        playSecretChime();
+        window.setTimeout(showSecretFoundNote, 2200);
+      };
+
+      document.addEventListener('keydown', (event) => {
+        if (!event.key || event.key.length !== 1) return;
+        typedBuffer = `${typedBuffer}${event.key.toLowerCase()}`.slice(-6);
+        if (typedBuffer === 'secret') {
+          triggerSecretExplosion();
+          typedBuffer = '';
+        }
+      });
+
+      const currentHour = new Date().getHours();
+      let hasShown3am = false;
+
+      try {
+        hasShown3am = sessionStorage.getItem('3am-shown') === 'true';
+      } catch (_) {
+        hasShown3am = false;
+      }
+
+      if (currentHour >= 0 && currentHour < 4 && !hasShown3am) {
+        const root = document.documentElement;
+        const syncLateNightBackground = () => {
+          if (root.getAttribute('data-theme') === 'dark') {
+            root.style.removeProperty('--bg');
+            return;
+          }
+
+          root.style.setProperty('--bg', '#EDEBE4');
+        };
+
+        syncLateNightBackground();
+
+        const themeObserver = new MutationObserver(syncLateNightBackground);
+        themeObserver.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+        window.setTimeout(() => {
+          const note = document.createElement('p');
+          note.textContent = "you're up late.";
+          note.style.position = 'fixed';
+          note.style.bottom = '1.5rem';
+          note.style.left = '2rem';
+          note.style.fontSize = '0.8rem';
+          note.style.fontStyle = 'italic';
+          note.style.color = 'var(--text-secondary)';
+          note.style.opacity = '0';
+          note.style.transition = 'opacity 1s ease';
+          note.style.zIndex = '9998';
+          note.style.pointerEvents = 'none';
+          document.body.appendChild(note);
+
+          window.setTimeout(() => {
+            note.style.opacity = '1';
+          }, 50);
+
+          window.setTimeout(() => {
+            note.style.opacity = '0';
+          }, 5050);
+
+          note.addEventListener('transitionend', () => {
+            if (note.style.opacity === '0') {
+              note.remove();
+            }
+          });
+        }, 4000);
+
+        try {
+          sessionStorage.setItem('3am-shown', 'true');
+        } catch (_) {
+          /* Session storage is optional for this easter egg. */
+        }
+      }
+    })();
+  </script>
 
 </body>
 </html>
