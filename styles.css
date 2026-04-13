@@ -2675,6 +2675,11 @@ footer {
     top: 4.25rem;
   }
 
+  /* Hide accessibility controls on mobile scroll to save space */
+  .accessibility-controls.hidden {
+    display: none;
+  }
+
   .section {
     padding: var(--sp-16) var(--sp-4);
   }
@@ -2748,6 +2753,21 @@ footer {
     padding: var(--sp-6);
     border-radius: var(--r-lg);
     max-height: 88vh;
+  }
+
+  /* Full-screen writing modals on mobile */
+  .modal.blog-modal .modal-content {
+    max-width: 100%;
+    width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    padding: var(--sp-8) var(--sp-4);
+  }
+
+  .modal.blog-modal {
+    padding: 0;
+    padding-top: 0;
   }
 
   .project-page-hero {

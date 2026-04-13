@@ -200,14 +200,32 @@ function setupHeroObserver() {
 /* ============================================
    4. NAVIGATION — SCROLL STATE
    Adds .scrolled class for visual elevation.
-   Throttled via requestAnimationFrame flag.
+   On mobile, hides accessibility controls to save space.
    ============================================ */
 
 function setupNavScroll() {
   if (!dom.nav) return;
 
+  let lastScrollY = 0;
+  let scrollTimeout = null;
+
   const updateNavState = () => {
     dom.nav.classList.toggle('scrolled', window.scrollY > 16);
+    
+    // On mobile, hide accessibility controls when scrolling
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && dom.body) {
+      const accessibilityControls = document.querySelector('.accessibility-controls');
+      if (accessibilityControls) {
+        // Hide if scrolling down, show if scrolling up
+        if (window.scrollY > lastScrollY) {
+          accessibilityControls.classList.add('hidden');
+        } else {
+          accessibilityControls.classList.remove('hidden');
+        }
+        lastScrollY = window.scrollY;
+      }
+    }
   };
 
   window.addEventListener('scroll', debounce(updateNavState, 100), { passive: true });
@@ -808,6 +826,13 @@ function openModal(id, triggerEl) {
   _modalTrigger = triggerEl ?? null;
 
   modal.classList.add('active');
+  
+  // Add blog-modal class for writing/blog content modals on mobile
+  const isBlogModal = id && (id.includes('blog') || id.includes('writing'));
+  if (isBlogModal) {
+    modal.classList.add('blog-modal');
+  }
+  
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('role', 'dialog');
   modal.removeAttribute('aria-hidden');
@@ -823,6 +848,7 @@ function openModal(id, triggerEl) {
 
 function closeModal(modal) {
   modal.classList.remove('active');
+  modal.classList.remove('blog-modal');
   modal.setAttribute('aria-hidden', 'true');
   dom.body.style.overflow = '';
 
@@ -1199,30 +1225,38 @@ function setupInteractiveAuroraBlobs() {
     
     const heroRect = hero.getBoundingClientRect();
     
-    // Random position within the hero section (but keep blobs behind the card)
-    const randomX = Math.random() * heroRect.width;
-    const randomY = Math.random() * heroRect.height * 0.8; // Bias towards upper half
+    // Create multiple blobs per click for more intense splashes
+    const blobCount = 3 + Math.floor(Math.random() * 3); // 3-5 blobs per click
     
-    // Random blob size (350-550px diameter for big splashes)
-    const blobSize = 350 + Math.random() * 200;
-    
-    // Pick a random color
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    // Create blob element
-    const blob = document.createElement('div');
-    blob.className = `aurora-blob ${randomColor}`;
-    blob.style.left = `${randomX}px`;
-    blob.style.top = `${randomY}px`;
-    blob.style.width = `${blobSize}px`;
-    blob.style.height = `${blobSize}px`;
-    
-    blobsContainer.appendChild(blob);
-    
-    // Remove blob after animation completes (2 seconds)
-    setTimeout(() => {
-      blob.remove();
-    }, 2000);
+    for (let i = 0; i < blobCount; i++) {
+      // Stagger the blob creation for cascading effect
+      setTimeout(() => {
+        // Random position within the hero section (but keep blobs behind the card)
+        const randomX = Math.random() * heroRect.width;
+        const randomY = Math.random() * heroRect.height * 0.8; // Bias towards upper half
+        
+        // Random blob size (350-550px diameter for big splashes)
+        const blobSize = 350 + Math.random() * 200;
+        
+        // Pick a random color
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Create blob element
+        const blob = document.createElement('div');
+        blob.className = `aurora-blob ${randomColor}`;
+        blob.style.left = `${randomX}px`;
+        blob.style.top = `${randomY}px`;
+        blob.style.width = `${blobSize}px`;
+        blob.style.height = `${blobSize}px`;
+        
+        blobsContainer.appendChild(blob);
+        
+        // Remove blob after animation completes (2 seconds)
+        setTimeout(() => {
+          blob.remove();
+        }, 2000);
+      }, i * 80); // 80ms delay between each blob for cascade effect
+    }
   });
 
   // Also allow mousedown for extra interactivity
