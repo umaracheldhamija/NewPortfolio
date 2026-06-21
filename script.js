@@ -378,10 +378,7 @@ function setupAccessibilityControls() {
       state.quietMode = !state.quietMode;
       dom.body.classList.toggle('quiet-mode', state.quietMode);
       dom.quietToggle.classList.toggle('active', state.quietMode);
-      dom.quietToggle.setAttribute(
-        'aria-label',
-        state.quietMode ? 'Resume animations' : 'Pause animations'
-      );
+      updateQuietIcon();
       resetTiltCards();
       savePreferences();
     });
@@ -1276,6 +1273,318 @@ function setupInteractiveAuroraBlobs() {
 
 
 /* ============================================
+   18. KATHAK FIGURE DECORATION
+
+   Scroll-driven draw-on animation for line-art Kathak figures.
+   Each figure's path draws itself on as it scrolls into view.
+
+   ─── HOW TO TUNE ────────────────────────────────────────────
+   KATHAK_FIGURE_CONFIG maps each figure's HTML id to its
+   scroll trigger range and opacity.
+
+   scrollStart / scrollEnd: fraction of total page scroll (0–1).
+     0   = very top of page
+     1   = very bottom of page
+   Tweak these to control when each figure draws itself on.
+
+   The position, size, and opacity of each figure are set via
+   the `style` attribute directly on the SVG in index.html —
+   no JS changes needed to move figures around.
+   ─────────────────────────────────────────────────────────── */
+
+const KATHAK_FIGURE_CONFIG = {
+  'kf-a': { scrollStart: 0.06, scrollEnd: 0.28 },
+  'kf-b': { scrollStart: 0.28, scrollEnd: 0.50 },
+  'kf-c': { scrollStart: 0.52, scrollEnd: 0.74 },
+};
+
+function setupKathakFigures() {
+  const layer = document.getElementById('kathak-layer');
+  if (!layer) return;
+
+  // Stretch the layer to match the live document height
+  const syncLayerHeight = () => {
+    layer.style.height = `${document.body.scrollHeight}px`;
+  };
+  syncLayerHeight();
+  window.addEventListener('resize', debounce(syncLayerHeight, 150), { passive: true });
+
+  // Collect all figures + measure their path lengths
+  const figures = [];
+  Object.entries(KATHAK_FIGURE_CONFIG).forEach(([id, cfg]) => {
+    const svg = document.getElementById(id);
+    if (!svg) return;
+    const path = svg.querySelector('.kf-path');
+    if (!path) return;
+
+    const pathLen = path.getTotalLength();
+    path.style.strokeDasharray = pathLen;
+
+    if (state.reducedMotion) {
+      // Show fully drawn — CSS also handles this fallback
+      path.style.strokeDashoffset = 0;
+      return;
+    }
+
+    // Start fully hidden
+    path.style.strokeDashoffset = pathLen;
+    figures.push({ path, pathLen, scrollStart: cfg.scrollStart, scrollEnd: cfg.scrollEnd });
+  });
+
+  if (!figures.length) return;
+
+  let lastScroll = -1;
+
+  function tickKathak() {
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+
+    if (Math.abs(progress - lastScroll) > 0.0005) {
+      lastScroll = progress;
+
+      figures.forEach(({ path, pathLen, scrollStart, scrollEnd }) => {
+        // Local progress: 0 when scroll = scrollStart, 1 when scroll = scrollEnd
+        const local = Math.min(1, Math.max(0, (progress - scrollStart) / (scrollEnd - scrollStart)));
+        path.style.strokeDashoffset = pathLen * (1 - local);
+      });
+    }
+
+    requestAnimationFrame(tickKathak);
+  }
+
+  requestAnimationFrame(tickKathak);
+}
+
+
+/* ============================================
+   19. VIBE-CODED BADGE — fades on scroll
+   ============================================ */
+
+function setupVibeBadge() {
+  const badge = document.getElementById('vibe-badge');
+  if (!badge) return;
+
+  let lastScrollY = -1;
+
+  function updateBadge() {
+    const scrolled = window.scrollY > 60;
+    if (scrolled !== (lastScrollY > 60)) {
+      badge.classList.toggle('scrolled-away', scrolled);
+    }
+    lastScrollY = window.scrollY;
+  }
+
+  window.addEventListener('scroll', debounce(updateBadge, 80), { passive: true });
+  updateBadge();
+}
+
+
+/* ============================================
+   20. WRITING — STACKED CARD DECK
+   ============================================ */
+
+function setupWritingDeck() {
+  const stack = document.getElementById('writing-stack');
+  if (!stack) return;
+
+  const cards = [...stack.querySelectorAll('.deck-card')];
+  const prevBtn = stack.querySelector('.deck-prev');
+  const nextBtn = stack.querySelector('.deck-next');
+  const dotsContainer = stack.querySelector('.deck-dots');
+  const viewport = stack.querySelector('.deck-viewport');
+
+  if (!cards.length || !dotsContainer || !viewport) return;
+
+  let activeIndex = 0;
+  let isAnimating = false;
+
+  // Build dots
+  dotsContainer.innerHTML = '';
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'deck-dot';
+    dot.setAttribute('role', 'tab');
+    dot.setAttribute('aria-label', `Go to article ${i + 1}`);
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function updatePositions() {
+    const count = cards.length;
+    cards.forEach((card, i) => {
+      // Skip the card currently exiting — it manages its own state
+      if (card.classList.contains('deck-exit')) return;
+
+      let pos = (i - activeIndex + count) % count;
+      const maxVisible = 2;
+      const finalPos = pos > maxVisible ? -1 : pos;
+      card.setAttribute('data-deck-pos', finalPos);
+      card.setAttribute('tabindex', finalPos === 0 ? '0' : '-1');
+      card.setAttribute('aria-hidden', finalPos === 0 ? 'false' : 'true');
+    });
+
+    [...dotsContainer.children].forEach((dot, i) => {
+      dot.classList.toggle('active', i === activeIndex);
+      dot.setAttribute('aria-selected', i === activeIndex ? 'true' : 'false');
+    });
+  }
+
+  function goTo(index) {
+    if (isAnimating) return;
+    const prevIndex = activeIndex;
+    activeIndex = (index + cards.length) % cards.length;
+    if (prevIndex === activeIndex) return;
+
+    isAnimating = true;
+    const leavingCard = cards[prevIndex];
+
+    // Remove from stack positioning and apply exit animation
+    leavingCard.removeAttribute('data-deck-pos');
+    leavingCard.classList.add('deck-exit');
+
+    // Update all remaining cards immediately
+    updatePositions();
+
+    setTimeout(() => {
+      leavingCard.classList.remove('deck-exit');
+      // Assign it a hidden position in the new stack order
+      const count = cards.length;
+      const pos = (prevIndex - activeIndex + count) % count;
+      leavingCard.setAttribute('data-deck-pos', pos > 2 ? '-1' : pos);
+      leavingCard.setAttribute('tabindex', '-1');
+      leavingCard.setAttribute('aria-hidden', 'true');
+      isAnimating = false;
+    }, 400);
+  }
+
+  function next() { goTo(activeIndex + 1); }
+  function prev() { goTo(activeIndex - 1); }
+
+  prevBtn?.addEventListener('click', prev);
+  nextBtn?.addEventListener('click', next);
+
+  // Card click: advance if not front, open if front
+  cards.forEach((card, i) => {
+    card.addEventListener('click', () => {
+      if (card.classList.contains('deck-exit')) return;
+      const pos = card.getAttribute('data-deck-pos');
+      if (pos !== '0') { goTo(i); return; }
+      activateCard(card);
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && card.getAttribute('data-deck-pos') === '0') {
+        e.preventDefault();
+        activateCard(card);
+      }
+    });
+  });
+
+  function activateCard(card) {
+    const externalUrl = card.dataset.external;
+    if (externalUrl) {
+      window.open(externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const modalId = card.dataset.modal;
+    if (modalId) openModal(modalId, card);
+  }
+
+  // Touch / drag swipe
+  let touchStartX = 0;
+  viewport.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+
+  viewport.addEventListener('touchend', (e) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(deltaX) > 48) {
+      deltaX < 0 ? next() : prev();
+    }
+  }, { passive: true });
+
+  updatePositions();
+}
+
+
+/* ============================================
+   21. RESUME MODAL
+   Desktop: opens inline PDF in modal.
+   Mobile (touch or narrow): opens PDF in new tab.
+   ============================================ */
+
+function setupResumeModal() {
+  const resumeModal = document.getElementById('resume-modal');
+  const resumePdfUrl = '/Uma_Dhamija_Resume.pdf';
+
+  // Subpages have no modal — just open the PDF in a new tab
+  if (!resumeModal) {
+    document.querySelectorAll('[data-action="view-resume"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open(resumePdfUrl, '_blank', 'noopener');
+      });
+    });
+    return;
+  }
+
+  const isMobile = (
+    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    window.innerWidth < 640
+  );
+
+  const viewer = document.getElementById('resume-viewer');
+  const mobileFallback = document.getElementById('resume-mobile-fallback');
+
+  if (isMobile && viewer && mobileFallback) {
+    viewer.style.display = 'none';
+    mobileFallback.style.display = 'flex';
+    mobileFallback.removeAttribute('aria-hidden');
+
+    document.querySelectorAll('[data-action="view-resume"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open(resumePdfUrl, '_blank', 'noopener');
+      });
+    });
+    return;
+  }
+
+  // Desktop + homepage: open modal
+  document.querySelectorAll('[data-action="view-resume"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal('resume-modal', btn);
+    });
+  });
+}
+
+
+/* ============================================
+   22. QUIET-MODE ICON — play/pause toggle
+   ============================================ */
+
+function updateQuietIcon() {
+  const quietToggle = dom.quietToggle;
+  if (!quietToggle) return;
+
+  const icon = quietToggle.querySelector('i');
+  if (!icon) return;
+
+  if (state.quietMode) {
+    icon.className = 'fas fa-play';
+    quietToggle.setAttribute('aria-label', 'Resume animations');
+  } else {
+    icon.className = 'fas fa-pause';
+    quietToggle.setAttribute('aria-label', 'Pause animations');
+  }
+}
+
+
+/* ============================================
    17. INIT
    Load → Apply prefs → Wire up all modules → Start loop.
    Order matters: prefs before controls, loop last.
@@ -1298,16 +1607,18 @@ function init() {
   setupModals();
   setupContactSubmissionFlow();
   setupExplorationGallery();
-  setupWritingCarousel();
+  setupWritingDeck();      // replaces setupWritingCarousel
   setupScrollTopButton();
   setupViewportMaintenance();
   setupTiltCards();
-  setupLiquidMetal(); // Pointer-aware glow on buttons, socials, and controls
-  setupInteractiveAuroraBlobs(); // Interactive blobs on profile click
+  setupLiquidMetal();
+  setupInteractiveAuroraBlobs();
+  setupKathakFigures();
+  setupVibeBadge();
+  setupResumeModal();
+  updateQuietIcon();
 
-  // Start the single animation loop (storm + cursor + glow)
-  // This replaces the two separate updateStormReveal() calls
-  // that previously caused a double RAF loop.
+  // Start the single animation loop
   requestAnimationFrame(runBackgroundLoop);
 }
 

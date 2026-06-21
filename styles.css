@@ -174,11 +174,17 @@
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-/* Large text accessibility mode */
+/* Large text accessibility mode — scales all type, not just body */
 body.large-text {
-  --text-base: 1.125rem;
-  --text-sm:   1rem;
-  --text-lg:   1.25rem;
+  --text-xs:      0.82rem;
+  --text-sm:      1rem;
+  --text-base:    1.125rem;
+  --text-lg:      1.25rem;
+  --text-xl:      1.4rem;
+  --text-2xl:     1.65rem;
+  --text-3xl:     2.2rem;
+  --text-hero:    clamp(3rem, 6.5vw, 5rem);
+  --text-section: clamp(2rem, 4vw, 3rem);
 }
 
 
@@ -534,7 +540,11 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 }
 
 /* Show in light mode when animations are active */
-[data-theme="light"] body:not(.quiet-mode) .light-cursor-glow { opacity: 1; }
+[data-theme="light"] body:not(.quiet-mode) .light-cursor-glow {
+  opacity: 1;
+  /* Softer feathered edge — blur eliminates the hard circular boundary */
+  filter: blur(22px);
+}
 
 
 /* ============================================
@@ -871,14 +881,14 @@ body:not([data-theme="light"]) .cursor-dot {
   margin-bottom: var(--sp-3);
 }
 
-/* Role / subtitle */
+/* Role / subtitle — two lines */
 .hero-role {
   font-size: clamp(0.82rem, 1.2vw, 0.95rem);
   letter-spacing: 0.06em;
   text-transform: lowercase;
   color: var(--text-secondary);
   font-weight: 500;
-  line-height: 1.55;
+  line-height: 1.9;
   max-width: 46rem;
   margin: 0 auto var(--sp-6);
 }
@@ -1379,10 +1389,10 @@ body:not([data-theme="light"]) .cursor-dot {
   z-index: 1;
 }
 
-/* Image container */
+/* Image container — shorter to give more room for card body */
 .project-thumb {
   width: 100%;
-  height: 220px;
+  height: 175px;
   background: linear-gradient(
     135deg,
     var(--accent-subtle) 0%,
@@ -1464,12 +1474,13 @@ body:not([data-theme="light"]) .cursor-dot {
   margin-bottom: var(--sp-4);
 }
 
-/* Tag pills */
+/* Tag pills — sit at the bottom of the card after bullets */
 .project-tags {
   display: flex;
   gap: var(--sp-2);
   flex-wrap: wrap;
-  margin-bottom: var(--sp-4);
+  margin-top: auto;
+  padding-top: var(--sp-3);
 }
 
 .tag {
@@ -1972,6 +1983,11 @@ body:not([data-theme="light"]) .cursor-dot {
   font-size: var(--text-base);
 }
 
+/* Left-align social icons in the contact section */
+.contact-info .social-links {
+  justify-content: flex-start;
+}
+
 .contact-email {
   display: inline-flex;
   align-items: center;
@@ -2037,10 +2053,10 @@ body:not([data-theme="light"]) .cursor-dot {
 .form-input::placeholder,
 .form-textarea::placeholder { color: var(--text-muted); }
 
+/* Send button — centered in the form column */
 .contact-submit {
-  width: 100%;
-  max-width: none;
-  justify-content: center;
+  display: flex;
+  margin: 0 auto;
   gap: var(--sp-2);
 }
 
@@ -2283,6 +2299,33 @@ footer {
   font-size: var(--text-xs);
   letter-spacing: 0.05em;
 }
+
+.footer-resume-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--t-base);
+  position: relative;
+}
+
+.footer-resume-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-primary);
+  transition: width var(--t-base);
+}
+
+.footer-resume-btn:hover { color: var(--accent-primary); }
+.footer-resume-btn:hover::after { width: 100%; }
 
 .scroll-top-btn {
   position: fixed;
@@ -2813,8 +2856,6 @@ footer {
     max-width: 280px;
   }
 
-  .contact-submit { max-width: none; }
-
   .footer-links { gap: var(--sp-4); }
 
   .social-links { gap: var(--sp-2); }
@@ -2997,4 +3038,590 @@ body.quiet-mode [data-reveal],
 body.quiet-mode [data-reveal-stagger] > * {
   opacity: 1 !important;
   transform: none !important;
+}
+
+
+/* ============================================
+   20. HERO — PEEK WORK SECTION
+   ============================================ */
+
+.hero-section {
+  min-height: 80svh;
+}
+
+/* Work section — reduced top padding so cards peek */
+#work {
+  padding-top: var(--sp-4);
+}
+
+#work .section-header {
+  margin-bottom: var(--sp-8);
+}
+
+
+/* ============================================
+   21. ACCESSIBILITY CONTROL LABELS
+   ============================================ */
+
+.control-btn {
+  flex-direction: column;
+  gap: 3px;
+  height: auto;
+  min-height: 52px;
+  padding: var(--sp-2) var(--sp-1);
+  width: 3rem;
+  min-width: 48px;
+}
+
+.control-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--text-muted);
+  line-height: 1;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Scale control buttons and labels in large-text mode */
+body.large-text .control-btn { font-size: 1.05rem; }
+body.large-text .control-label { font-size: 0.68rem; }
+
+.control-btn:hover .control-label,
+.control-btn.active .control-label {
+  color: var(--text-secondary);
+}
+
+
+/* ============================================
+   22. KATHAK FIGURE DECORATION
+   ============================================ */
+
+/* Full-document absolute container — sits behind all content */
+#kathak-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* height is set to match document by JS */
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+.kathak-figure {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.kf-path {
+  fill: none;
+  stroke: var(--accent-primary);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-opacity: 0.75;
+}
+
+/* Reduced motion: show all figures fully drawn, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .kf-path { stroke-dashoffset: 0 !important; }
+}
+
+body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
+
+
+/* ============================================
+   23. VIBE-CODED BADGE
+   ============================================ */
+
+.vibe-badge {
+  position: fixed;
+  bottom: var(--sp-6);
+  left: var(--sp-6);
+  z-index: 902;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.6s var(--ease-smooth);
+  line-height: 1.2;
+}
+
+.vibe-badge.scrolled-away {
+  opacity: 0;
+}
+
+[data-theme="dark"] .vibe-badge {
+  color: rgba(168, 175, 221, 0.45);
+}
+
+
+/* ============================================
+   24. WORK SECTION — HORIZONTAL SCROLL
+   ============================================ */
+
+.projects-grid-wrapper {
+  position: relative;
+  /* No overflow: hidden — allows card box-shadows to show */
+}
+
+/* Fade hint on the trailing edge */
+.projects-grid-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: calc(100% - 6px);
+  background: linear-gradient(to right, transparent, var(--bg));
+  pointer-events: none;
+  z-index: 4;
+  /* No border-radius — individual cards keep their own radii */
+}
+
+.projects-grid {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  gap: clamp(1.5rem, 2.5vw, 2rem);
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  /* Generous padding: top lets shadows show, left starts cards with breathing room, right leaves room for the fade */
+  padding: var(--sp-4) 100px var(--sp-6) var(--sp-6);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  grid-template-columns: unset;
+}
+
+.projects-grid::-webkit-scrollbar { height: 3px; }
+.projects-grid::-webkit-scrollbar-track { background: transparent; }
+.projects-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* Every card: fixed width + same height */
+.project-card {
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+  height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* clips only at the card boundary */
+}
+
+/* Card subtitle — sits quietly below the title */
+.card-subtitle {
+  font-size: var(--text-xs);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: calc(var(--sp-1) * -1); /* pull up slightly */
+  margin-bottom: var(--sp-3);
+}
+
+/* Card title (interesting line) — primary */
+.project-body h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: var(--sp-1);
+}
+
+/* Impact bullets — above tags, no auto-margin */
+.card-bullets {
+  list-style: none;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.card-bullets li {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  padding-left: var(--sp-4);
+  position: relative;
+}
+
+.card-bullets li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--accent-primary);
+  font-size: 1.3em;
+  line-height: 1.3;
+}
+
+@media (max-width: 768px) {
+  .projects-grid {
+    padding-right: 60px;
+  }
+  .project-card {
+    flex: 0 0 280px;
+    height: 520px;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-card {
+    flex: 0 0 260px;
+  }
+}
+
+
+/* ============================================
+   25. WRITING — STACKED CARD DECK
+   ============================================ */
+
+.writing-stack {
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.deck-viewport {
+  position: relative;
+  /* overflow: visible so the x/y-offset behind cards can show on all sides */
+  overflow: visible;
+  /* Height equals the front card — behind cards extend past this */
+  height: 340px;
+  /* Extra margin reserves visual space for the behind-card peek */
+  margin-bottom: calc(var(--sp-8) + 28px);
+  margin-right: 28px; /* behind cards peek right */
+}
+
+.deck-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 340px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl);
+  padding: var(--sp-8);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.5s var(--ease-spring),
+              opacity 0.45s ease,
+              box-shadow 0.5s ease;
+  will-change: transform, opacity;
+  outline: none;
+}
+
+/* Front card — sits at the top-left of the deck */
+.deck-card[data-deck-pos="0"] {
+  transform: translate(0, 0);
+  z-index: 10;
+  opacity: 1;
+  box-shadow: var(--shadow-hover);
+  pointer-events: auto;
+}
+
+/* 1 behind — offset right + down, clearly peeking on three sides */
+.deck-card[data-deck-pos="1"] {
+  transform: translate(13px, 13px);
+  z-index: 9;
+  opacity: 0.72;
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+  background: var(--bg-elevated);
+}
+
+/* 2 behind — deeper offset */
+.deck-card[data-deck-pos="2"] {
+  transform: translate(25px, 25px);
+  z-index: 8;
+  opacity: 0.45;
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+  background: var(--bg-elevated);
+}
+
+/* Hidden cards */
+.deck-card[data-deck-pos="3"],
+.deck-card[data-deck-pos="-1"] {
+  transform: translate(35px, 35px);
+  z-index: 7;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Exit: fade and shrink upward */
+.deck-card.deck-exit {
+  transform: translate(-10px, -20px) scale(0.9) !important;
+  opacity: 0 !important;
+  z-index: 11 !important;
+  pointer-events: none !important;
+  transition: transform 0.36s var(--ease-smooth), opacity 0.3s ease !important;
+}
+
+.deck-card:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-hover);
+}
+
+/* Writing meta row in deck */
+.deck-card .writing-meta {
+  margin-bottom: var(--sp-4);
+}
+
+.deck-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.28;
+  margin-bottom: var(--sp-3);
+}
+
+.deck-card p {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.72;
+  flex: 1;
+}
+
+.deck-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--accent-primary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-top: var(--sp-4);
+  transition: gap var(--dur-fast);
+}
+
+.deck-card[data-deck-pos="0"]:hover .deck-read-more {
+  gap: var(--sp-3);
+}
+
+.deck-external-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.deck-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+
+.deck-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all var(--t-base);
+}
+
+.deck-btn:hover {
+  border-color: var(--glass-border-hover);
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+}
+
+.deck-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.deck-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  padding: 0;
+}
+
+.deck-dot.active {
+  background: var(--accent-primary);
+  transform: scale(1.25);
+}
+
+@media (max-width: 480px) {
+  .writing-stack { max-width: 100%; }
+  .deck-viewport { height: 340px; }
+  .deck-card { padding: var(--sp-6); }
+}
+
+
+/* ============================================
+   26. ABOUT / CONTACT — HEADSHOT & REFRESH
+   ============================================ */
+
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-6);
+}
+
+.about-headshot {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--glass-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
+              0 0 0 5px var(--accent-subtle);
+  flex-shrink: 0;
+}
+
+.about-bio {
+  margin: 0;
+}
+
+.about-bio p {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.65;
+  margin-bottom: var(--sp-2);
+}
+
+.about-bio cite {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 600px) {
+  .about-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .contact-email,
+  .contact-info .social-links {
+    justify-content: center;
+  }
+}
+
+
+/* ============================================
+   27. RESUME MODAL — centered panel (matches article modals)
+   ============================================ */
+
+/* Full-screen resume modal.
+   16px padding on the overlay keeps a thin backdrop ring visible
+   so clicking outside (that ring) still closes the modal. */
+.modal-resume {
+  padding: 16px;
+  align-items: stretch;
+}
+
+.resume-modal-content {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.resume-modal-top {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6) var(--sp-10);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.resume-modal-top h2 {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  letter-spacing: 0.03em;
+}
+
+/* Close button stays in normal flow (not absolute) */
+.resume-modal-content .modal-close {
+  position: static;
+  top: auto;
+  right: auto;
+}
+
+.resume-viewer {
+  /* min-height: 0 is critical — without it a flex item won't shrink
+     below its content's intrinsic size, causing the iframe to overflow */
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.resume-iframe {
+  /* Absolute fill so the iframe always matches its container exactly */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.resume-mobile-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  flex: 1;
+  padding: var(--sp-12) var(--sp-8);
+  text-align: center;
+}
+
+.resume-mobile-fallback p {
+  color: var(--text-secondary);
+  font-size: var(--text-base);
 }

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Uma Dhamija — UX Designer specialising in human-centred design and brain-computer interfaces.">
+  <meta name="description" content="Uma Dhamija UX Designer specialising in human-centred design and brain-computer interfaces.">
   <meta name="theme-color" content="#F5F4F0">
-  <meta property="og:title" content="Uma Dhamija — Experience Designer">
+  <meta property="og:title" content="Uma Dhamija Experience Designer">
   <meta property="og:description" content="UX Advocate • Interface Designer • NeuroTech Enthusiast • Kathak Dancer">
   <meta property="og:type" content="website">
-  <title>Uma Dhamija — Experience Designer</title>
+  <title>Uma Dhamija Experience Designer</title>
 
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,21 +39,104 @@
     </div>
   </div>
 
+  <!-- ============================================
+       KATHAK FIGURES decorative, homepage only.
+
+       HOW TO USE YOUR OWN ILLUSTRATIONS:
+       1. Export each pose as an SVG with a single <path> (or a few paths).
+          Keep strokes only no fills.
+       2. Copy the path `d` attribute value and paste it over the placeholder
+          `d` value in the matching <path class="kf-path"> below.
+       3. Update the `viewBox` on the parent <svg> to match your artwork's
+          natural coordinate system.
+       4. Tune position/size with the `style` attribute on the <svg>:
+            left / right  horizontal offset (vw or px)
+            top           distance from top of document (vh or px)
+            width         rendered size of the figure
+            opacity       overall visibility (0–1)
+       5. Tune the scroll animation in KATHAK_FIGURE_CONFIG in script.js ;
+          each entry maps the figure's id to a scrollStart/End fraction.
+       ============================================ -->
+
+  <div id="kathak-layer" aria-hidden="true">
+
+    <!-- Figure A: Extended arm / hasta left side, work section area -->
+    <svg
+      class="kathak-figure" id="kf-a"
+      style="left: 2.5vw; top: 95vh; width: 110px; opacity: 0.12;"
+      viewBox="0 0 80 140"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <!-- PLACEHOLDER replace path d with your own single-line illustration -->
+      <path class="kf-path" d="
+        M 40 8 C 42 5 46 5 46 9 C 46 13 42 15 40 13 C 38 15 34 13 34 9 C 34 5 38 5 40 8 Z
+        M 40 13 L 40 55
+        M 40 32 C 30 27 18 25 10 30 C 6 32 5 36 8 39 C 10 41 14 40 16 37
+        M 16 37 C 13 40 12 44 15 46 C 17 48 21 46 21 44
+        M 40 32 C 50 27 62 22 70 14
+        M 40 55 L 32 84 L 28 118
+        M 40 55 L 48 82 L 52 112
+      "/>
+    </svg>
+
+    <!-- Figure B: Chakkar / spin suggestion right side, education area -->
+    <svg
+      class="kathak-figure" id="kf-b"
+      style="right: 3vw; top: 200vh; width: 120px; opacity: 0.10;"
+      viewBox="0 0 90 140"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path class="kf-path" d="
+        M 45 9 C 47 6 51 6 51 10 C 51 14 47 16 45 14 C 43 16 39 14 39 10 C 39 6 43 6 45 9 Z
+        M 45 14 L 43 56
+        M 43 32 C 30 29 18 33 10 42 C 6 46 7 52 12 54
+        M 43 32 C 56 26 70 20 80 12 C 85 8 84 3 80 2
+        M 43 56 C 36 70 30 84 28 100 C 27 110 30 118 36 117
+        M 43 56 C 52 66 62 76 72 80 C 80 84 85 80 83 74
+      "/>
+    </svg>
+
+    <!-- Figure C: Aramandi standing pose left side, writing/contact area -->
+    <svg
+      class="kathak-figure" id="kf-c"
+      style="left: 3.5vw; top: 320vh; width: 95px; opacity: 0.11;"
+      viewBox="0 0 70 145"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path class="kf-path" d="
+        M 35 9 C 37 6 41 6 41 10 C 41 14 37 16 35 14 C 33 16 29 14 29 10 C 29 6 33 6 35 9 Z
+        M 35 14 L 35 60
+        M 35 36 C 24 31 14 29 8 35 C 5 39 6 44 10 46
+        M 35 36 C 46 31 56 29 62 35 C 65 39 64 44 60 46
+        M 35 60 C 28 72 22 86 20 102 C 19 112 22 120 28 118
+        M 35 60 C 42 72 48 86 50 102 C 51 112 48 120 42 118
+      "/>
+    </svg>
+
+  </div>
+
+  <!-- Vibe badge fades on scroll -->
+  <p class="vibe-badge" id="vibe-badge" aria-hidden="true">Vibe-coded with Claude in VSCode</p>
+
 
   <!-- ============================================
        ACCESSIBILITY CONTROLS
-       Original used fa-cloud-bolt for quiet mode — preserved.
+       Motion button: pause icon when playing, play icon when paused.
+       JS in setupQuietIcon() drives the swap.
        ============================================ -->
 
   <div class="accessibility-controls" aria-label="Accessibility settings">
     <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Switch to dark mode">
       <i class="fas fa-moon" aria-hidden="true"></i>
+      <span class="control-label">Dark</span>
     </button>
     <button class="control-btn" id="quiet-toggle" title="Pause animations" aria-label="Pause animations">
-      <i class="fa-solid fa-cloud-bolt" aria-hidden="true"></i>
+      <i class="fas fa-pause" aria-hidden="true"></i>
+      <span class="control-label">Motion</span>
     </button>
     <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Increase text size">
       <i class="fas fa-text-height" aria-hidden="true"></i>
+      <span class="control-label">Text size</span>
     </button>
   </div>
 
@@ -97,22 +180,10 @@
     
     <div class="hero-content tilt-card" data-tilt-max="6">
 
-      <!-- Original: images/Headshot.jpeg -->
-      <div class="profile-image">
-        <img
-          src="images/Headshot.jpeg"
-          alt="Uma Dhamija portrait"
-          width="140"
-          height="140"
-          loading="eager"
-        >
-      </div>
-
       <h1 class="hero-name">Uma Dhamija</h1>
-      <!-- Original bio text preserved exactly -->
-      <p class="hero-role">ai ux &bull; interaction designer &bull; neurotech enthusiast &bull; kathak dancer</p>
+      <p class="hero-role">designing for better healthcare<br>ai ux &bull; neurotech enthusiast &bull; kathak dancer</p>
 
-      <!-- Social links — original URLs preserved -->
+      <!-- Social links original URLs preserved -->
       <div class="social-links" aria-label="Social links">
         <a href="https://www.linkedin.com/in/umadhamija" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)" title="LinkedIn">
           <i class="fab fa-linkedin-in" aria-hidden="true"></i>
@@ -134,174 +205,205 @@
           <span>View My Work</span>
           <i class="fas fa-arrow-down" aria-hidden="true"></i>
         </a>
-        <!-- Original: download attribute + Uma_Dhamija_Resume.pdf -->
-        <a href="Uma_Dhamija_Resume.pdf" class="btn btn-secondary" download aria-label="Download resume PDF">
-          <span>Download Resume</span>
-          <i class="fas fa-download" aria-hidden="true"></i>
-        </a>
+        <button type="button" class="btn btn-secondary" data-action="view-resume" aria-label="View resume PDF">
+          <span>View Resume</span>
+          <i class="fas fa-file-pdf" aria-hidden="true"></i>
+        </button>
       </div>
 
     </div>
-
-    <div class="scroll-indicator" data-poem-trigger="scroll" aria-hidden="true">Scroll</div>
   </section>
 
 
   <!-- ============================================
        WORK SECTION
-       All 6 original projects — exact image paths
+       All 6 original projects exact image paths
        and sub-page links from the original HTML.
        ============================================ -->
 
   <section class="section" id="work" aria-labelledby="work-title">
     <div class="section-header" data-reveal>
-      <!-- <span class="section-label">Selected Work</span> -->
-      <h2 class="section-title" id="work-title">Featured Work</h2>
-      <!-- Original section intro preserved -->
+      <h2 class="section-title" id="work-title">Some late night hours</h2>
       <p class="section-intro" data-poem-trigger="website">Creating this website was also fun ;)</p>
     </div>
 
-    <div class="projects-grid" data-reveal-stagger>
+    <div class="projects-grid-wrapper">
+      <div class="projects-grid" data-reveal-stagger>
 
-      <!-- 1. OpenMined Capstone -->
-      <a href="openmined/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img
-            src="openmined/logo.jpg"
-            alt="OpenMined logo"
-            loading="lazy"
-            decoding="async"
-            width="2560"
-            height="1440"
-          >
-        </div>
-        <div class="project-body">
-          <h3>OpenMined - Capstone</h3>
-          <p>Developing use cases for privacy-preserving Artificial Intelligence Technology.</p>
-          <div class="project-tags">
-            <span class="tag">User Research</span>
-            <span class="tag">AI Ethics</span>
-            <span class="tag">UX Design</span>
+        <!-- 1. OpenMined Capstone -->
+        <a href="openmined/index.html" class="project-card tilt-card">
+          <div class="project-thumb">
+            <img
+              src="openmined/logo.jpg"
+              alt="OpenMined logo"
+              loading="lazy"
+              decoding="async"
+              width="2560"
+              height="1440"
+            >
           </div>
-        </div>
-      </a>
-
-      <!-- 2. UPMC Magee Hospital — Designing w/CARE -->
-      <a href="upmc/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img
-            src="upmc/logo.jpg"
-            alt="UPMC Magee Hospital Gynaecological Oncology Unit"
-            loading="lazy"
-            decoding="async"
-            width="2046"
-            height="949"
-          >
-        </div>
-        <div class="project-body">
-          <h3>Designing w/CARE</h3>
-          <p>Creating design solutions for Magee Hospital's Gynaecological Oncology Unit.</p>
-          <div class="project-tags">
-            <span class="tag">Research</span>
-            <span class="tag">User Experience</span>
-            <span class="tag">Interface Design</span>
-            <span class="tag">Service Design</span>
+          <div class="project-body">
+            <h3>Securely training AI on private data</h3>
+            <p class="card-subtitle">OpenMined</p>
+            <ul class="card-bullets">
+              <li>Narrowed 36 ideas down to the one concept OpenMined chose to build</li>
+              <li>Prototyped "The Informed Patient" a privacy-preserving AI product</li>
+            </ul>
+            <div class="project-tags">
+              <span class="tag">AI Ethics</span>
+              <span class="tag">User Research</span>
+              <span class="tag">UI + UX Design</span>
+              <span class="tag">A lot of desk research</span>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
 
-      <!-- 3. MeditationWise -->
-      <a href="meditationwise/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img
-            src="meditationwise/logo.png"
-            alt="MeditationWise app interface"
-            loading="lazy"
-            decoding="async"
-            width="1368"
-            height="1068"
-          >
-        </div>
-        <div class="project-body">
-          <h3>MeditationWise</h3>
-          <p>Lead Designer for a meditation app connecting users with global spiritual and authentic practices. From concept to launch with daily active users.</p>
-          <div class="project-tags">
-            <span class="tag">Interface Design</span>
-            <span class="tag">UX Research</span>
-            <span class="tag">Product Management</span>
+        <!-- 2. UPMC Magee Hospital Designing w/CARE -->
+        <a href="upmc/index.html" class="project-card tilt-card">
+          <div class="project-thumb">
+            <img
+              src="upmc/logo.jpg"
+              alt="UPMC Magee Hospital Gynaecological Oncology Unit"
+              loading="lazy"
+              decoding="async"
+              width="2046"
+              height="949"
+            >
           </div>
-        </div>
-      </a>
-
-      <!-- 4. Northwestern Capstone — GlowUp Eye Care -->
-      <a href="northwestern/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img
-            src="northwestern/photo.jpg"
-            alt="GlowUp Eye Care VR project"
-            loading="lazy"
-            decoding="async"
-            width="1024"
-            height="1024"
-          >
-        </div>
-        <div class="project-body">
-          <h3>GlowUp Eye Care</h3>
-          <p>Northwestern Capstone: VR-based research exploring children's oculomotor development and eye exercise games.</p>
-          <div class="project-tags">
-            <span class="tag">Research</span>
-            <span class="tag">VR Design</span>
-            <span class="tag">Conceptualisation</span>
+          <div class="project-body">
+            <h3>Designing care that holds through the hardest moments</h3>
+            <p class="card-subtitle">Designing w/CARE · UPMC</p>
+            <ul class="card-bullets">
+              <li>Mapped the oncology journey to find where caregivers lost confidence</li>
+              <li>Designed service concepts that eased clinical communication for staff</li>
+            </ul>
+            <div class="project-tags">
+              <span class="tag">Healthcare UX</span>
+              <span class="tag">Service Design</span>
+              <span class="tag">Research</span>
+              <span class="tag">Journey Mapping</span>
+              <span class="tag">Stakeholder Interviews</span>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
 
-      <!-- 5. Electric Scooters for Kids -->
-      <a href="scooter/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img
-            src="scooter/photo.png"
-            alt="Electric scooter prototype for kids"
-            loading="lazy"
-            decoding="async"
-            width="822"
-            height="566"
-          >
-        </div>
-        <div class="project-body">
-          <h3>Electric Scooters for Kids</h3>
-          <p>Physical prototype combining 3D printing, research, and user-centred design for safer mobility.</p>
-          <div class="project-tags">
-            <span class="tag">Wireframing</span>
-            <span class="tag">Prototyping</span>
-            <span class="tag">User Experience Design</span>
+        <!-- 3. MeditationWise -->
+        <a href="meditationwise/index.html" class="project-card tilt-card">
+          <div class="project-thumb">
+            <img
+              src="meditationwise/logo.png"
+              alt="MeditationWise app interface"
+              loading="lazy"
+              decoding="async"
+              width="1368"
+              height="1068"
+            >
           </div>
-        </div>
-      </a>
-
-      <!-- 6. Kathak Kala Kendra -->
-      <a href="kathak/index.html" class="project-card tilt-card">
-        <div class="project-thumb">
-          <img
-            src="kathak/photo.png"
-            alt="Kathak Kala Kendra dance school website"
-            loading="lazy"
-            decoding="async"
-            width="1264"
-            height="842"
-          >
-        </div>
-        <div class="project-body">
-          <h3>Kathak Kala Kendra</h3>
-          <p>A website for a Kathak dance school based in India - made for my teacher of 15 years.</p>
-          <div class="project-tags">
-            <span class="tag">Product Design</span>
-            <span class="tag">Conceptualisation</span>
-            <span class="tag">Web Development</span>
+          <div class="project-body">
+            <h3>An app that actually respects why people meditate</h3>
+            <p class="card-subtitle">MeditationWise</p>
+            <ul class="card-bullets">
+              <li>9+ usability sessions uncovered where the existing app was losing people</li>
+              <li>Redesigned discovery to reduce cognitive load while honoring cultural depth</li>
+            </ul>
+            <div class="project-tags">
+              <span class="tag">Mobile UX</span>
+              <span class="tag">Product Design</span>
+              <span class="tag">User Research</span>
+              <span class="tag">Design Systems</span>
+              <span class="tag">Interaction Design</span>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
 
+        <!-- 4. Northwestern Capstone GlowUp Eye Care -->
+        <a href="northwestern/index.html" class="project-card tilt-card">
+          <div class="project-thumb">
+            <img
+              src="northwestern/photo.jpg"
+              alt="GlowUp Eye Care VR project"
+              loading="lazy"
+              decoding="async"
+              width="1024"
+              height="1024"
+            >
+          </div>
+          <div class="project-body">
+            <h3>Making eye therapy fun enough that kids come back tomorrow</h3>
+            <p class="card-subtitle">GlowUp Eye Care · Northwestern</p>
+            <ul class="card-bullets">
+              <li>Adherence not awareness was the real design problem</li>
+              <li>Designed an XR exercise system built around child attention spans</li>
+            </ul>
+            <div class="project-tags">
+              <span class="tag">XR Design</span>
+              <span class="tag">Healthcare</span>
+              <span class="tag">Children's UX</span>
+              <span class="tag">Research</span>
+              <span class="tag">Speculative Design</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 5. Electric Scooters for Kids -->
+        <a href="scooter/index.html" class="project-card tilt-card">
+          <div class="project-thumb">
+            <img
+              src="scooter/photo.png"
+              alt="Electric scooter prototype for kids"
+              loading="lazy"
+              decoding="async"
+              width="822"
+              height="566"
+            >
+          </div>
+          <div class="project-body">
+            <h3>When the rider is 8 years old, everything about the design changes</h3>
+            <p class="card-subtitle">Electric Scooters for Kids</p>
+            <ul class="card-bullets">
+              <li>Mapped 4 ride scenarios to anchor every design decision</li>
+              <li>3 prototype iterations validated control placement against real handling</li>
+            </ul>
+            <div class="project-tags">
+              <span class="tag">Physical Prototyping</span>
+              <span class="tag">Safety Design</span>
+              <span class="tag">Ergonomics</span>
+              <span class="tag">User Research</span>
+              <span class="tag">Iteration</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 6. Kathak Kala Kendra -->
+        <a href="kathak/index.html" class="project-card tilt-card">
+          <div class="project-thumb">
+            <img
+              src="kathak/photo.png"
+              alt="Kathak Kala Kendra dance school website"
+              loading="lazy"
+              decoding="async"
+              width="1264"
+              height="842"
+            >
+          </div>
+          <div class="project-body">
+            <h3>A website my teacher of 15 years didn't know he was getting</h3>
+            <p class="card-subtitle">Kathak Kala Kendra</p>
+            <ul class="card-bullets">
+              <li>Built solo designed for Dharamshala's bandwidth and a non-technical client</li>
+              <li>Connects Guru Dharmendra Jain with students worldwide</li>
+            </ul>
+            <div class="project-tags">
+              <span class="tag">Web Design</span>
+              <span class="tag">Content Strategy</span>
+              <span class="tag">Solo Project</span>
+              <span class="tag">Low-Resource Design</span>
+              <span class="tag">Handoff</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
     </div>
   </section>
 
@@ -312,8 +414,8 @@
 
   <section class="section" id="education" aria-labelledby="education-title">
     <div class="section-header" data-reveal>
-      <h2 class="section-title" id="education-title">Education</h2>
-      <p class="section-intro" data-poem-trigger="website">But, of course, it doesn't end here.</p>
+      <h2 class="section-title" id="education-title">Expensive Paperweight</h2>
+      <p class="section-intro">Education doesn't end here.</p>
     </div>
 
     <div class="education-panel" data-reveal-stagger>
@@ -351,7 +453,7 @@
         <div class="education-body">
           <h3>Master in Information Design &amp; Strategy</h3>
           <p class="education-school">Northwestern University</p>
-          <p class="education-meta">Sep 2025 &ndash; Aug 2025 &middot; Remote</p>
+          <p class="education-meta">Sep 2024 &ndash; Aug 2025 &middot; Remote</p>
         </div>
       </article>
 
@@ -519,92 +621,93 @@
        All 5 original cards restored.
        FIX: Cards 3–5 all shared id="blog-2" in the original.
        Now: blog-1, blog-2, blog-3, blog-4 (unique IDs).
-       Card 2 (Medium) links externally — no modal needed.
+       Card 2 (Medium) links externally no modal needed.
        ============================================ -->
 
   <section class="section" id="writing" aria-labelledby="writing-title">
     <div class="section-header" data-reveal>
-      <!-- <span class="section-label">Thinking Out Loud</span> -->
       <h2 class="section-title" id="writing-title">Writing</h2>
       <p class="section-intro">Thoughts on design, technology, and the human experience.</p>
     </div>
 
-    <div class="carousel-3d" data-reveal>
-      <div class="carousel-track">
-        <!-- 1. The Neural Interface -->
-        <button
-          class="carousel-card writing-trigger active"
-          type="button"
-          data-modal="blog-1"
-          aria-label="Read: The Neural Interface — Designing for the Mind"
-        >
-          <span class="carousel-card-media writing-card">
-            <div class="writing-meta">
-              <span class="writing-date">Dec 2025</span>
-              <span class="writing-read-time">On-site</span>
-            </div>
-            <h3>The Neural Interface: Designing for the Mind</h3>
-            <p>Exploring the intersection of brain-computer interfaces and human-centred design principles.</p>
-          </span>
-          <span class="card-label">The Neural Interface</span>
-        </button>
+    <div class="writing-stack" data-reveal id="writing-stack">
+      <div class="deck-viewport" role="region" aria-label="Writing articles">
 
-        <!-- 2. Beyond the Screen -->
-        <button
-          class="carousel-card writing-trigger"
-          type="button"
+        <!-- Card 1 The Neural Interface (on-site modal) -->
+        <div
+          class="deck-card"
+          data-modal="blog-1"
+          role="button"
+          tabindex="0"
+          aria-label="Read: The Neural Interface Designing for the Mind"
+        >
+          <div class="writing-meta">
+            <span class="writing-date">Dec 2025</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>The Neural Interface: Designing for the Mind</h3>
+          <p>Exploring the intersection of brain-computer interfaces and human-centred design principles.</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
+
+        <!-- Card 2 Beyond the Screen (external Medium link) -->
+        <div
+          class="deck-card"
           data-external="https://medium.com/@umaracheldhamija/beyond-the-screen-user-centered-design-in-urban-bike-sharing-systems-7b118196a82d"
+          role="button"
+          tabindex="-1"
           aria-label="Read Beyond the Screen on Medium (opens in new tab)"
         >
-          <span class="carousel-card-media writing-card">
-            <div class="writing-meta">
-              <span class="writing-date">Medium</span>
-            </div>
-            <h3>Beyond the Screen</h3>
-            <p>User-Centred Design in Urban Bike-Sharing Systems.</p>
-          </span>
-          <span class="card-label">Beyond the Screen</span>
-        </button>
+          <div class="writing-meta">
+            <span class="writing-date">Medium</span>
+            <span class="deck-external-badge"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> External</span>
+          </div>
+          <h3>Beyond the Screen</h3>
+          <p>User-Centred Design in Urban Bike-Sharing Systems.</p>
+          <span class="deck-read-more">Read on Medium <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+        </div>
 
-        <!-- 3. The Paradox at the Heart of Design -->
-        <button
-          class="carousel-card writing-trigger"
-          type="button"
+        <!-- Card 3 The Paradox (on-site modal) -->
+        <div
+          class="deck-card"
           data-modal="blog-2"
+          role="button"
+          tabindex="-1"
           aria-label="Read: The Paradox at the Heart of Design"
         >
-          <span class="carousel-card-media writing-card">
-            <div class="writing-meta">
-              <span class="writing-date">Dec 2025</span>
-              <span class="writing-read-time">On-site</span>
-            </div>
-            <h3>The Paradox at the Heart of Design</h3>
-            <p>The deepest paradox in design is this: the best design often disappears.</p>
-          </span>
-          <span class="card-label">The Paradox</span>
-        </button>
+          <div class="writing-meta">
+            <span class="writing-date">Dec 2025</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>The Paradox at the Heart of Design</h3>
+          <p>The deepest paradox in design is this: the best design often disappears.</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
 
-        <!-- 4. Is AI replacing human creativity? -->
-        <button
-          class="carousel-card writing-trigger"
-          type="button"
+        <!-- Card 4 Is AI replacing human creativity? (on-site modal) -->
+        <div
+          class="deck-card"
           data-modal="blog-3"
+          role="button"
+          tabindex="-1"
           aria-label="Read: Is AI replacing human creativity?"
         >
-          <span class="carousel-card-media writing-card">
-            <div class="writing-meta">
-              <span class="writing-date">Jan 2026</span>
-              <span class="writing-read-time">On-site</span>
-            </div>
-            <h3>Is AI replacing human creativity?</h3>
-            <p>A developing essay on authorship, taste, and what meaningful human craft should look like in AI-assisted workflows.</p>
-          </span>
-          <span class="card-label">AI & Creativity</span>
-        </button>
+          <div class="writing-meta">
+            <span class="writing-date">Jan 2026</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>Is AI replacing human creativity?</h3>
+          <p>A developing essay on authorship, taste, and what meaningful human craft should look like in AI-assisted workflows.</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
+
       </div>
-      <button class="carousel-btn prev-btn" type="button" aria-label="Previous">&#8249;</button>
-      <button class="carousel-btn next-btn" type="button" aria-label="Next">&#8250;</button>
-      <div class="carousel-dots" role="tablist" aria-label="Writing articles slides"></div>
+
+      <div class="deck-controls">
+        <button class="deck-btn deck-prev" type="button" aria-label="Previous article">&#8249;</button>
+        <div class="deck-dots" role="tablist" aria-label="Writing article navigation"></div>
+        <button class="deck-btn deck-next" type="button" aria-label="Next article">&#8250;</button>
+      </div>
     </div>
   </section>
 
@@ -623,9 +726,21 @@
 
     <div class="contact-layout" data-reveal>
       <div class="contact-info">
-        <h3>Let's make technology to improve lives.</h3>
-        <p>Say hello :)</p>
-        <p>I'm always interested in hearing about new projects, collaboration opportunities, and thoughtful conversations about design, technology, and the human experience.</p>
+        <div class="about-header">
+          <img
+            src="images/Headshot.jpeg"
+            alt="Uma Dhamija"
+            class="about-headshot"
+            loading="lazy"
+            decoding="async"
+            width="200"
+            height="200"
+          >
+          <blockquote class="about-bio">
+            <p>"Design creates culture. Culture shapes values. Values determine the future."</p>
+            <cite>Robert L. Peters</cite>
+          </blockquote>
+        </div>
         <a href="mailto:umaracheldhamija@gmail.com" class="contact-email">
           <i class="fas fa-envelope" aria-hidden="true"></i>
           umaracheldhamija@gmail.com
@@ -643,7 +758,7 @@
         </div>
       </div>
 
-      <!-- Original form action: formsubmit.co — preserved exactly -->
+      <!-- Original form action: formsubmit.co preserved exactly -->
       <form
         class="contact-form"
         action="https://formsubmit.co/umaracheldhamija@gmail.com"
@@ -663,7 +778,7 @@
         </div>
         <div class="form-group">
           <label for="message" class="form-label">Message</label>
-          <textarea id="message" name="message" class="form-textarea" rows="6" placeholder="Tell me about your project or just say hello." required></textarea>
+          <textarea id="message" name="message" class="form-textarea" rows="6" required>Hey Uma!</textarea>
         </div>
         <button type="submit" class="btn btn-primary contact-submit">
           <span>Send Message</span>
@@ -686,13 +801,8 @@
         <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.linkedin.com/in/umadhamija" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener noreferrer">Medium</a>
+        <button type="button" class="footer-resume-btn" data-action="view-resume" aria-label="View resume">View Resume</button>
       </nav>
-      <div class="cta-group" style="justify-content:center; margin-bottom:1.5rem;">
-        <a href="Uma_Dhamija_Resume.pdf" class="btn btn-secondary" download aria-label="Download resume PDF">
-          <span>Download Resume</span>
-          <i class="fas fa-download" aria-hidden="true"></i>
-        </a>
-      </div>
       <p class="footer-copy">&copy; 2026 Uma Dhamija.</p>
     </div>
   </footer>
@@ -744,10 +854,10 @@
   <!-- ============================================
        BLOG MODALS
        
-       blog-1 — The Neural Interface (full essay)
-       blog-2 — The Paradox at the Heart of Design (full essay)
-       blog-3 — Is AI replacing human creativity?
-       blog-4 — Why Art Goes Underappreciated
+       blog-1 The Neural Interface (full essay)
+       blog-2 The Paradox at the Heart of Design (full essay)
+       blog-3 Is AI replacing human creativity?
+       blog-4 Why Art Goes Underappreciated
        ============================================ -->
 
   <!-- blog-1: The Neural Interface -->
@@ -833,6 +943,42 @@
       </div>
     </div>
   </div> -->
+
+
+  <!-- ============================================
+       RESUME MODAL
+       Desktop: inline iframe PDF viewer.
+       Mobile: redirects to PDF in new tab via JS.
+       ============================================ -->
+
+  <div class="modal modal-resume" id="resume-modal" aria-labelledby="resume-modal-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content resume-modal-content" role="document">
+      <div class="resume-modal-top">
+        <h2 id="resume-modal-title">Uma Dhamija Resume</h2>
+        <a href="Uma_Dhamija_Resume.pdf" download class="btn btn-secondary" aria-label="Download resume PDF">
+          <span>Download</span>
+          <i class="fas fa-download" aria-hidden="true"></i>
+        </a>
+        <button class="modal-close" aria-label="Close resume">&times;</button>
+      </div>
+      <div class="resume-viewer" id="resume-viewer">
+        <iframe
+          src="Uma_Dhamija_Resume.pdf#zoom=90"
+          title="Uma Dhamija Resume"
+          class="resume-iframe"
+          loading="lazy"
+          aria-label="Resume PDF viewer"
+        ></iframe>
+      </div>
+      <div class="resume-mobile-fallback" id="resume-mobile-fallback" aria-hidden="true" style="display:none;">
+        <p>For the best experience on mobile, open the PDF directly.</p>
+        <a href="Uma_Dhamija_Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          <span>Open Resume</span>
+          <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </div>
 
 
   <script defer src="script.js"></script>
@@ -1019,7 +1165,6 @@
         });
       };
 
-      attachPoemTrigger(document.querySelector('[data-poem-trigger="scroll"]'), 'scroll');
       attachPoemTrigger(document.querySelector('img[src*="New_York_University"]'), 'nyu');
       attachPoemTrigger(document.querySelector('.poem-trigger[data-poem="paradox"]'), 'paradox');
       attachPoemTrigger(document.querySelector('[data-poem-trigger="name"]'), 'name');
