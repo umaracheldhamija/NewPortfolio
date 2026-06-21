@@ -1292,7 +1292,7 @@ body:not([data-theme="light"]) .cursor-dot {
 .project-card {
   display: block;
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(217, 216, 213, 0.35);
   border-radius: var(--r-xl);
   overflow: hidden;
   position: relative;
@@ -3134,6 +3134,41 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
 
 
 /* ============================================
+   28. CARD BADGE (Capstone / Startup labels)
+   Sits inline with .card-subtitle, same pill
+   family as .tag but paired with the org name.
+   ============================================ */
+
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-3);
+}
+
+/* Override the subtitle's own margin-bottom when inside the row */
+.card-meta-row .card-subtitle {
+  margin: 0;
+}
+
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.6rem;
+  background: var(--accent-subtle);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-pill);
+  font-size: 0.68rem;
+  color: var(--accent-primary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+
+/* ============================================
    23. VIBE-CODED BADGE
    ============================================ */
 
@@ -3208,7 +3243,7 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
 .project-card {
   flex: 0 0 320px;
   scroll-snap-align: start;
-  height: 520px;
+  height: 600px;
   display: flex;
   flex-direction: column;
 }
@@ -3274,13 +3309,14 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
   }
   .project-card {
     flex: 0 0 280px;
-    height: 520px;
+    height: 620px;
   }
 }
 
 @media (max-width: 480px) {
   .project-card {
     flex: 0 0 260px;
+    height: 640px;
   }
 }
 
@@ -3296,13 +3332,16 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
 
 .deck-viewport {
   position: relative;
-  /* overflow: visible so the x/y-offset behind cards can show on all sides */
   overflow: visible;
-  /* Height equals the front card — behind cards extend past this */
   height: 340px;
-  /* Extra margin reserves visual space for the behind-card peek */
-  margin-bottom: calc(var(--sp-8) + 28px);
-  margin-right: 28px; /* behind cards peek right */
+  /* Bottom margin for controls + extra room for rotated corners */
+  margin-bottom: calc(var(--sp-8) + 20px);
+}
+
+/* Give the stack container horizontal breathing room so rotated
+   card corners don't clip against anything */
+.writing-stack {
+  padding: 0 var(--sp-6);
 }
 
 .deck-card {
@@ -3327,30 +3366,30 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
   outline: none;
 }
 
-/* Front card — sits at the top-left of the deck */
+/* Front card — level, fully visible */
 .deck-card[data-deck-pos="0"] {
-  transform: translate(0, 0);
+  transform: translateY(0) rotate(0deg);
   z-index: 10;
   opacity: 1;
   box-shadow: var(--shadow-hover);
   pointer-events: auto;
 }
 
-/* 1 behind — offset right + down, clearly peeking on three sides */
+/* 1 behind — tilted clockwise; right side peeks right, left side peeks left */
 .deck-card[data-deck-pos="1"] {
-  transform: translate(13px, 13px);
+  transform: translateY(10px) rotate(3deg);
   z-index: 9;
-  opacity: 0.72;
+  opacity: 0.82;
   box-shadow: var(--shadow-card);
   pointer-events: none;
   background: var(--bg-elevated);
 }
 
-/* 2 behind — deeper offset */
+/* 2 behind — tilted counter-clockwise; opposite corners peek out */
 .deck-card[data-deck-pos="2"] {
-  transform: translate(25px, 25px);
+  transform: translateY(18px) rotate(-2.5deg);
   z-index: 8;
-  opacity: 0.45;
+  opacity: 0.58;
   box-shadow: var(--shadow-sm);
   pointer-events: none;
   background: var(--bg-elevated);
@@ -3359,15 +3398,15 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
 /* Hidden cards */
 .deck-card[data-deck-pos="3"],
 .deck-card[data-deck-pos="-1"] {
-  transform: translate(35px, 35px);
+  transform: translateY(24px) rotate(1deg);
   z-index: 7;
   opacity: 0;
   pointer-events: none;
 }
 
-/* Exit: fade and shrink upward */
+/* Exit: shrink upward and fade */
 .deck-card.deck-exit {
-  transform: translate(-10px, -20px) scale(0.9) !important;
+  transform: translateY(-20px) scale(0.92) !important;
   opacity: 0 !important;
   z-index: 11 !important;
   pointer-events: none !important;

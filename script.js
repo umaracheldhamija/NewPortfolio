@@ -320,26 +320,32 @@ function setupScrollReveal() {
   // CSS handles immediate visibility for reduced-motion users
   if (state.reducedMotion) return;
 
-  const opts = {
+  // Single-element reveals: require 14% visible before firing
+  const singleOpts = {
     threshold: 0.14,
     rootMargin: '0px 0px -50px 0px',
   };
 
-  // Single elements with [data-reveal]
+  // Stagger grid reveals: fire as soon as 1px is visible so the first
+  // row of cards (which peeks at the bottom of the viewport on load)
+  // is never invisible on initial render
+  const staggerOpts = {
+    threshold: 0.01,
+    rootMargin: '0px 0px 0px 0px',
+  };
+
   if (dom.revealEls.length) {
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('in-view');
-        obs.unobserve(entry.target); // Reveal only once
+        obs.unobserve(entry.target);
       });
-    }, opts);
+    }, singleOpts);
 
     dom.revealEls.forEach(el => obs.observe(el));
   }
 
-  // Grid containers with [data-reveal-stagger]
-  // The container gets in-view; CSS transition-delay staggers children
   if (dom.revealStaggerEls.length) {
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -347,7 +353,7 @@ function setupScrollReveal() {
         entry.target.classList.add('in-view');
         obs.unobserve(entry.target);
       });
-    }, opts);
+    }, staggerOpts);
 
     dom.revealStaggerEls.forEach(el => obs.observe(el));
   }
