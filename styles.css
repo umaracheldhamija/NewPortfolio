@@ -3676,9 +3676,9 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
 /* --- Parallax logo banner --- */
 .om-parallax-section {
   position: relative;
-  height: 280px;
+  height: 130px;
   overflow: hidden;
-  margin-bottom: var(--sp-12);
+  margin-bottom: var(--sp-8);
 }
 
 .om-parallax-bg {
@@ -3744,9 +3744,9 @@ body.quiet-mode .om-parallax-bg {
 
 .artifact-frame-header {
   display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-5);
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-5) var(--sp-6);
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-elevated);
 }
@@ -3759,30 +3759,53 @@ body.quiet-mode .om-parallax-bg {
   font-weight: 600;
 }
 
-.artifact-phase-tag {
-  font-size: var(--text-xs);
-  color: var(--accent-primary);
-  background: var(--accent-subtle);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-pill);
-  padding: 0.15rem 0.55rem;
-  font-weight: 500;
-  margin-left: auto;
+.artifact-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .artifact-placeholder-tag {
   font-size: var(--text-xs);
   color: var(--text-muted);
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-pill);
-  padding: 0.15rem 0.55rem;
-  margin-left: auto;
+  font-weight: 400;
+  font-style: italic;
 }
 
 .artifact-frame img {
   width: 100%;
   display: block;
+}
+
+/* Modal images: zoom-in cursor + click hint */
+.artifact-modal-panel .artifact-frame img {
+  cursor: zoom-in;
+  transition: opacity 0.15s;
+}
+
+.artifact-modal-panel .artifact-frame img:hover {
+  opacity: 0.9;
+}
+
+.artifact-modal-panel .artifact-frame::after {
+  content: 'Click image to open full size';
+  display: block;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  padding: var(--sp-2) var(--sp-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.artifact-modal-panel .artifact-frame--placeholder::after {
+  content: none;
+}
+
+/* Extra right padding in modal headers so text clears the close button */
+.artifact-modal-panel .artifact-frame-header {
+  padding-right: calc(var(--sp-6) + 2.5rem);
 }
 
 .artifact-frame--placeholder .artifact-placeholder-body {
@@ -3818,7 +3841,7 @@ body.quiet-mode .om-parallax-bg {
 }
 
 .research-flip-card {
-  height: 230px;
+  height: 270px;
   perspective: 1000px;
   cursor: pointer;
   outline: none;
@@ -3860,21 +3883,23 @@ body.quiet-mode .om-parallax-bg {
   inset: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  border-radius: var(--r-xl);
-  padding: var(--sp-5);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
 }
 
 .flip-card-front {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
 }
 
 .flip-card-back {
-  background: var(--accent-subtle);
+  background: var(--bg-card);
   border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
   transform: rotateY(180deg);
   justify-content: space-between;
 }
@@ -3916,21 +3941,22 @@ body.quiet-mode .om-parallax-bg {
   align-items: center;
   gap: var(--sp-2);
   padding: 0.38rem 0.9rem;
-  background: var(--accent-primary);
-  color: #fff;
-  border: none;
+  background: transparent;
+  color: var(--accent-primary);
+  border: 1px solid var(--glass-border-hover);
   border-radius: var(--r-pill);
   font-size: var(--text-xs);
   font-weight: 600;
   cursor: pointer;
-  align-self: flex-start;
+  align-self: center;
   letter-spacing: 0.02em;
-  transition: opacity var(--t-base);
+  transition: background var(--t-base), border-color var(--t-base);
   flex-shrink: 0;
 }
 
 .view-results-btn:hover {
-  opacity: 0.82;
+  background: var(--accent-subtle);
+  border-color: var(--accent-primary);
 }
 
 .view-results-btn:focus-visible {
@@ -4042,7 +4068,7 @@ body.quiet-mode .om-parallax-bg {
 
 /* --- Artifact accordion (details/summary) --- */
 .artifact-accordion {
-  margin-top: var(--sp-4);
+  margin-top: var(--sp-6);
 }
 
 .artifact-accordion-summary {
@@ -4108,7 +4134,7 @@ body.quiet-mode .om-parallax-bg {
   }
 
   .research-flip-card {
-    height: 210px;
+    height: 260px;
   }
 
   .om-parallax-section {
