@@ -118,9 +118,9 @@
       </div>
     </header>
 
-    <!-- Logo parallax banner -->
+    <!-- Logo parallax banner — inline style so url() resolves relative to this page, not styles.css -->
     <div class="om-parallax-section" aria-hidden="true">
-      <div class="om-parallax-bg" id="om-parallax-bg"></div>
+      <div class="om-parallax-bg" id="om-parallax-bg" style="background-image: url(logo.jpg)"></div>
     </div>
 
     <div class="project-body-content">
@@ -128,22 +128,24 @@
       <!-- Executive Summary -->
       <section class="case-section" aria-labelledby="om-exec" data-reveal>
         <h2 class="case-section-title" id="om-exec">Executive Summary</h2>
-        <ul class="exec-summary-list">
-          <li>Led C2C use-case discovery for a privacy-preserving AI org, translating dense PETs concepts into buildable product directions</li>
-          <li>Co-designed with 50+ people across interviews and sessions; synthesized 275+ data points into a weighted decision framework across 36 candidate use cases</li>
-          <li>From open ideation to a chosen use case - validated and prototyped in 1 month, and presented directly to CEO Andrew Trask, who is looking forward to the final deliverable</li>
-        </ul>
-        <div class="artifact-frame" data-reveal>
-          <div class="artifact-frame-header">
-            <span class="artifact-label">Exploratory Phase</span>
-            <span class="artifact-subtitle">By the numbers</span>
+        <div class="exec-summary-card tilt-card">
+          <ul class="exec-summary-list">
+            <li>Led C2C use-case discovery for a privacy-preserving AI org, translating dense PETs concepts into buildable product directions</li>
+            <li>Co-designed with 50+ people across interviews and sessions; synthesized 275+ data points into a weighted decision framework across 36 candidate use cases</li>
+            <li>From open ideation to a chosen use case - validated and prototyped in 1 month, and presented directly to CEO Andrew Trask, who is looking forward to the final deliverable</li>
+          </ul>
+          <div class="artifact-frame">
+            <div class="artifact-frame-header">
+              <span class="artifact-label">Exploratory Phase</span>
+              <span class="artifact-subtitle">By the numbers</span>
+            </div>
+            <img
+              src="overview.png"
+              alt="Research overview stats: 50 primary research articles, 73 secondary papers, 10 SME interviews, 82 survey responses, 36 use case generation sessions, 44 speed dating sessions"
+              loading="lazy"
+              decoding="async"
+            >
           </div>
-          <img
-            src="overview.png"
-            alt="Research overview stats: 50 primary research articles, 73 secondary papers, 10 SME interviews, 82 survey responses, 36 use case generation sessions, 44 speed dating sessions"
-            loading="lazy"
-            decoding="async"
-          >
         </div>
       </section>
 
@@ -310,44 +312,42 @@
       <!-- Where We Are Now -->
       <section class="case-section" aria-labelledby="om-where-now" data-reveal>
         <h2 class="case-section-title" id="om-where-now">Where We Are Now</h2>
-        <div class="om-callout">
-          <div class="om-callout-header">
-            <span class="om-callout-eyebrow">Use case selected</span>
-            <h3 class="om-callout-title">Informed Patient - why this use case won</h3>
-          </div>
-          <p>We ran a weighted decision matrix across our top 8 ideas, scoring each on technology fit, market need, and regulatory barriers. <strong>Informed Patient won</strong> - the largest underserved market, with the best technology fit.</p>
+        <span class="om-callout-eyebrow">Use case selected</span>
+        <h3 class="om-callout-title" style="margin-bottom: var(--sp-4); margin-top: var(--sp-2)">Informed Patient - why this use case won</h3>
+        <p>We ran a weighted decision matrix across our top 8 ideas, scoring each on technology fit, market need, and regulatory barriers. <strong>Informed Patient won</strong> - the largest underserved market, with the best technology fit.</p>
 
-          <details class="artifact-accordion">
-            <summary class="artifact-accordion-summary">
-              <span>See the analysis</span>
-              <i class="fas fa-chevron-down artifact-accordion-chevron" aria-hidden="true"></i>
-            </summary>
-            <div class="artifact-accordion-body">
-              <div class="artifact-frame">
-                <div class="artifact-frame-header">
-                  <span class="artifact-label">SWOT - Informed Patient</span>
-                  <span class="artifact-subtitle">Validation</span>
-                </div>
-                <img
-                  src="swot.png"
-                  alt="SWOT analysis for the Informed Patient use case: Strength score 3.95, 58.5% of US adults already search health info online, clear opportunity in institutional scaling"
-                  loading="lazy"
-                  decoding="async"
-                >
+        <details class="artifact-accordion">
+          <summary class="artifact-accordion-summary">
+            <span>See the analysis</span>
+            <i class="fas fa-chevron-down artifact-accordion-chevron" aria-hidden="true"></i>
+          </summary>
+          <div class="artifact-accordion-body">
+            <div class="artifact-frame">
+              <div class="artifact-frame-header">
+                <span class="artifact-label">SWOT - Informed Patient</span>
+                <span class="artifact-subtitle">Validation</span>
               </div>
-              <div class="artifact-frame artifact-frame--placeholder">
-                <div class="artifact-frame-header">
-                  <span class="artifact-label">Weighted Decision Matrix</span>
-                  <span class="artifact-placeholder-tag">Coming soon</span>
-                </div>
-                <div class="artifact-placeholder-body">
-                  <i class="fas fa-table" aria-hidden="true"></i>
-                  <p>Full scoring matrix across all 8 ideas - dropping here once the prototype is complete.</p>
-                </div>
-              </div>
+              <img
+                src="swot.png"
+                alt="SWOT analysis for the Informed Patient use case: Strength score 3.95, 58.5% of US adults already search health info online, clear opportunity in institutional scaling"
+                loading="lazy"
+                decoding="async"
+              >
             </div>
-          </details>
-        </div>
+            <div class="artifact-frame">
+              <div class="artifact-frame-header">
+                <span class="artifact-label">8 Ideas - Decision Landscape</span>
+                <span class="artifact-subtitle">Ideation</span>
+              </div>
+              <img
+                src="8 ideas.png"
+                alt="Quadrant map showing 8 candidate use cases plotted by technology fit and market need; Informed Patient sits in the highest value quadrant"
+                loading="lazy"
+                decoding="async"
+              >
+            </div>
+          </div>
+        </details>
       </section>
 
       <!-- Accomplishments -->
@@ -394,9 +394,11 @@
     <div class="artifact-modal" id="modal-sme-interviews" role="dialog" aria-modal="true" aria-label="SME Interviews research results" hidden>
       <div class="artifact-modal-backdrop"></div>
       <div class="artifact-modal-panel">
-        <button class="artifact-modal-close" aria-label="Close modal">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
+        <div class="artifact-modal-toolbar">
+          <button class="artifact-modal-close" aria-label="Close modal">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="artifact-frame">
           <div class="artifact-frame-header">
             <span class="artifact-label">SME Interviews</span>
@@ -415,9 +417,11 @@
     <div class="artifact-modal" id="modal-primary-research" role="dialog" aria-modal="true" aria-label="Primary and Secondary Research results" hidden>
       <div class="artifact-modal-backdrop"></div>
       <div class="artifact-modal-panel">
-        <button class="artifact-modal-close" aria-label="Close modal">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
+        <div class="artifact-modal-toolbar">
+          <button class="artifact-modal-close" aria-label="Close modal">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="artifact-frame">
           <div class="artifact-frame-header">
             <span class="artifact-label">Primary &amp; Secondary Research</span>
@@ -436,9 +440,11 @@
     <div class="artifact-modal" id="modal-pestle" role="dialog" aria-modal="true" aria-label="PESTLE Analysis results" hidden>
       <div class="artifact-modal-backdrop"></div>
       <div class="artifact-modal-panel">
-        <button class="artifact-modal-close" aria-label="Close modal">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
+        <div class="artifact-modal-toolbar">
+          <button class="artifact-modal-close" aria-label="Close modal">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="artifact-frame">
           <div class="artifact-frame-header">
             <span class="artifact-label">PESTLE Analysis</span>
@@ -457,9 +463,11 @@
     <div class="artifact-modal" id="modal-competitive" role="dialog" aria-modal="true" aria-label="Competitive Analysis results" hidden>
       <div class="artifact-modal-backdrop"></div>
       <div class="artifact-modal-panel">
-        <button class="artifact-modal-close" aria-label="Close modal">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
+        <div class="artifact-modal-toolbar">
+          <button class="artifact-modal-close" aria-label="Close modal">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="artifact-frame">
           <div class="artifact-frame-header">
             <span class="artifact-label">Competitive Analysis</span>
@@ -478,9 +486,11 @@
     <div class="artifact-modal" id="modal-hmws" role="dialog" aria-modal="true" aria-label="Assumption Mapping and HMW results" hidden>
       <div class="artifact-modal-backdrop"></div>
       <div class="artifact-modal-panel">
-        <button class="artifact-modal-close" aria-label="Close modal">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
+        <div class="artifact-modal-toolbar">
+          <button class="artifact-modal-close" aria-label="Close modal">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="artifact-frame">
           <div class="artifact-frame-header">
             <span class="artifact-label">Assumption Mapping &amp; HMWs</span>
@@ -499,9 +509,11 @@
     <div class="artifact-modal" id="modal-use-cases" role="dialog" aria-modal="true" aria-label="Use Case Studies results" hidden>
       <div class="artifact-modal-backdrop"></div>
       <div class="artifact-modal-panel">
-        <button class="artifact-modal-close" aria-label="Close modal">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
+        <div class="artifact-modal-toolbar">
+          <button class="artifact-modal-close" aria-label="Close modal">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="artifact-frame">
           <div class="artifact-frame-header">
             <span class="artifact-label">Use Case Studies</span>
@@ -589,10 +601,16 @@
         });
       });
 
-      // Modal images: click to open full size in new tab
+      // Modal images: click to zoom in place (2×); click again to restore
       document.querySelectorAll('.artifact-modal-panel img').forEach(img => {
-        img.title = 'Click to open full size';
-        img.addEventListener('click', () => window.open(img.src, '_blank', 'noopener,noreferrer'));
+        img.title = 'Click to zoom in';
+        img.addEventListener('click', () => {
+          const zoomed = img.classList.toggle('img-zoomed');
+          const panel = img.closest('.artifact-modal-panel');
+          img.title = zoomed ? 'Click to zoom out' : 'Click to zoom in';
+          panel.style.overflow = zoomed ? 'auto' : '';
+          panel.style.maxHeight = zoomed ? 'none' : '';
+        });
       });
 
       document.querySelectorAll('.artifact-modal').forEach(modal => {

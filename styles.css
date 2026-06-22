@@ -3684,11 +3684,11 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
 .om-parallax-bg {
   position: absolute;
   inset: -25% 0;
-  background-image: url(logo.jpg);
-  background-size: 32%;
+  /* background-image set via inline style — path is relative to the page, not this CSS file */
+  background-size: 28%;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.07;
+  opacity: 0.08;
   will-change: transform;
   pointer-events: none;
 }
@@ -3702,6 +3702,19 @@ body.quiet-mode .om-parallax-bg {
   will-change: auto;
 }
 
+
+/* --- Executive summary card --- */
+.exec-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl);
+  padding: var(--sp-8);
+  margin-top: var(--sp-6);
+}
+
+.exec-summary-card .exec-summary-list {
+  margin-bottom: var(--sp-6);
+}
 
 /* --- Executive summary list --- */
 .exec-summary-list {
@@ -3778,18 +3791,21 @@ body.quiet-mode .om-parallax-bg {
   display: block;
 }
 
-/* Modal images: zoom-in cursor + click hint */
+/* Modal images: zoom in-place on click */
 .artifact-modal-panel .artifact-frame img {
   cursor: zoom-in;
-  transition: opacity 0.15s;
+  display: block;
+  width: 100%;
 }
 
-.artifact-modal-panel .artifact-frame img:hover {
-  opacity: 0.9;
+.artifact-modal-panel .artifact-frame img.img-zoomed {
+  width: 200%;
+  max-width: none;
+  cursor: zoom-out;
 }
 
 .artifact-modal-panel .artifact-frame::after {
-  content: 'Click image to open full size';
+  content: 'Click image to zoom in';
   display: block;
   text-align: center;
   font-size: var(--text-xs);
@@ -3803,9 +3819,28 @@ body.quiet-mode .om-parallax-bg {
   content: none;
 }
 
-/* Extra right padding in modal headers so text clears the close button */
+/* Modal frame header: row layout so label + subtitle sit side by side cleanly */
 .artifact-modal-panel .artifact-frame-header {
-  padding-right: calc(var(--sp-6) + 2.5rem);
+  flex-direction: row;
+  align-items: center;
+  padding: var(--sp-5) var(--sp-6);
+  gap: var(--sp-4);
+}
+
+.artifact-modal-panel .artifact-label {
+  flex: 1;
+  min-width: 0; /* allow truncation on very narrow viewports */
+}
+
+.artifact-modal-panel .artifact-subtitle {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-style: normal;
+  flex-shrink: 0;
+  font-size: var(--text-xs);
 }
 
 .artifact-frame--placeholder .artifact-placeholder-body {
@@ -3990,17 +4025,24 @@ body.quiet-mode .om-parallax-bg {
   z-index: 1;
   width: min(100%, 860px);
   max-height: 88vh;
-  overflow-y: auto;
+  overflow: hidden;
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-hover);
-  scroll-behavior: smooth;
+}
+
+/* Toolbar row that sits above the artifact frame; holds the close button */
+.artifact-modal-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
 }
 
 .artifact-modal-close {
-  position: absolute;
-  top: var(--sp-4);
-  right: var(--sp-4);
-  z-index: 2;
+  position: static;
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
@@ -4013,6 +4055,7 @@ body.quiet-mode .om-parallax-bg {
   justify-content: center;
   font-size: 0.75rem;
   transition: background var(--t-base), color var(--t-base);
+  flex-shrink: 0;
 }
 
 .artifact-modal-close:hover {
@@ -4024,6 +4067,15 @@ body.quiet-mode .om-parallax-bg {
 .artifact-modal-close:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 3px;
+}
+
+/* Remove top border-radius from frame when inside modal (toolbar provides the rounding) */
+.artifact-modal-panel .artifact-frame {
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+}
+
+.artifact-modal-panel .artifact-frame-header {
+  border-radius: 0;
 }
 
 
