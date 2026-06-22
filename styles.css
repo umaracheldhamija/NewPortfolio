@@ -3673,35 +3673,6 @@ body.quiet-mode .kf-path { stroke-dashoffset: 0 !important; }
    artifact frames, callout cards, accordion.
    ============================================ */
 
-/* --- Parallax logo banner --- */
-.om-parallax-section {
-  position: relative;
-  height: 130px;
-  overflow: hidden;
-  margin-bottom: var(--sp-8);
-}
-
-.om-parallax-bg {
-  position: absolute;
-  inset: -25% 0;
-  /* background-image set via inline style — path is relative to the page, not this CSS file */
-  background-size: 28%;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.08;
-  will-change: transform;
-  pointer-events: none;
-}
-
-[data-theme="dark"] .om-parallax-bg {
-  opacity: 0.18;
-  mix-blend-mode: screen;
-}
-
-body.quiet-mode .om-parallax-bg {
-  will-change: auto;
-}
-
 
 /* --- Executive summary card --- */
 .exec-summary-card {
@@ -3759,7 +3730,7 @@ body.quiet-mode .om-parallax-bg {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
-  padding: var(--sp-5) var(--sp-6);
+  padding: var(--sp-4) var(--sp-8);
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-elevated);
 }
@@ -3791,21 +3762,15 @@ body.quiet-mode .om-parallax-bg {
   display: block;
 }
 
-/* Modal images: zoom in-place on click */
+/* Modal images: click opens full size in new tab */
 .artifact-modal-panel .artifact-frame img {
   cursor: zoom-in;
   display: block;
   width: 100%;
 }
 
-.artifact-modal-panel .artifact-frame img.img-zoomed {
-  width: 200%;
-  max-width: none;
-  cursor: zoom-out;
-}
-
 .artifact-modal-panel .artifact-frame::after {
-  content: 'Click image to zoom in';
+  content: 'Click image to open full size';
   display: block;
   text-align: center;
   font-size: var(--text-xs);
@@ -3819,17 +3784,18 @@ body.quiet-mode .om-parallax-bg {
   content: none;
 }
 
-/* Modal frame header: row layout so label + subtitle sit side by side cleanly */
+/* Modal frame header: single row — label (grows) | subtitle | close button */
 .artifact-modal-panel .artifact-frame-header {
   flex-direction: row;
   align-items: center;
-  padding: var(--sp-5) var(--sp-6);
+  padding: var(--sp-3) var(--sp-8);
   gap: var(--sp-4);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
 }
 
 .artifact-modal-panel .artifact-label {
   flex: 1;
-  min-width: 0; /* allow truncation on very narrow viewports */
+  min-width: 0;
 }
 
 .artifact-modal-panel .artifact-subtitle {
@@ -3840,7 +3806,11 @@ body.quiet-mode .om-parallax-bg {
   font-weight: 500;
   font-style: normal;
   flex-shrink: 0;
-  font-size: var(--text-xs);
+}
+
+.artifact-modal-panel .artifact-frame-header .artifact-modal-close {
+  flex-shrink: 0;
+  margin-left: var(--sp-2);
 }
 
 .artifact-frame--placeholder .artifact-placeholder-body {
@@ -4025,22 +3995,12 @@ body.quiet-mode .om-parallax-bg {
   z-index: 1;
   width: min(100%, 860px);
   max-height: 88vh;
-  overflow: hidden;
+  overflow-y: auto;
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-hover);
 }
 
 /* Toolbar row that sits above the artifact frame; holds the close button */
-.artifact-modal-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: var(--sp-3) var(--sp-4);
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--border-subtle);
-  border-radius: var(--r-xl) var(--r-xl) 0 0;
-}
-
 .artifact-modal-close {
   position: static;
   width: 2rem;
@@ -4067,15 +4027,6 @@ body.quiet-mode .om-parallax-bg {
 .artifact-modal-close:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 3px;
-}
-
-/* Remove top border-radius from frame when inside modal (toolbar provides the rounding) */
-.artifact-modal-panel .artifact-frame {
-  border-radius: 0 0 var(--r-xl) var(--r-xl);
-}
-
-.artifact-modal-panel .artifact-frame-header {
-  border-radius: 0;
 }
 
 
@@ -4128,7 +4079,7 @@ body.quiet-mode .om-parallax-bg {
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-5);
+  padding: var(--sp-4) var(--sp-8);
   background: var(--accent-subtle);
   border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
@@ -4187,10 +4138,6 @@ body.quiet-mode .om-parallax-bg {
 
   .research-flip-card {
     height: 260px;
-  }
-
-  .om-parallax-section {
-    height: 180px;
   }
 
   .om-callout {
