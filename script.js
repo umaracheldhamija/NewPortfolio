@@ -1591,6 +1591,52 @@ function updateQuietIcon() {
 
 
 /* ============================================
+   16b. BIO TAB
+   Scroll page to work section on load so work
+   is immediately visible. A small straight tab
+   slides in from the left edge when the hero is
+   above the viewport; clicking it scrolls back.
+   ============================================ */
+
+function setupBioTab() {
+  const hero  = document.getElementById('hero');
+  const work  = document.getElementById('work');
+  const tab   = document.getElementById('bio-tab');
+
+  if (!hero || !work) return;
+
+  // Prevent browser from restoring a prior scroll position
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
+  // Instantly skip past the hero so work is the first thing visible.
+  // Direct scrollTop assignment bypasses css scroll-behavior: smooth entirely.
+  const navEl = document.querySelector('.site-nav');
+  const navH  = navEl ? navEl.offsetHeight : 64;
+  document.documentElement.scrollTop = Math.max(0, work.offsetTop - navH);
+
+  // Show/hide the tab based on hero visibility.
+  // rootMargin shrinks the observation zone by navH at top, so the hero
+  // counts as "not visible" even when its last few pixels are behind the nav.
+  if (tab) {
+    const heroObs = new IntersectionObserver(
+      ([entry]) => {
+        tab.classList.toggle('bio-tab-visible', !entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: `-${navH + 1}px 0px 0px 0px` }
+    );
+    heroObs.observe(hero);
+
+    // Click → smooth scroll back to top (hero visible)
+    tab.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+}
+
+
+/* ============================================
    17. INIT
    Load → Apply prefs → Wire up all modules → Start loop.
    Order matters: prefs before controls, loop last.
@@ -1617,6 +1663,7 @@ function init() {
   setupScrollTopButton();
   setupViewportMaintenance();
   setupTiltCards();
+  setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();
   setupKathakFigures();
