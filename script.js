@@ -613,12 +613,14 @@ function savePreferences() {
 }
 
 function loadPreferences() {
-  // Hard default: light mode unless the user explicitly chose otherwise.
   applyTheme('light');
   state.themeExplicit = false;
 
-  // System reduced-motion takes priority over any saved preference
-  if (state.reducedMotion) {
+  const isMobile = window.innerWidth < 768;
+
+  // Auto-enable quiet mode on mobile devices and reduced-motion systems.
+  // Saved user preferences can override this below.
+  if (state.reducedMotion || isMobile) {
     state.quietMode = true;
     dom.body.classList.add('quiet-mode');
     if (dom.quietToggle) {
@@ -633,7 +635,6 @@ function loadPreferences() {
 
     const prefs = JSON.parse(raw);
 
-    // Apply theme
     if (
       prefs.themeExplicit === true &&
       prefs.theme &&
@@ -643,17 +644,18 @@ function loadPreferences() {
       applyTheme(prefs.theme);
     }
 
-    // Apply quiet mode (don't override if reducedMotion already set it)
-    if (prefs.quietMode && !state.quietMode) {
-      state.quietMode = true;
-      dom.body.classList.add('quiet-mode');
+    // Respect explicit user preference for quiet mode.
+    // Never override system prefers-reduced-motion.
+    if ('quietMode' in prefs && !state.reducedMotion) {
+      state.quietMode = prefs.quietMode;
+      dom.body.classList.toggle('quiet-mode', prefs.quietMode);
       if (dom.quietToggle) {
-        dom.quietToggle.classList.add('active');
-        dom.quietToggle.setAttribute('aria-label', 'Resume animations');
+        dom.quietToggle.classList.toggle('active', prefs.quietMode);
+        dom.quietToggle.setAttribute('aria-label',
+          prefs.quietMode ? 'Resume animations' : 'Pause animations');
       }
     }
 
-    // Apply large text
     if (prefs.largeText) {
       state.largeText = true;
       dom.body.classList.add('large-text');
@@ -1278,88 +1280,6 @@ function setupInteractiveAuroraBlobs() {
 }
 
 
-/* ============================================
-   18. KATHAK FIGURE DECORATION
-
-   Scroll-driven draw-on animation for line-art Kathak figures.
-   Each figure's path draws itself on as it scrolls into view.
-
-   ─── HOW TO TUNE ────────────────────────────────────────────
-   KATHAK_FIGURE_CONFIG maps each figure's HTML id to its
-   scroll trigger range and opacity.
-
-   scrollStart / scrollEnd: fraction of total page scroll (0–1).
-     0   = very top of page
-     1   = very bottom of page
-   Tweak these to control when each figure draws itself on.
-
-   The position, size, and opacity of each figure are set via
-   the `style` attribute directly on the SVG in index.html —
-   no JS changes needed to move figures around.
-   ─────────────────────────────────────────────────────────── */
-
-const KATHAK_FIGURE_CONFIG = {
-  'kf-a': { scrollStart: 0.06, scrollEnd: 0.28 },
-  'kf-b': { scrollStart: 0.28, scrollEnd: 0.50 },
-  'kf-c': { scrollStart: 0.52, scrollEnd: 0.74 },
-};
-
-function setupKathakFigures() {
-  const layer = document.getElementById('kathak-layer');
-  if (!layer) return;
-
-  // Stretch the layer to match the live document height
-  const syncLayerHeight = () => {
-    layer.style.height = `${document.body.scrollHeight}px`;
-  };
-  syncLayerHeight();
-  window.addEventListener('resize', debounce(syncLayerHeight, 150), { passive: true });
-
-  // Collect all figures + measure their path lengths
-  const figures = [];
-  Object.entries(KATHAK_FIGURE_CONFIG).forEach(([id, cfg]) => {
-    const svg = document.getElementById(id);
-    if (!svg) return;
-    const path = svg.querySelector('.kf-path');
-    if (!path) return;
-
-    const pathLen = path.getTotalLength();
-    path.style.strokeDasharray = pathLen;
-
-    if (state.reducedMotion) {
-      // Show fully drawn — CSS also handles this fallback
-      path.style.strokeDashoffset = 0;
-      return;
-    }
-
-    // Start fully hidden
-    path.style.strokeDashoffset = pathLen;
-    figures.push({ path, pathLen, scrollStart: cfg.scrollStart, scrollEnd: cfg.scrollEnd });
-  });
-
-  if (!figures.length) return;
-
-  let lastScroll = -1;
-
-  function tickKathak() {
-    const maxScroll = document.body.scrollHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
-
-    if (Math.abs(progress - lastScroll) > 0.0005) {
-      lastScroll = progress;
-
-      figures.forEach(({ path, pathLen, scrollStart, scrollEnd }) => {
-        // Local progress: 0 when scroll = scrollStart, 1 when scroll = scrollEnd
-        const local = Math.min(1, Math.max(0, (progress - scrollStart) / (scrollEnd - scrollStart)));
-        path.style.strokeDashoffset = pathLen * (1 - local);
-      });
-    }
-
-    requestAnimationFrame(tickKathak);
-  }
-
-  requestAnimationFrame(tickKathak);
-}
 
 
 /* ============================================
@@ -1591,6 +1511,89 @@ function updateQuietIcon() {
 
 
 /* ============================================
+   16a. INTRO LOADING SCREEN
+   Types out Uma's intro text on first visit per
+   session, then fades to reveal the work section.
+
+   Flow:
+   1. Inline <script> in <head> adds html.intro-skip
+      immediately if sessionStorage says already seen.
+   2. setupIntroScreen() bails early if skip class
+      is present OR if reduced-motion is active.
+   3. Otherwise: types text char-by-char, then fades.
+   4. Any click (or Skip button) completes immediately.
+   5. sessionStorage key set before fade starts.
+   ============================================ */
+
+function setupIntroScreen() {
+  const screen = document.getElementById('intro-screen');
+  if (!screen) return;
+
+  // Skip for reduced-motion users — purely decorative
+  if (state.reducedMotion) {
+    screen.classList.add('intro-hidden');
+    return;
+  }
+
+  // Already seen this session (set by inline script in <head>)
+  if (document.documentElement.classList.contains('intro-skip')) {
+    screen.classList.add('intro-hidden');
+    return;
+  }
+
+  const typedEl = document.getElementById('intro-typed');
+  const cursor  = screen.querySelector('.intro-cursor');
+  const skipBtn = screen.querySelector('.intro-skip-btn');
+
+  const TEXT      = 'designing technology for better healthcare.';
+  const CHAR_MS   = 25;   // ms per character
+  const END_PAUSE = 900;  // ms to hold completed text before fading
+
+  let isDone  = false;
+  let isFading = false;
+
+  function fadeOut() {
+    if (isFading) return;
+    isFading = true;
+    try { sessionStorage.setItem('intro-seen', 'true'); } catch (_) {}
+    screen.classList.add('intro-fade');
+    screen.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'opacity') screen.classList.add('intro-hidden');
+    }, { once: true });
+  }
+
+  function finish() {
+    if (isDone) return;
+    isDone = true;
+    if (typedEl) typedEl.textContent = TEXT;
+    if (cursor)  cursor.classList.add('intro-cursor-done');
+    fadeOut();
+  }
+
+  let charIndex = 0;
+
+  function typeNext() {
+    if (isDone) return;
+    charIndex++;
+    if (typedEl) typedEl.textContent = TEXT.slice(0, charIndex);
+
+    if (charIndex < TEXT.length) {
+      window.setTimeout(typeNext, CHAR_MS);
+    } else {
+      isDone = true;
+      if (cursor) cursor.classList.add('intro-cursor-done');
+      window.setTimeout(fadeOut, END_PAUSE);
+    }
+  }
+
+  skipBtn?.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
+  screen.addEventListener('click', finish, { once: true });
+
+  window.setTimeout(typeNext, 350);
+}
+
+
+/* ============================================
    16b. BIO TAB
    Scroll page to work section on load so work
    is immediately visible. A small straight tab
@@ -1637,7 +1640,306 @@ function setupBioTab() {
 
 
 /* ============================================
-   17. INIT
+   17. VINE BACKGROUND
+   Canvas-based vines that grow from the bottom
+   upward as the user scrolls and interacts.
+   ============================================ */
+
+function setupVines() {
+  if (state.reducedMotion) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'vine-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  const bgLayer = document.querySelector('.bg-layer');
+  (bgLayer || document.body).appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = W;
+    canvas.height = H;
+  }
+  resize();
+  window.addEventListener('resize', debounce(resize, 250), { passive: true });
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  // Purple palette — depth 0 uses deeper/richer purples, deeper branches lighter/cooler
+  const PALETTES = {
+    light: [
+      [72,  58,  210],   // deep indigo
+      [90,  70,  225],   // indigo
+      [110, 88,  240],   // mid purple
+      [130, 100, 245],   // violet
+      [100, 55,  195],   // grape
+      [150, 115, 255],   // lavender
+    ],
+    dark: [
+      [110, 130, 255],   // bright indigo
+      [140, 155, 255],   // periwinkle
+      [125, 100, 245],   // mid purple
+      [165, 140, 255],   // lavender
+      [95,  118, 240],   // blue-indigo
+      [180, 160, 255],   // pale lavender
+    ],
+  };
+
+  function pickColor(depth) {
+    const isDark = dom.html.getAttribute('data-theme') !== 'light';
+    const pool   = isDark ? PALETTES.dark : PALETTES.light;
+    // Deeper vines (depth 0) lean toward richer indices; branches lean lighter
+    const idx = Math.min(pool.length - 1,
+      Math.floor(rnd(depth * 1.2, depth * 1.2 + 2.5)));
+    const [r, g, b] = pool[idx];
+    return { r, g, b };
+  }
+
+  const isProjectPage = !!document.querySelector('.project-page');
+
+  const SEG      = 20;
+  const MAX_V    = isProjectPage ? 30 : 90;
+  const LEAF_P   = isProjectPage ? 0.07 : 0.16;
+  const BUD_P    = isProjectPage ? 0.04 : 0.10;
+  const BASE_SPD = 24;
+  const MAX_BST  = 7;
+
+  let vines = [];
+  let boost = 0;         // smooth speed multiplier (exponential decay)
+  let lastTs = performance.now();
+
+  function initTip(v) {
+    v.curAngle += rnd(-0.14, 0.14);
+    v.curAngle  = v.curAngle * 0.88 + v.baseAngle * 0.12;
+    const sp    = 0.62;
+    v.curAngle  = Math.max(-Math.PI - sp, Math.min(-Math.PI / 2 + sp, v.curAngle));
+    const last  = v.pts[v.pts.length - 1];
+    v.tipX = last.x + Math.cos(v.curAngle) * SEG;
+    v.tipY = last.y + Math.sin(v.curAngle) * SEG;
+    // Leaf or bud — mutually exclusive per waypoint
+    const roll = Math.random();
+    v.tipLeaf = roll < LEAF_P ? {
+      size:  rnd(4, 8),
+      angle: v.curAngle + (Math.random() > 0.5 ? 1 : -1) * rnd(0.5, 1.0),
+    } : null;
+    v.tipBud = !v.tipLeaf && roll < LEAF_P + BUD_P ? {
+      size:   rnd(2.5, 5),
+      offset: rnd(3, 7),
+      side:   Math.random() > 0.5 ? 1 : -1,
+    } : null;
+    v.tipP = 0;
+  }
+
+  function spawnVine(x, depth, startAngle, startY, inheritedSpeed) {
+    if (vines.length >= MAX_V) return;
+    const base  = -Math.PI / 2;
+    const angle = startAngle !== undefined ? startAngle : base + rnd(-0.40, 0.40);
+    const color = pickColor(depth);
+    // Each root vine gets its own random pace; branches vary slightly from parent
+    const speed = inheritedSpeed !== undefined
+      ? Math.max(0.3, inheritedSpeed * rnd(0.75, 1.25))
+      : rnd(0.4, 1.8);
+    const v = {
+      pts: [{ x, y: startY !== undefined ? startY : H + 10, leaf: null, bud: null }],
+      curAngle: angle, baseAngle: angle,
+      tipX: 0, tipY: 0, tipP: 0, tipLeaf: null, tipBud: null,
+      thickness: depth === 0 ? rnd(0.7, 1.2) : depth === 1 ? rnd(0.35, 0.7) : rnd(0.2, 0.45),
+      alpha:     isProjectPage
+        ? (depth === 0 ? rnd(0.03, 0.05) : depth === 1 ? rnd(0.015, 0.03) : rnd(0.008, 0.018))
+        : (depth === 0 ? rnd(0.04, 0.07) : depth === 1 ? rnd(0.02, 0.04)  : rnd(0.01, 0.025)),
+      speed,
+      color,
+      depth,
+      alive: true, ready: false,
+    };
+    vines.push(v);
+  }
+
+  function growAll(dt) {
+    if (state.quietMode) return;
+
+    // Exponential boost decay — smooth, no energy bucket jitter
+    boost *= Math.pow(0.90, dt * 60);
+    boost  = Math.max(0, Math.min(boost, MAX_BST));
+
+    for (const v of vines) {
+      if (!v.alive) continue;
+      if (!v.ready) { initTip(v); v.ready = true; }
+
+      if (v.pts[v.pts.length - 1].y < -40) { v.alive = false; continue; }
+
+      // Each vine advances at its own pace, all smoothed by the shared boost
+      const adv = v.speed * BASE_SPD * (1 + boost) * dt;
+      v.tipP += adv / SEG;
+
+      while (v.tipP >= 1) {
+        v.tipP -= 1;
+        const committed = { x: v.tipX, y: v.tipY, leaf: v.tipLeaf, bud: v.tipBud };
+        v.pts.push(committed);
+
+        // Branch — child inherits parent speed with slight variation
+        if (v.depth < 4 && v.pts.length > 4 && Math.random() < (isProjectPage ? 0.10 : 0.26)) {
+          spawnVine(committed.x, v.depth + 1,
+            v.curAngle + (Math.random() > 0.5 ? 1 : -1) * rnd(0.42, 0.85),
+            undefined, v.speed);
+        }
+        initTip(v);
+      }
+    }
+  }
+
+  function drawLeaf(x, y, leaf, r, g, b, alpha) {
+    if (!leaf) return;
+    const s = leaf.size;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(leaf.angle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(s * 0.3, -s * 0.38, s * 0.82, -s * 0.28, s, 0);
+    ctx.bezierCurveTo(s * 0.82, s * 0.28, s * 0.3, s * 0.28, 0, 0);
+    ctx.fillStyle = `rgba(${r},${g},${b},${(alpha * 0.45).toFixed(3)})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBud(x, y, bud, angle, r, g, b, alpha) {
+    if (!bud) return;
+    // Offset the bud perpendicular to the vine direction
+    const perpAngle = angle + Math.PI / 2 * bud.side;
+    const bx = x + Math.cos(perpAngle) * bud.offset;
+    const by = y + Math.sin(perpAngle) * bud.offset;
+    // Small stem line
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(bx, by);
+    ctx.strokeStyle = `rgba(${r},${g},${b},${(alpha * 0.6).toFixed(3)})`;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+    // Bud circle
+    ctx.beginPath();
+    ctx.arc(bx, by, bud.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${r},${g},${b},${(alpha * 0.55).toFixed(3)})`;
+    ctx.fill();
+    // Tiny highlight
+    ctx.beginPath();
+    ctx.arc(bx - bud.size * 0.25, by - bud.size * 0.25, bud.size * 0.38, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${(alpha * 0.25).toFixed(3)})`;
+    ctx.fill();
+  }
+
+  function drawAll() {
+    ctx.clearRect(0, 0, W, H);
+
+    for (const v of vines) {
+      if (!v.ready) continue;
+      const pts = v.pts;
+      const { r, g, b } = v.color;
+
+      ctx.strokeStyle = `rgba(${r},${g},${b},${v.alpha})`;
+      ctx.lineWidth   = v.thickness;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+
+      // Smooth bezier through all committed waypoints
+      if (pts.length >= 2) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length - 1; i++) {
+          const mx = (pts[i].x + pts[i + 1].x) / 2;
+          const my = (pts[i].y + pts[i + 1].y) / 2;
+          ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+        }
+        ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+        ctx.stroke();
+      }
+
+      // Continuously growing tip segment
+      if (v.alive && v.tipP > 0) {
+        const last = pts[pts.length - 1];
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(
+          last.x + (v.tipX - last.x) * v.tipP,
+          last.y + (v.tipY - last.y) * v.tipP,
+        );
+        ctx.stroke();
+      }
+
+      // Leaves and buds on committed waypoints
+      for (let i = 0; i < pts.length; i++) {
+        const pt  = pts[i];
+        const ang = i > 0
+          ? Math.atan2(pt.y - pts[i - 1].y, pt.x - pts[i - 1].x)
+          : v.baseAngle;
+        drawLeaf(pt.x, pt.y, pt.leaf, r, g, b, v.alpha);
+        drawBud(pt.x, pt.y, pt.bud, ang, r, g, b, v.alpha);
+      }
+
+      // Tip leaf/bud fades in as the segment nears completion
+      if (v.alive && v.tipP > 0.45) {
+        const last = pts[pts.length - 1];
+        const tx   = last.x + (v.tipX - last.x) * v.tipP;
+        const ty   = last.y + (v.tipY - last.y) * v.tipP;
+        const fade = v.alpha * Math.min(1, (v.tipP - 0.45) / 0.55);
+        drawLeaf(tx, ty, v.tipLeaf, r, g, b, fade);
+        drawBud(tx, ty, v.tipBud, v.curAngle, r, g, b, fade);
+      }
+    }
+  }
+
+  function loop(ts) {
+    const dt = Math.min((ts - lastTs) / 1000, 0.07);
+    lastTs = ts;
+    growAll(dt);
+    drawAll();
+    requestAnimationFrame(loop);
+  }
+
+  let lastScrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const dy = Math.abs(window.scrollY - lastScrollY);
+    lastScrollY = window.scrollY;
+    boost = Math.min(boost + dy * 0.05, MAX_BST);
+  }, { passive: true });
+
+  document.addEventListener('mousemove', () => {
+    boost = Math.min(boost + 0.015, MAX_BST);
+  }, { passive: true });
+
+  document.addEventListener('click', () => {
+    boost = Math.min(boost + 1.8, MAX_BST);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) lastTs = performance.now();
+  });
+
+  // Full-width seeds
+  const seeds = isProjectPage
+    ? 4 + Math.floor(Math.random() * 3)
+    : 18 + Math.floor(Math.random() * 6);
+  for (let i = 0; i < seeds; i++) {
+    spawnVine(rnd(W * 0.01, W * 0.99), 0, undefined, H + 10 + rnd(0, 40));
+  }
+  // Extra left-side seeds for denser coverage on the left
+  const leftSeeds = isProjectPage
+    ? 2 + Math.floor(Math.random() * 2)
+    : 8 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < leftSeeds; i++) {
+    spawnVine(rnd(W * 0.01, W * 0.38), 0, undefined, H + 10 + rnd(0, 50));
+  }
+
+  requestAnimationFrame(loop);
+}
+
+
+/* ============================================
+   18. INIT
    Load → Apply prefs → Wire up all modules → Start loop.
    Order matters: prefs before controls, loop last.
    ============================================ */
@@ -1645,6 +1947,9 @@ function setupBioTab() {
 function init() {
   // Apply saved user preferences before anything renders
   loadPreferences();
+
+  // Show intro screen (covers page while setupBioTab scrolls to work behind it)
+  setupIntroScreen();
 
   // Wire up all interactions
   setupMouseTracking();
@@ -1666,9 +1971,9 @@ function init() {
   setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();
-  setupKathakFigures();
   setupVibeBadge();
   setupResumeModal();
+  setupVines();
   updateQuietIcon();
 
   // Start the single animation loop

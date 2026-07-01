@@ -17,9 +17,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
+  <!-- Immediately hide intro for returning visitors this session — runs before paint -->
+  <script>try{if(sessionStorage.getItem('intro-seen')==='true'){document.documentElement.classList.add('intro-skip');}}catch(e){}</script>
 </head>
 
 <body>
+
+  <!-- ============================================
+       INTRO LOADING SCREEN
+       Shown once per browser session. Types out
+       Uma's intro text then fades to reveal work.
+       JS: setupIntroScreen() in script.js
+       ============================================ -->
+  <div id="intro-screen" aria-hidden="true">
+    <div class="intro-content">
+      <p class="intro-line"><span id="intro-typed"></span><span class="intro-cursor" aria-hidden="true">|</span></p>
+    </div>
+    <button class="intro-skip-btn" type="button" aria-label="Skip intro">Skip</button>
+  </div>
+
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <!-- ============================================
@@ -37,82 +53,6 @@
       <div class="aurora-orb aurora-orb-2"></div>
       <div class="aurora-orb aurora-orb-3"></div>
     </div>
-  </div>
-
-  <!-- ============================================
-       KATHAK FIGURES decorative, homepage only.
-
-       HOW TO USE YOUR OWN ILLUSTRATIONS:
-       1. Export each pose as an SVG with a single <path> (or a few paths).
-          Keep strokes only no fills.
-       2. Copy the path `d` attribute value and paste it over the placeholder
-          `d` value in the matching <path class="kf-path"> below.
-       3. Update the `viewBox` on the parent <svg> to match your artwork's
-          natural coordinate system.
-       4. Tune position/size with the `style` attribute on the <svg>:
-            left / right  horizontal offset (vw or px)
-            top           distance from top of document (vh or px)
-            width         rendered size of the figure
-            opacity       overall visibility (0–1)
-       5. Tune the scroll animation in KATHAK_FIGURE_CONFIG in script.js ;
-          each entry maps the figure's id to a scrollStart/End fraction.
-       ============================================ -->
-
-  <div id="kathak-layer" aria-hidden="true">
-
-    <!-- Figure A: Extended arm / hasta left side, work section area -->
-    <svg
-      class="kathak-figure" id="kf-a"
-      style="left: 2.5vw; top: 95vh; width: 110px; opacity: 0.12;"
-      viewBox="0 0 80 140"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <!-- PLACEHOLDER replace path d with your own single-line illustration -->
-      <path class="kf-path" d="
-        M 40 8 C 42 5 46 5 46 9 C 46 13 42 15 40 13 C 38 15 34 13 34 9 C 34 5 38 5 40 8 Z
-        M 40 13 L 40 55
-        M 40 32 C 30 27 18 25 10 30 C 6 32 5 36 8 39 C 10 41 14 40 16 37
-        M 16 37 C 13 40 12 44 15 46 C 17 48 21 46 21 44
-        M 40 32 C 50 27 62 22 70 14
-        M 40 55 L 32 84 L 28 118
-        M 40 55 L 48 82 L 52 112
-      "/>
-    </svg>
-
-    <!-- Figure B: Chakkar / spin suggestion right side, education area -->
-    <svg
-      class="kathak-figure" id="kf-b"
-      style="right: 3vw; top: 200vh; width: 120px; opacity: 0.10;"
-      viewBox="0 0 90 140"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path class="kf-path" d="
-        M 45 9 C 47 6 51 6 51 10 C 51 14 47 16 45 14 C 43 16 39 14 39 10 C 39 6 43 6 45 9 Z
-        M 45 14 L 43 56
-        M 43 32 C 30 29 18 33 10 42 C 6 46 7 52 12 54
-        M 43 32 C 56 26 70 20 80 12 C 85 8 84 3 80 2
-        M 43 56 C 36 70 30 84 28 100 C 27 110 30 118 36 117
-        M 43 56 C 52 66 62 76 72 80 C 80 84 85 80 83 74
-      "/>
-    </svg>
-
-    <!-- Figure C: Aramandi standing pose left side, writing/contact area -->
-    <svg
-      class="kathak-figure" id="kf-c"
-      style="left: 3.5vw; top: 320vh; width: 95px; opacity: 0.11;"
-      viewBox="0 0 70 145"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path class="kf-path" d="
-        M 35 9 C 37 6 41 6 41 10 C 41 14 37 16 35 14 C 33 16 29 14 29 10 C 29 6 33 6 35 9 Z
-        M 35 14 L 35 60
-        M 35 36 C 24 31 14 29 8 35 C 5 39 6 44 10 46
-        M 35 36 C 46 31 56 29 62 35 C 65 39 64 44 60 46
-        M 35 60 C 28 72 22 86 20 102 C 19 112 22 120 28 118
-        M 35 60 C 42 72 48 86 50 102 C 51 112 48 120 42 118
-      "/>
-    </svg>
-
   </div>
 
   <!-- Vibe badge fades on scroll -->

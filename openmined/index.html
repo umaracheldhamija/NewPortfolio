@@ -123,17 +123,13 @@
       <!-- Executive Summary -->
       <section class="case-section" aria-labelledby="om-exec" data-reveal>
         <h2 class="case-section-title" id="om-exec">Executive Summary</h2>
-        <div class="exec-summary-card tilt-card">
+        <div class="exec-summary-card">
           <ul class="exec-summary-list">
-            <li>Led C2C use-case discovery for a privacy-preserving AI org, translating dense PETs concepts into buildable product directions</li>
+            <li>Led consumer-to-consumer use-case discovery for a privacy-preserving AI, translating dense PETs (Privacy-Enhancing Technology) concepts into buildable product directions</li>
             <li>Co-designed with 50+ people across interviews and sessions; synthesized 275+ data points into a weighted decision framework across 36 candidate use cases</li>
-            <li>From open ideation to a chosen use case - validated and prototyped in 1 month, and presented directly to CEO Andrew Trask, who is looking forward to the final deliverable</li>
+            <li>From open ideation to a chosen use case - validated and prototyped in 2 months, and presented directly to CEO Andrew Trask, who is looking forward to the final deliverable</li>
           </ul>
           <div class="artifact-frame">
-            <div class="artifact-frame-header">
-              <span class="artifact-label">Exploratory Phase</span>
-              <span class="artifact-subtitle">By the numbers</span>
-            </div>
             <img
               src="overview.png"
               alt="Research overview stats: 50 primary research articles, 73 secondary papers, 10 SME interviews, 82 survey responses, 36 use case generation sessions, 44 speed dating sessions"
@@ -331,12 +327,12 @@
             </div>
             <div class="artifact-frame">
               <div class="artifact-frame-header">
-                <span class="artifact-label">8 Ideas - Decision Landscape</span>
-                <span class="artifact-subtitle">Ideation</span>
+                <span class="artifact-label">User Journey Map</span>
+                <span class="artifact-subtitle">Informed Patient</span>
               </div>
               <img
-                src="8 ideas.png"
-                alt="Quadrant map showing 8 candidate use cases plotted by technology fit and market need; Informed Patient sits in the highest value quadrant"
+                src="user journey map.png"
+                alt="User journey map for the Informed Patient use case, showing key stages, touchpoints, and pain points"
                 loading="lazy"
                 decoding="async"
               >
@@ -596,17 +592,37 @@
         });
       });
 
-      // Modal images: click to zoom in place (2×); click again to restore
-      document.querySelectorAll('.artifact-modal-panel img').forEach(img => {
-        img.title = 'Click to zoom in';
-        img.addEventListener('click', () => {
-          const zoomed = img.classList.toggle('img-zoomed');
-          const panel = img.closest('.artifact-modal-panel');
-          img.title = zoomed ? 'Click to zoom out' : 'Click to zoom in';
-          panel.style.overflow = zoomed ? 'auto' : '';
-          panel.style.maxHeight = zoomed ? 'none' : '';
+      // Image lightbox — opens any .artifact-frame img full-screen on click
+      const lb = document.createElement('div');
+      lb.id = 'img-lightbox';
+      lb.setAttribute('hidden', '');
+      lb.innerHTML = '<button id="img-lightbox-close" aria-label="Close image"><i class="fas fa-times" aria-hidden="true"></i></button><img alt="">';
+      document.body.appendChild(lb);
+
+      const lbImg = lb.querySelector('img');
+
+      function openLightbox(src, alt) {
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        lb.removeAttribute('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        lb.setAttribute('hidden', '');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+      }
+
+      document.querySelectorAll('.artifact-frame img').forEach(img => {
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openLightbox(img.src, img.alt);
         });
       });
+
+      lb.querySelector('#img-lightbox-close').addEventListener('click', closeLightbox);
+      lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
 
       document.querySelectorAll('.artifact-modal').forEach(modal => {
         modal.querySelector('.artifact-modal-backdrop')?.addEventListener('click', () => closeModal(modal));
@@ -615,6 +631,7 @@
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          if (!lb.hasAttribute('hidden')) { closeLightbox(); return; }
           const open = document.querySelector('.artifact-modal:not([hidden])');
           if (open) closeModal(open);
         }
