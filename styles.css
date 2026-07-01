@@ -4434,7 +4434,7 @@ html.intro-skip #intro-screen { display: none !important; }
 
 /* 1. Project cards — vertical scroll passes through to page */
 .projects-grid {
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
   overscroll-behavior-x: contain;
 }
 
