@@ -736,7 +736,7 @@ body:not([data-theme="light"]) .cursor-dot {
   -webkit-backdrop-filter: blur(14px);
   box-shadow: var(--shadow-sm);
   opacity: 0.84;
-  transition: opacity var(--t-base), border-color var(--t-base);
+  transition: opacity var(--t-base), border-color var(--t-base), transform 0.3s var(--ease-smooth);
 }
 
 /* Show fully on hover OR when keyboard focus is inside */
@@ -2750,7 +2750,9 @@ footer {
 
   /* Hide accessibility controls on mobile scroll to save space */
   .accessibility-controls.hidden {
-    display: none;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(calc(100% + var(--sp-6))) !important;
   }
 
   .section {
@@ -3293,6 +3295,12 @@ body.large-text .control-label { font-size: 0.68rem; }
 @media (max-width: 768px) {
   .projects-grid {
     padding-right: 60px;
+    /* Remove gradient mask on mobile — causes rendering glitches */
+    mask-image: none;
+    -webkit-mask-image: none;
+    /* Ensure grid doesn't expand body width */
+    width: 100%;
+    box-sizing: border-box;
   }
   .project-card {
     flex: 0 0 280px;
@@ -4430,10 +4438,15 @@ html.intro-skip #intro-screen { display: none !important; }
   overscroll-behavior-x: contain;
 }
 
-/* 2. Page-level overscroll */
+/* 2. Page-level overscroll + horizontal scroll containment */
 @media (max-width: 768px) {
   html {
     overscroll-behavior-y: none;
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: hidden;
+    width: 100%;
   }
 }
 
@@ -4456,5 +4469,109 @@ html.intro-skip #intro-screen { display: none !important; }
   .modal.blog-modal .modal-content {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+
+/* ============================================
+   MOBILE — No animations, clean scrolling
+   All decorative motion disabled on mobile
+   viewports. Web version is unaffected.
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  /* --- Hide all decorative visual effects --- */
+  .aurora-layer,
+  .aurora-orb,
+  .storm-base,
+  .storm-reveal,
+  .light-cursor-glow,
+  .cursor-dot,
+  #vine-canvas,
+  .aurora-blobs,
+  .vibe-badge,
+  .scroll-indicator {
+    display: none !important;
+  }
+
+  /* --- Intro screen: skip on mobile --- */
+  #intro-screen {
+    display: none !important;
+  }
+
+  /* --- Scroll reveal: show everything instantly, no entrance animation --- */
+  [data-reveal],
+  [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* --- No 3-D tilt on cards --- */
+  .tilt-card {
+    transform: none !important;
+    transition: box-shadow var(--t-base), border-color var(--t-base) !important;
+  }
+
+  .tilt-card::before,
+  .tilt-card::after,
+  .tilt-card .project-thumb::after {
+    display: none !important;
+  }
+
+  .project-thumb img,
+  .project-card:hover .project-thumb img,
+  .carousel-card:hover img {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* --- Writing deck: instant card transitions --- */
+  .deck-card {
+    transition: opacity 0.15s ease !important;
+  }
+
+  .deck-card.deck-exit {
+    transition: opacity 0.15s ease !important;
+  }
+
+  /* --- Carousel: instant position changes --- */
+  .carousel-card {
+    transition: opacity 0.15s ease !important;
+  }
+
+  /* --- Modal: no entrance animation --- */
+  @keyframes modal-rise {
+    from { opacity: 1; transform: none; }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .modal-content {
+    animation: none !important;
+  }
+
+  /* --- No button hover lift / glow --- */
+  .btn:hover,
+  .social-link:hover,
+  .project-card:not(.coming-soon):hover:not(.tilt-card) {
+    transform: none !important;
+  }
+
+  .btn::before,
+  .social-link::before,
+  .control-btn::before {
+    display: none !important;
+  }
+
+  /* --- No aurora orb drift --- */
+  .aurora-orb {
+    animation: none !important;
+  }
+
+  /* --- Nav-link underline: still functional but instant --- */
+  .nav-links a::after {
+    transition: none !important;
   }
 }

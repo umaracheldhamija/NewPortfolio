@@ -146,8 +146,8 @@ function setupMouseTracking() {
 }
 
 function runBackgroundLoop() {
-  // Skip rendering effects if quiet mode or system reduced-motion
-  if (!state.quietMode && !state.reducedMotion) {
+  // Skip rendering effects on mobile, quiet mode, or system reduced-motion
+  if (!state.quietMode && !state.reducedMotion && window.innerWidth >= 768) {
     const easing = 0.12;
     state.reveal.x += (state.target.x - state.reveal.x) * easing;
     state.reveal.y += (state.target.y - state.reveal.y) * easing;
@@ -206,24 +206,15 @@ function setupHeroObserver() {
 function setupNavScroll() {
   if (!dom.nav) return;
 
-  let lastScrollY = 0;
-  let scrollTimeout = null;
-
   const updateNavState = () => {
     dom.nav.classList.toggle('scrolled', window.scrollY > 16);
-    
-    // On mobile, hide accessibility controls when scrolling
-    const isMobile = window.innerWidth < 768;
-    if (isMobile && dom.body) {
+
+    // On mobile: hide accessibility controls once user has scrolled past
+    // the initial area; only show again when back near the top.
+    if (window.innerWidth < 768) {
       const accessibilityControls = document.querySelector('.accessibility-controls');
       if (accessibilityControls) {
-        // Hide if scrolling down, show if scrolling up
-        if (window.scrollY > lastScrollY) {
-          accessibilityControls.classList.add('hidden');
-        } else {
-          accessibilityControls.classList.remove('hidden');
-        }
-        lastScrollY = window.scrollY;
+        accessibilityControls.classList.toggle('hidden', window.scrollY > 150);
       }
     }
   };
@@ -1174,6 +1165,8 @@ function setupViewportMaintenance() {
    ============================================ */
 
 function setupInteractiveAuroraBlobs() {
+  if (window.innerWidth < 768) return;
+
   const profileImage = document.querySelector('.profile-image');
   const blobsContainer = document.getElementById('aurora-blobs-container');
 
@@ -1529,8 +1522,8 @@ function setupIntroScreen() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
 
-  // Skip for reduced-motion users — purely decorative
-  if (state.reducedMotion) {
+  // Skip for reduced-motion users and mobile — purely decorative
+  if (state.reducedMotion || window.innerWidth < 768) {
     screen.classList.add('intro-hidden');
     return;
   }
@@ -1623,17 +1616,34 @@ function setupBioTab() {
   // rootMargin shrinks the observation zone by navH at top, so the hero
   // counts as "not visible" even when its last few pixels are behind the nav.
   if (tab) {
+    const isMobileView = window.innerWidth < 768;
+    let bioTabTimer = null;
+
     const heroObs = new IntersectionObserver(
       ([entry]) => {
-        tab.classList.toggle('bio-tab-visible', !entry.isIntersecting);
+        const shouldShow = !entry.isIntersecting;
+        tab.classList.toggle('bio-tab-visible', shouldShow);
+
+        // On mobile: auto-hide bio-tab after 3 s so it doesn't crowd the screen
+        if (isMobileView) {
+          if (bioTabTimer) { clearTimeout(bioTabTimer); bioTabTimer = null; }
+          if (shouldShow) {
+            bioTabTimer = setTimeout(() => {
+              tab.classList.remove('bio-tab-visible');
+            }, 3000);
+          }
+        }
       },
       { threshold: 0, rootMargin: `-${navH + 1}px 0px 0px 0px` }
     );
     heroObs.observe(hero);
 
-    // Click → smooth scroll back to top (hero visible)
+    // Click → smooth scroll back to top
     tab.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: (state.reducedMotion || state.quietMode) ? 'auto' : 'smooth',
+      });
     });
   }
 }
@@ -1646,7 +1656,7 @@ function setupBioTab() {
    ============================================ */
 
 function setupVines() {
-  if (state.reducedMotion) return;
+  if (state.reducedMotion || window.innerWidth < 768) return;
 
   const canvas = document.createElement('canvas');
   canvas.id = 'vine-canvas';
