@@ -4438,15 +4438,10 @@ html.intro-skip #intro-screen { display: none !important; }
   overscroll-behavior-x: contain;
 }
 
-/* 2. Page-level overscroll + horizontal scroll containment */
+/* 2. Page-level overscroll */
 @media (max-width: 768px) {
   html {
     overscroll-behavior-y: none;
-    overflow-x: hidden;
-  }
-  body {
-    overflow-x: hidden;
-    width: 100%;
   }
 }
 
