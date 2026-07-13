@@ -306,12 +306,6 @@ a, button, input, textarea, select, [tabindex]:not([tabindex="-1"]) {
   overflow: hidden;
 }
 
-#vine-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-}
 
 /* --- Dark mode: atmospheric base --- */
 /* Heavy blur + very low opacity — creates soft textural depth
@@ -4483,7 +4477,6 @@ html.intro-skip #intro-screen { display: none !important; }
   .storm-reveal,
   .light-cursor-glow,
   .cursor-dot,
-  #vine-canvas,
   .aurora-blobs,
   .vibe-badge,
   .scroll-indicator {
