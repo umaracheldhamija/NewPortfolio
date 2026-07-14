@@ -367,59 +367,6 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 
 [data-theme="light"] .aurora-layer { opacity: 1; }
 
-.aurora-orb {
-  position: absolute;
-  border-radius: 50%;
-  /* Heavy blur creates smooth, light-leak quality */
-  filter: blur(100px);
-  will-change: transform;
-  /* Ensure orbs don't cause scrollbars */
-  overflow: hidden;
-}
-
-.aurora-orb-1 {
-  width: clamp(400px, 55vw, 750px);
-  height: clamp(400px, 55vw, 750px);
-  background: radial-gradient(circle, var(--aurora-violet, rgba(167,139,250,0.38)) 0%, transparent 70%);
-  top: -15%;
-  left: -8%;
-  animation: aurora-drift-1 30s ease-in-out infinite;
-}
-
-.aurora-orb-2 {
-  width: clamp(350px, 45vw, 620px);
-  height: clamp(350px, 45vw, 620px);
-  background: radial-gradient(circle, var(--aurora-peach, rgba(253,186,140,0.32)) 0%, transparent 70%);
-  top: 30%;
-  right: -12%;
-  animation: aurora-drift-2 38s ease-in-out infinite;
-}
-
-.aurora-orb-3 {
-  width: clamp(300px, 40vw, 560px);
-  height: clamp(300px, 40vw, 560px);
-  background: radial-gradient(circle, var(--aurora-sky, rgba(147,197,253,0.28)) 0%, transparent 70%);
-  bottom: 5%;
-  left: 15%;
-  animation: aurora-drift-3 24s ease-in-out infinite;
-}
-
-@keyframes aurora-drift-1 {
-  0%,  100% { transform: translate(0, 0) scale(1); }
-  33%        { transform: translate(4%, 9%) scale(1.08); }
-  66%        { transform: translate(-3%, 4%) scale(0.94); }
-}
-
-@keyframes aurora-drift-2 {
-  0%,  100% { transform: translate(0, 0) scale(1); }
-  40%        { transform: translate(-7%, 5%) scale(1.12); }
-  75%        { transform: translate(3%, -6%) scale(0.92); }
-}
-
-@keyframes aurora-drift-3 {
-  0%,  100% { transform: translate(0, 0) scale(1); }
-  50%        { transform: translate(6%, -8%) scale(1.1); }
-}
 
 /* ============================================
    INTERACTIVE AURORA BLOBS
@@ -2931,7 +2878,6 @@ footer {
   body { cursor: auto !important; }
 
   /* Disable decorative animations — keep functional state transitions */
-  .aurora-orb,
   .scroll-indicator,
   .storm-reveal,
   .light-cursor-glow,
@@ -3041,8 +2987,6 @@ body.quiet-mode .cursor-dot { display: none !important; }
     transform: none;
   }
 }
-
-body.quiet-mode .aurora-orb { animation-play-state: paused; }
 
 body.quiet-mode .tilt-card {
   transform: none !important;
@@ -4472,7 +4416,6 @@ html.intro-skip #intro-screen { display: none !important; }
 
   /* --- Hide all decorative visual effects --- */
   .aurora-layer,
-  .aurora-orb,
   .storm-base,
   .storm-reveal,
   .light-cursor-glow,
@@ -4551,11 +4494,6 @@ html.intro-skip #intro-screen { display: none !important; }
   .social-link::before,
   .control-btn::before {
     display: none !important;
-  }
-
-  /* --- No aurora orb drift --- */
-  .aurora-orb {
-    animation: none !important;
   }
 
   /* --- Nav-link underline: still functional but instant --- */
