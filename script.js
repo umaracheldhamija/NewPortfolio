@@ -431,6 +431,156 @@ function setupLiquidMetal() {
 
 
 /* ============================================
+   11. PROJECT TILT (Cards + Panels)
+   Subtle parallax tilt + ambient gradient tracking.
+   Skips if reducedMotion or quietMode enabled.
+   ============================================ */
+
+function setupTiltCards() {
+  const cards = document.querySelectorAll('.tilt-card');
+  if (!cards.length) return;
+
+  if (!window.matchMedia || !window.matchMedia('(pointer: fine)').matches) {
+    return;
+  }
+
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+  const lerp = (start, end, amt) => start + (end - start) * amt;
+
+  const supportsPointer = 'PointerEvent' in window;
+  const enterEvent = supportsPointer ? 'pointerenter' : 'mouseenter';
+  const moveEvent = supportsPointer ? 'pointermove' : 'mousemove';
+  const leaveEvent = supportsPointer ? 'pointerleave' : 'mouseleave';
+
+  cards.forEach(card => {
+    let rafId = null;
+    let rect = null;
+    let isActive = false;
+    const parsedMax = Number(card.dataset.tiltMax);
+    const maxTilt = Number.isFinite(parsedMax) ? parsedMax : 8;
+    const ease = 0.18;
+
+    let currentTiltX = 0;
+    let currentTiltY = 0;
+    let currentGlowX = 50;
+    let currentGlowY = 50;
+
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+    let targetGlowX = 50;
+    let targetGlowY = 50;
+
+    const reset = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      card.classList.remove('is-tilting');
+      isActive = false;
+      rect = null;
+      currentTiltX = 0;
+      currentTiltY = 0;
+      currentGlowX = 50;
+      currentGlowY = 50;
+      targetTiltX = 0;
+      targetTiltY = 0;
+      targetGlowX = 50;
+      targetGlowY = 50;
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+      card.style.setProperty('--glow-x', '50%');
+      card.style.setProperty('--glow-y', '50%');
+    };
+
+    registerTiltResetter(reset);
+
+    const updateTargetsFromEvent = (e) => {
+      if (!rect) rect = card.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const x = clamp(e.clientX - rect.left, 0, rect.width);
+      const y = clamp(e.clientY - rect.top, 0, rect.height);
+      const pctX = x / rect.width;
+      const pctY = y / rect.height;
+
+      targetTiltY = (pctX - 0.5) * 2 * maxTilt;
+      targetTiltX = (0.5 - pctY) * 2 * maxTilt;
+      targetGlowX = pctX * 100;
+      targetGlowY = pctY * 100;
+    };
+
+    const tick = () => {
+      if (state.reducedMotion || state.quietMode) {
+        reset();
+        return;
+      }
+
+      currentTiltX = lerp(currentTiltX, targetTiltX, ease);
+      currentTiltY = lerp(currentTiltY, targetTiltY, ease);
+      currentGlowX = lerp(currentGlowX, targetGlowX, ease);
+      currentGlowY = lerp(currentGlowY, targetGlowY, ease);
+
+      card.style.setProperty('--tilt-x', `${currentTiltX.toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${currentTiltY.toFixed(2)}deg`);
+      card.style.setProperty('--glow-x', `${currentGlowX.toFixed(1)}%`);
+      card.style.setProperty('--glow-y', `${currentGlowY.toFixed(1)}%`);
+
+      const tiltSettled = Math.abs(targetTiltX - currentTiltX) < 0.01
+        && Math.abs(targetTiltY - currentTiltY) < 0.01;
+      const glowSettled = Math.abs(targetGlowX - currentGlowX) < 0.1
+        && Math.abs(targetGlowY - currentGlowY) < 0.1;
+
+      if (!isActive && tiltSettled && glowSettled) {
+        reset();
+        return;
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (!rafId) rafId = requestAnimationFrame(tick);
+    };
+
+    const handleEnter = (e) => {
+      if (state.reducedMotion || state.quietMode) {
+        reset();
+        return;
+      }
+      card.classList.add('is-tilting');
+      rect = card.getBoundingClientRect();
+      isActive = true;
+      updateTargetsFromEvent(e);
+      start();
+    };
+
+    const handleMove = (e) => {
+      if (!isActive) return;
+      updateTargetsFromEvent(e);
+    };
+
+    const handleLeave = () => {
+      isActive = false;
+      rect = null;
+      targetTiltX = 0;
+      targetTiltY = 0;
+      targetGlowX = 50;
+      targetGlowY = 50;
+      start();
+    };
+
+    card.addEventListener(enterEvent, handleEnter, { passive: true });
+    card.addEventListener(moveEvent, handleMove, { passive: true });
+    card.addEventListener(leaveEvent, handleLeave, { passive: true });
+    if (supportsPointer) {
+      card.addEventListener('pointercancel', handleLeave, { passive: true });
+    }
+    card.addEventListener('focusout', handleLeave);
+  });
+}
+
+
+/* ============================================
    12. PREFERENCES
    localStorage key namespaced to avoid collisions.
    Fails silently if storage is unavailable
@@ -1128,6 +1278,28 @@ function setupInteractiveAuroraBlobs() {
 
 
 
+/* ============================================
+   19. VIBE-CODED BADGE — fades on scroll
+   ============================================ */
+
+function setupVibeBadge() {
+  const badge = document.getElementById('vibe-badge');
+  if (!badge) return;
+
+  let lastScrollY = -1;
+
+  function updateBadge() {
+    const scrolled = window.scrollY > 60;
+    if (scrolled !== (lastScrollY > 60)) {
+      badge.classList.toggle('scrolled-away', scrolled);
+    }
+    lastScrollY = window.scrollY;
+  }
+
+  window.addEventListener('scroll', debounce(updateBadge, 80), { passive: true });
+  updateBadge();
+}
+
 
 /* ============================================
    20. WRITING — STACKED CARD DECK
@@ -1334,6 +1506,88 @@ function updateQuietIcon() {
 }
 
 
+/* ============================================
+   16a. INTRO LOADING SCREEN
+   Types out Uma's intro text on first visit per
+   session, then fades to reveal the work section.
+
+   Flow:
+   1. Inline <script> in <head> adds html.intro-skip
+      immediately if sessionStorage says already seen.
+   2. setupIntroScreen() bails early if skip class
+      is present OR if reduced-motion is active.
+   3. Otherwise: types text char-by-char, then fades.
+   4. Any click (or Skip button) completes immediately.
+   5. sessionStorage key set before fade starts.
+   ============================================ */
+
+function setupIntroScreen() {
+  const screen = document.getElementById('intro-screen');
+  if (!screen) return;
+
+  // Skip for reduced-motion users and mobile — purely decorative
+  if (state.reducedMotion || window.innerWidth < 768) {
+    screen.classList.add('intro-hidden');
+    return;
+  }
+
+  // Already seen this session (set by inline script in <head>)
+  if (document.documentElement.classList.contains('intro-skip')) {
+    screen.classList.add('intro-hidden');
+    return;
+  }
+
+  const typedEl = document.getElementById('intro-typed');
+  const cursor  = screen.querySelector('.intro-cursor');
+  const skipBtn = screen.querySelector('.intro-skip-btn');
+
+  const TEXT      = 'designing technology for better healthcare.';
+  const CHAR_MS   = 25;   // ms per character
+  const END_PAUSE = 900;  // ms to hold completed text before fading
+
+  let isDone  = false;
+  let isFading = false;
+
+  function fadeOut() {
+    if (isFading) return;
+    isFading = true;
+    try { sessionStorage.setItem('intro-seen', 'true'); } catch (_) {}
+    screen.classList.add('intro-fade');
+    screen.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'opacity') screen.classList.add('intro-hidden');
+    }, { once: true });
+  }
+
+  function finish() {
+    if (isDone) return;
+    isDone = true;
+    if (typedEl) typedEl.textContent = TEXT;
+    if (cursor)  cursor.classList.add('intro-cursor-done');
+    fadeOut();
+  }
+
+  let charIndex = 0;
+
+  function typeNext() {
+    if (isDone) return;
+    charIndex++;
+    if (typedEl) typedEl.textContent = TEXT.slice(0, charIndex);
+
+    if (charIndex < TEXT.length) {
+      window.setTimeout(typeNext, CHAR_MS);
+    } else {
+      isDone = true;
+      if (cursor) cursor.classList.add('intro-cursor-done');
+      window.setTimeout(fadeOut, END_PAUSE);
+    }
+  }
+
+  skipBtn?.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
+  screen.addEventListener('click', finish, { once: true });
+
+  window.setTimeout(typeNext, 350);
+}
+
 
 /* ============================================
    16b. BIO TAB
@@ -1409,6 +1663,9 @@ function init() {
   // Apply saved user preferences before anything renders
   loadPreferences();
 
+  // Show intro screen (covers page while setupBioTab scrolls to work behind it)
+  setupIntroScreen();
+
   // Wire up all interactions
   setupMouseTracking();
   setupHeroObserver();
@@ -1425,9 +1682,11 @@ function init() {
   setupWritingDeck();      // replaces setupWritingCarousel
   setupScrollTopButton();
   setupViewportMaintenance();
+  setupTiltCards();
   setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();
+  setupVibeBadge();
   setupResumeModal();
   updateQuietIcon();
 

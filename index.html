@@ -18,9 +18,22 @@
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <!-- Immediately hide intro for returning visitors this session — runs before paint -->
+  <script>try{if(sessionStorage.getItem('intro-seen')==='true'){document.documentElement.classList.add('intro-skip');}}catch(e){}</script>
 </head>
 
 <body>
+
+  <!-- ============================================
+       INTRO LOADING SCREEN
+       Shown once per browser session. Types out intro text then fades to reveal work.
+       JS: setupIntroScreen() in script.js
+       ============================================ -->
+  <div id="intro-screen" aria-hidden="true">
+    <div class="intro-content">
+      <p class="intro-line"><span id="intro-typed"></span><span class="intro-cursor" aria-hidden="true">|</span></p>
+    </div>
+    <button class="intro-skip-btn" type="button" aria-label="Skip intro">Skip</button>
+  </div>
 
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
@@ -34,8 +47,16 @@
   <div class="bg-layer" aria-hidden="true">
     <div class="storm-base"></div>
     <div class="storm-reveal" id="storm-reveal"></div>
-    <div class="aurora-layer"></div>
+    <div class="aurora-layer">
+      <div class="aurora-orb aurora-orb-1"></div>
+      <div class="aurora-orb aurora-orb-2"></div>
+      <div class="aurora-orb aurora-orb-3"></div>
+    </div>
   </div>
+
+  <!-- Vibe badge fades on scroll -->
+  <p class="vibe-badge" id="vibe-badge" aria-hidden="true">Vibe-coded with Claude in VSCode</p>
+
 
   <!-- ============================================
        ACCESSIBILITY CONTROLS
