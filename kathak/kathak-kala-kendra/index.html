@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kathak Kala Kendra | Guru Dharmendra Jain | Dharamshala</title>
+  <meta name="description" content="Kathak Kala Kendra – a centre for the classical arts of Kathak and Tabla, led by Guru Dharmendra Jain in Dharamshala, Himachal Pradesh." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&amp;family=Raleway:wght@300;400;500;600&amp;display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Variables ────────────────────────────────────────── */
+    :root {
+      --ink:        #0e0608;
+      --maroon:     #6b1220;
+      --gold:       #c9943a;
+      --gold-light: #e8c97a;
+      --cream:      #f5ede0;
+      --muted:      #a89070;
+      --text:       #e8ddd0;
+      --white:      #fff9f2;
+      --nav-h:      72px;
+    }
+
+    /* ─── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    .skip-link {
+      position: absolute;
+      top: -48px;
+      left: 1.5rem;
+      background: var(--gold);
+      color: var(--ink);
+      padding: 0.6rem 1rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      z-index: 999;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus {
+      top: 1.2rem;
+    }
+
+    /* ─── Focus ─────────────────────────────────────────────── */
+    :focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: 3px;
+    }
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: 3px;
+    }
+
+    /* ─── Utility ────────────────────────────────────────────── */
+    .section-label {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .ornament {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .ornament::before,
+    .ornament::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+    .ornament::after {
+      background: linear-gradient(to left, transparent, var(--gold));
+    }
+    .ornament span {
+      color: var(--gold);
+      font-size: 1.1rem;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      line-height: 1.15;
+    }
+
+    /* ─── Nav ────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4rem;
+      transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(14, 6, 8, 0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(201,148,58,0.2);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--gold-light);
+      line-height: 1.1;
+      max-width: min(100%, 20rem);
+    }
+    .nav-logo span {
+      display: block;
+      font-size: 0.55rem;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold-light); }
+    .nav-cta {
+      border: 1px solid var(--gold);
+      padding: 0.45rem 1.2rem;
+      color: var(--gold) !important;
+      transition: background 0.2s, color 0.2s !important;
+    }
+    .nav-cta:hover {
+      background: var(--gold) !important;
+      color: var(--ink) !important;
+    }
+    .nav-toggle {
+      display: none;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+      background: transparent;
+      border: 1px solid rgba(201,148,58,0.4);
+      padding: 0.5rem;
+    }
+    .nav-toggle span {
+      display: block; width: 24px; height: 1.5px;
+      background: var(--gold-light); transition: all 0.3s;
+    }
+
+    /* ─── Hero ───────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 620px;
+      min-height: max(620px, 100svh);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('images/photo.png');
+      background-size: cover;
+      background-position: center top;
+      transform-origin: center;
+      animation: slowZoom 20s ease-in-out infinite alternate;
+    }
+    @keyframes slowZoom {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        120deg,
+        rgba(14,6,8,0.75) 0%,
+        rgba(107,18,32,0.3) 45%,
+        rgba(14,6,8,0.9) 100%
+      );
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 2.75rem 3.25rem;
+      max-width: 680px;
+      margin-right: 0;
+      background: rgba(14,6,8,0.6);
+      border: 1px solid rgba(201,148,58,0.25);
+      border-radius: 6px;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      text-align: center;
+      animation: fadeUp 1.2s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-top: 1px solid var(--gold);
+      padding-top: 0.5rem;
+      margin-bottom: 1.2rem;
+      animation: fadeUp 1.2s 0.2s ease both;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    .hero-title {
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 300;
+      color: var(--white);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.3rem;
+      animation: fadeUp 1.2s 0.3s ease both;
+      text-shadow: 0 8px 22px rgba(0,0,0,0.4);
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-style: italic;
+      color: #e7d8c7;
+      margin-bottom: 2rem;
+      animation: fadeUp 1.2s 0.45s ease both;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 1.2s 0.6s ease both;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold);
+      color: var(--ink);
+      padding: 0.75rem 2rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      line-height: 1.4;
+      text-align: center;
+      text-transform: uppercase;
+      transition: background 0.25s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(201,148,58,0.5);
+      color: var(--cream);
+      padding: 0.75rem 2rem;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      line-height: 1.4;
+      text-align: center;
+      text-transform: uppercase;
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold-light); }
+    .hero-scroll {
+      position: absolute;
+      bottom: 2rem;
+      right: 4rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      animation: fadeIn 2s 1s ease both;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: lineGrow 2s 1s ease both, pulse 2s 3s ease infinite;
+    }
+    @keyframes lineGrow { from { height: 0; } to { height: 50px; } }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ─── Section wrapper ────────────────────────────────────── */
+    section { padding: 6rem 5rem; scroll-margin-top: calc(var(--nav-h) + 1rem); }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    /* ─── About ──────────────────────────────────────────────── */
+    #about {
+      background: linear-gradient(160deg, #140a0c 0%, var(--ink) 60%);
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-image-wrap {
+      position: relative;
+    }
+    .about-image-wrap img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      object-position: top center;
+      filter: sepia(15%) contrast(1.05);
+    }
+    .about-image-wrap::before {
+      content: '';
+      position: absolute;
+      top: -16px;
+      left: -16px;
+      right: 16px;
+      bottom: 16px;
+      border: 1px solid rgba(201,148,58,0.3);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .about-image-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(14,6,8,0.6) 0%, transparent 50%);
+    }
+    .about-text h2 {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .about-text h2 em {
+      display: block;
+      font-style: italic;
+      color: var(--gold-light);
+      font-size: 0.75em;
+    }
+    .about-text p {
+      color: #c9bba8;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+    }
+    .about-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.8rem;
+    }
+    .badge {
+      border: 1px solid rgba(201,148,58,0.4);
+      color: var(--gold);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.9rem;
+    }
+
+    /* ─── Studio ─────────────────────────────────────────────── */
+    #studio {
+      padding-top: 0;
+      padding-bottom: 5rem;
+      background: linear-gradient(160deg, #140a0c 0%, var(--ink) 60%);
+    }
+    .studio-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .studio-header h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+    }
+    .studio-header p {
+      color: var(--muted);
+      max-width: 600px;
+      margin: 1rem auto 0;
+      font-size: 0.9rem;
+    }
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+    }
+    .studio-grid img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      filter: brightness(0.8) sepia(10%);
+    }
+    .studio-copy {
+      margin-top: 3px;
+      padding: 2rem;
+      background: rgba(201,148,58,0.05);
+      border: 1px solid rgba(201,148,58,0.12);
+    }
+    .studio-copy p {
+      color: #c9bba8;
+      text-align: center;
+      font-size: 0.9rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* ─── Classes ────────────────────────────────────────────── */
+    #classes {
+      background: var(--ink);
+      border-top: 1px solid rgba(201,148,58,0.1);
+    }
+    .classes-header { text-align: center; margin-bottom: 3.5rem; }
+    .classes-header h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+    }
+    .classes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    .class-card {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+    }
+    .class-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+      filter: brightness(0.55) sepia(20%) contrast(1.05);
+    }
+    .class-card:hover img { transform: scale(1.05); }
+    .class-body {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2.5rem;
+      background: linear-gradient(
+        to top,
+        rgba(10,4,6,0.95) 0%,
+        rgba(14,6,8,0.7) 55%,
+        rgba(14,6,8,0.25) 100%
+      );
+    }
+    .class-body h3 {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+    .class-body p {
+      font-size: 0.88rem;
+      color: #f3e9dd;
+      margin-bottom: 1.2rem;
+      max-width: 380px;
+      text-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+    .class-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    .detail-pill {
+      background: rgba(201,148,58,0.28);
+      border: 1px solid rgba(201,148,58,0.7);
+      color: #fff4dc;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.45);
+    }
+    .classes-info {
+      margin-top: 2px;
+      background: rgba(201,148,58,0.06);
+      border: 1px solid rgba(201,148,58,0.15);
+      padding: 2.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+    .info-item h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      margin-bottom: 0.3rem;
+    }
+    .info-item p {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ─── Gallery ────────────────────────────────────────────── */
+    #gallery {
+      background: linear-gradient(160deg, var(--ink) 0%, #0a0305 100%);
+      border-top: 1px solid rgba(201,148,58,0.1);
+    }
+    .gallery-header { text-align: center; margin-bottom: 3rem; }
+    .gallery-header h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto;
+      gap: 3px;
+    }
+    .gallery-item {
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    .gallery-item:first-child {
+      grid-column: span 2;
+      grid-row: span 1;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      min-height: 260px;
+      transition: transform 0.5s ease, filter 0.5s ease;
+      filter: brightness(0.85);
+    }
+    .gallery-item:hover img {
+      transform: scale(1.04);
+      filter: brightness(1);
+    }
+    .gallery-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid transparent;
+      transition: border-color 0.3s;
+      pointer-events: none;
+    }
+    .gallery-item:hover::after { border-color: rgba(201,148,58,0.4); }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(14,6,8,0.95);
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem; right: 2rem;
+      font-size: 2rem;
+      color: var(--gold);
+      cursor: pointer;
+      line-height: 1;
+      background: transparent;
+      border: none;
+    }
+
+    /* ─── Performances ───────────────────────────────────────── */
+    #performances {
+      background: var(--ink);
+      border-top: 1px solid rgba(201,148,58,0.1);
+    }
+    .performances-header { text-align: center; margin-bottom: 3rem; }
+    .performances-header h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+    }
+    .performances-header p {
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0.8rem auto 0;
+      font-size: 0.88rem;
+    }
+    .performances-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .perf-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(201,148,58,0.12);
+      transition: border-color 0.3s;
+    }
+    .perf-card:hover { border-color: rgba(201,148,58,0.4); }
+    .perf-card img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      filter: brightness(0.75) sepia(15%);
+      transition: transform 0.5s, filter 0.5s;
+    }
+    .perf-card:hover img { transform: scale(1.04); filter: brightness(0.9); }
+    .perf-info {
+      padding: 1.2rem 1.5rem 1.5rem;
+      background: rgba(107,18,32,0.1);
+    }
+    .perf-info h3 {
+      font-size: 1.2rem;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+    .perf-info p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* ─── Facebook Feed ──────────────────────────────────────── */
+    #updates {
+      background: linear-gradient(to bottom, #0a0305, var(--ink));
+      border-top: 1px solid rgba(201,148,58,0.1);
+      text-align: center;
+    }
+    #updates h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    #updates .sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+    }
+    .fb-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+    .fb-page,
+    .fb-page span,
+    .fb-page iframe {
+      width: 100% !important;
+      max-width: 500px !important;
+    }
+    .fb-wrap iframe {
+      border-radius: 2px;
+      max-width: 100%;
+    }
+    .fb-fallback {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .updates-cta {
+      margin-top: 2rem;
+    }
+
+    /* ─── Contact ────────────────────────────────────────────── */
+    #contact {
+      background: #080305;
+      border-top: 1px solid rgba(201,148,58,0.15);
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .contact-left h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .contact-left p {
+      color: #c9bba8;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .contact-items { display: flex; flex-direction: column; gap: 1.5rem; }
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .contact-icon {
+      width: 38px; height: 38px;
+      border: 1px solid rgba(201,148,58,0.35);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+    .contact-item-text h4 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.2rem;
+    }
+    .contact-item-text {
+      min-width: 0;
+    }
+    .contact-item-text p, .contact-item-text a {
+      font-size: 0.9rem;
+      color: #c9bba8;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+    .contact-item-text a:hover { color: var(--gold-light); }
+    .contact-right {
+      background: rgba(201,148,58,0.05);
+      border: 1px solid rgba(201,148,58,0.15);
+      padding: 2.5rem;
+    }
+    .contact-right h3 {
+      font-size: 1.6rem;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,148,58,0.2);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-group select option { background: #1a0a10; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .btn-submit {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--maroon);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 0.9rem;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s;
+    }
+    .btn-submit:hover { background: var(--gold); color: var(--ink); }
+    .contact-note {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    footer {
+      background: #050103;
+      border-top: 1px solid rgba(201,148,58,0.15);
+      padding: 3rem 5rem 2rem;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+    }
+    .footer-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .footer-social { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; }
+    .social-btn {
+      border: 1px solid rgba(201,148,58,0.3);
+      color: var(--muted);
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+    footer hr { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.2rem; }
+    .footer-copy {
+      font-size: 0.72rem;
+      color: rgba(168,144,112,0.5);
+    }
+
+    /* ─── Scroll-reveal ──────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 1.25rem; }
+      .nav-logo {
+        max-width: calc(100% - 4.5rem);
+        font-size: 1rem;
+        letter-spacing: 0.05em;
+      }
+      .nav-logo span {
+        font-size: 0.48rem;
+        letter-spacing: 0.18em;
+      }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: var(--nav-h); left: 0; right: 0; background: rgba(14,6,8,0.97); padding: 1.5rem 1.25rem; gap: 1.5rem; }
+      .nav-links.open { display: flex; }
+      .nav-toggle { display: flex; }
+      section { padding: 4rem 2rem; }
+      .about-grid, .contact-grid, .classes-grid, .performances-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-item:first-child { grid-column: span 2; }
+      #hero { justify-content: center; }
+      .hero-content {
+        width: min(100%, 34rem);
+        margin-right: 0;
+        padding: 2.25rem 1.5rem;
+        text-align: center;
+      }
+      .hero-tag {
+        letter-spacing: 0.28em;
+        font-size: 0.58rem;
+      }
+      .hero-actions { justify-content: center; }
+      .btn-primary,
+      .btn-ghost {
+        width: min(100%, 16rem);
+      }
+      .hero-scroll { display: none; }
+      .classes-info { grid-template-columns: 1fr; gap: 1.5rem; }
+      #studio {
+        padding-top: 0;
+        padding-bottom: 4rem;
+      }
+      .studio-grid { grid-template-columns: 1fr; }
+      .class-card {
+        aspect-ratio: auto;
+        min-height: 30rem;
+      }
+      .class-card img {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+      }
+      .class-body {
+        position: relative;
+        inset: auto;
+        min-height: 100%;
+        padding: 1.75rem;
+      }
+      .contact-right { padding: 2rem; }
+      .fb-wrap { align-items: center; }
+    }
+    @media (max-width: 540px) {
+      nav { padding: 0 1rem; }
+      .nav-logo {
+        max-width: calc(100% - 4rem);
+        font-size: 0.92rem;
+      }
+      .nav-logo span {
+        letter-spacing: 0.14em;
+      }
+      .nav-links { padding: 1.25rem 1rem 1.5rem; }
+      section { padding: 3.5rem 1.25rem; }
+      #hero {
+        min-height: 560px;
+        min-height: max(560px, 100svh);
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .hero-content { padding: 1.75rem 1.1rem; }
+      .hero-title { font-size: clamp(2.45rem, 16vw, 3.6rem); }
+      .hero-tag {
+        font-size: 0.55rem;
+        letter-spacing: 0.18em;
+      }
+      .hero-sub { font-size: 1rem; }
+      .hero-actions { gap: 0.75rem; }
+      .btn-primary,
+      .btn-ghost {
+        width: 100%;
+      }
+      .section-label,
+      .footer-sub {
+        letter-spacing: 0.18em;
+      }
+      .badge,
+      .detail-pill {
+        letter-spacing: 0.12em;
+      }
+      .studio-header,
+      .classes-header,
+      .gallery-header,
+      .performances-header {
+        margin-bottom: 2.25rem;
+      }
+      .studio-copy,
+      .contact-right,
+      .classes-info {
+        padding: 1.5rem 1.25rem;
+      }
+      .class-card { min-height: 28rem; }
+      .class-body { padding: 1.25rem; }
+      .class-body p { font-size: 0.82rem; }
+      .class-details { gap: 0.55rem; }
+      .contact-item { gap: 0.75rem; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-item:first-child { grid-column: span 1; }
+      footer { padding: 2rem 1.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="navbar" aria-label="Primary">
+  <div class="nav-logo">
+    Kathak Kala Kendra
+    <span>Dharamshala · Since 2004</span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about">About</a></li>
+    <li><a href="#classes">Classes</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#performances">Performances</a></li>
+    <li><a href="#updates">Updates</a></li>
+    <li><a href="#contact" class="nav-cta">Enroll Now</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle" onclick="toggleNav()" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks" type="button">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<main id="main-content" tabindex="-1">
+<!-- ══════════ HERO ══════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Dharamshala · Himachal Pradesh</div>
+    <h1 class="hero-title">
+      Kathak<br><em>Kala Kendra</em>
+    </h1>
+    <p class="hero-sub">Under the guidance of Guru Dharmendra Jain</p>
+    <div class="hero-actions">
+      <a href="#classes" class="btn-primary">Explore Classes</a>
+      <a href="#about" class="btn-ghost">Meet the Guru</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ══════════ ABOUT ══════════ -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-image-wrap reveal">
+        <img src="images/performance.jpg" alt="Guru Dharmendra Jain with students" />
+      </div>
+      <div class="about-text">
+        <p class="section-label">The Guru</p>
+        <h2>Guru Dharmendra Jain<em>Kathak Guru &amp; Tabla Maestro</em></h2>
+        <div class="ornament"><span>✦</span></div>
+        <p class="reveal reveal-delay-1">
+          Guru Dharmendra Jain is a dedicated practitioner and teacher of Kathak — one of India's most
+          luminous classical dance forms. Rooted in the ancient storytelling traditions of the temples of
+          North India, Kathak weaves together rhythmic footwork, expressive gestures, and devotional narrative
+          into a language of movement that transcends the ordinary.
+        </p>
+        <p class="reveal reveal-delay-2">
+          Equally accomplished as a Tabla player, Guruji brings a rare musicianship to his teaching.
+          His students benefit not only from precise technical instruction but from a deep understanding
+          of taal, laya, and the inner pulse that animates both music and dance.
+        </p>
+        <p class="reveal reveal-delay-3">
+          Based in the foothills of the Dhauladhar range in Dharamshala, Guruji has been shaping the cultural
+          landscape of the region for over a decade — nurturing students of all ages and backgrounds with
+          patience, rigour, and joy.
+        </p>
+        <div class="about-badges reveal">
+          <span class="badge">Kathak Dance</span>
+          <span class="badge">Tabla</span>
+          <span class="badge">Classical Arts</span>
+          <span class="badge">Online &amp; In-Person</span>
+          <span class="badge">All Age Groups</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ABOUT STUDIO ══════════ -->
+<section id="studio">
+  <div class="section-inner">
+    <div class="studio-header reveal">
+      <p class="section-label">The Studio</p>
+      <h2>Kathak Kala Kendra</h2>
+      <p>
+        A warm, dedicated space in the heart of Dharamshala where the ancient art of Kathak lives and breathes.
+      </p>
+    </div>
+    <div class="studio-grid reveal">
+      <img src="images/studio.jpg" alt="Studio class in session" />
+      <img src="images/holi.jpg" alt="Holi celebrations at the studio" />
+    </div>
+    <div class="studio-copy reveal">
+      <p>
+        Nestled in the Natraj Guest House Building near Churan Khad, the Kendra is more than a dance school —
+        it is a community of practitioners, a space of celebration, and a living repository of classical tradition.
+        Students participate in performances, festivals, and cultural events throughout the year.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CLASSES ══════════ -->
+<section id="classes">
+  <div class="section-inner">
+    <div class="classes-header reveal">
+      <p class="section-label">What We Teach</p>
+      <h2>Classes &amp; Teachings</h2>
+    </div>
+    <div class="classes-grid">
+      <!-- Kathak card -->
+      <div class="class-card reveal">
+        <img src="images/kathak2.jpg" alt="Kathak dance class" />
+        <div class="class-body">
+          <h3>Kathak Dance</h3>
+          <p>
+            Comprehensive classical Kathak training in the Lucknow Gharana — from
+            foundational footwork and mudras to elaborate compositions and stage performance.
+          </p>
+          <div class="class-details">
+            <span class="detail-pill">All Age Groups</span>
+            <span class="detail-pill">Special Women's Batches</span>
+            <span class="detail-pill">Online &amp; In-Person</span>
+          </div>
+        </div>
+      </div>
+      <!-- Tabla card -->
+      <div class="class-card reveal reveal-delay-1">
+        <img src="images/holi.jpg" alt="Tabla class" />
+        <div class="class-body">
+          <h3>Tabla</h3>
+          <p>
+            From the first strokes of tali and khali to intricate compositions in Teentaal and
+            Ektaal — a grounded, disciplined introduction to India's most beloved percussion instrument.
+          </p>
+          <div class="class-details">
+            <span class="detail-pill">Beginner to Advanced</span>
+            <span class="detail-pill">Theory &amp; Practice</span>
+            <span class="detail-pill">Online Available</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="classes-info reveal">
+      <div class="info-item">
+        <h4>4:00 – 5:00 PM</h4>
+        <p>Batch One · Daily</p>
+      </div>
+      <div class="info-item">
+        <h4>5:00 – 6:00 PM</h4>
+        <p>Batch Two · Daily</p>
+      </div>
+      <div class="info-item">
+        <h4>Online</h4>
+        <p>Live classes available · All time zones welcome</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GALLERY ══════════ -->
+<section id="gallery">
+  <div class="section-inner">
+    <div class="gallery-header reveal">
+      <p class="section-label">Moments from the Kendra</p>
+      <h2>Gallery</h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal" role="button" tabindex="0" aria-label="Open image: Students in performance" onclick="openLightbox('images/performance.jpg')">
+        <img src="images/performance.jpg" alt="Students in performance" />
+      </div>
+      <div class="gallery-item reveal reveal-delay-1" role="button" tabindex="0" aria-label="Open image: Kathak performance group" onclick="openLightbox('images/kathak2.jpg')">
+        <img src="images/kathak2.jpg" alt="Kathak performance group" />
+      </div>
+      <div class="gallery-item reveal reveal-delay-2" role="button" tabindex="0" aria-label="Open image: Stage performance" onclick="openLightbox('images/performance2.jpg')">
+        <img src="images/performance2.jpg" alt="Stage performance" />
+      </div>
+      <div class="gallery-item reveal reveal-delay-1" role="button" tabindex="0" aria-label="Open image: Studio class" onclick="openLightbox('images/studio.jpg')">
+        <img src="images/studio.jpg" alt="Studio class" />
+      </div>
+      <div class="gallery-item reveal reveal-delay-2" role="button" tabindex="0" aria-label="Open image: Holi celebration at the Kendra" onclick="openLightbox('images/holi.jpg')">
+        <img src="images/holi.jpg" alt="Holi celebration at the Kendra" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" onclick="closeLightbox()">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close image viewer" onclick="closeLightbox()">×</button>
+  <img id="lightboxImg" src="" alt="Gallery image" />
+</div>
+
+<!-- ══════════ PERFORMANCES & EVENTS ══════════ -->
+<section id="performances">
+  <div class="section-inner">
+    <div class="performances-header reveal">
+      <p class="section-label">On Stage</p>
+      <h2>Performances &amp; Events</h2>
+      <p>
+        The Kendra regularly stages performances at cultural festivals, religious celebrations, and community events across Himachal Pradesh.
+      </p>
+    </div>
+    <div class="performances-grid">
+      <div class="perf-card reveal">
+        <img src="images/performance2.jpg" alt="Stage performance with students" />
+        <div class="perf-info">
+          <h3>Annual Showcase</h3>
+          <p>Students from all batches come together for our annual year-end performance, celebrating a season of learning and devotion.</p>
+        </div>
+      </div>
+      <div class="perf-card reveal reveal-delay-1">
+        <img src="images/Krishna janmashtmi mahotsav by iskon kangra.jpg" alt="Krishna Janmashtami Mahotsav" />
+        <div class="perf-info">
+          <h3>Krishna Janmashtami Mahotsav</h3>
+          <p>A special devotional performance presented at ISKCON Kangra in celebration of Janmashtami — the birth of Lord Krishna.</p>
+        </div>
+      </div>
+      <div class="perf-card reveal reveal-delay-2">
+        <img src="images/kathak2.jpg" alt="Cultural event performance" />
+        <div class="perf-info">
+          <h3>Cultural &amp; Festival Events</h3>
+          <p>Performances at schools, cultural programmes, and festivals across Dharamshala and the Kangra Valley.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FACEBOOK / UPDATES ══════════ -->
+<section id="updates">
+  <div class="section-inner">
+    <p class="section-label">Stay Connected</p>
+    <h2>Latest Updates</h2>
+    <p class="sub">Follow our Facebook page for news, performances, and announcements</p>
+    <div class="fb-wrap reveal">
+      <div id="fb-root"></div>
+      <div
+        class="fb-page"
+        data-href="https://www.facebook.com/profile.php?id=100008042598278"
+        data-tabs="timeline"
+        data-width="500"
+        data-height="600"
+        data-small-header="true"
+        data-adapt-container-width="true"
+        data-hide-cover="false"
+        data-show-facepile="false"
+      >
+        <blockquote cite="https://www.facebook.com/profile.php?id=100008042598278" class="fb-xfbml-parse-ignore">
+          <a href="https://www.facebook.com/profile.php?id=100008042598278">Kathak Kala Kendra</a>
+        </blockquote>
+      </div>
+      <p class="fb-fallback">If the feed doesn’t load, Facebook may be blocking embedded profiles. Opening the page directly will always work.</p>
+    </div>
+    <div class="updates-cta">
+      <a href="https://www.facebook.com/profile.php?id=100008042598278" target="_blank" rel="noopener" class="btn-primary">
+        View Facebook Page
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CONTACT ══════════ -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="contact-grid">
+      <div class="contact-left reveal">
+        <p class="section-label">Get in Touch</p>
+        <h2>Enroll or Inquire</h2>
+        <p>Whether you are a complete beginner or a returning student, we welcome you. Reach out to learn more about classes, schedules, and fees.</p>
+        <div class="contact-items">
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div class="contact-item-text">
+              <h4>Address</h4>
+              <p>First Floor, Natraj Guest House Building<br>Near Churan Khad, Civil Line<br>Dharamshala, Dist. Kangra, H.P.</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📞</div>
+            <div class="contact-item-text">
+              <h4>Phone</h4>
+              <a href="tel:+919418835288">+91 94188 35288</a><br>
+              <a href="tel:+917018969485">+91 70189 69485</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">✉</div>
+            <div class="contact-item-text">
+              <h4>Email</h4>
+              <a href="mailto:dharmendrajainkathak@gmail.com">dharmendrajainkathak@gmail.com</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">🕐</div>
+            <div class="contact-item-text">
+              <h4>Class Timings</h4>
+              <p>Batch 1: 4:00 PM – 5:00 PM<br>Batch 2: 5:00 PM – 6:00 PM<br>Online classes also available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-right reveal reveal-delay-1">
+        <h3>Send an Inquiry</h3>
+        <form id="inquiryForm">
+          <div class="form-group">
+            <label for="contact-name">Your Name</label>
+            <input id="contact-name" name="name" type="text" autocomplete="name" placeholder="Full name" />
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email Address</label>
+            <input id="contact-email" name="email" type="email" autocomplete="email" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label for="contact-phone">Phone Number</label>
+            <input id="contact-phone" name="phone" type="tel" autocomplete="tel" placeholder="+91 XXXXX XXXXX" />
+          </div>
+          <div class="form-group">
+            <label for="contact-interest">Interested In</label>
+            <select id="contact-interest" name="interest">
+              <option value="">Select a class</option>
+              <option>Kathak Dance – In Person</option>
+              <option>Kathak Dance – Online</option>
+              <option>Tabla – In Person</option>
+              <option>Tabla – Online</option>
+              <option>Both Kathak &amp; Tabla</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contact-message">Message (optional)</label>
+            <textarea id="contact-message" name="message" placeholder="Tell us a little about yourself or your child, your experience level, availability, etc."></textarea>
+          </div>
+          <button class="btn-submit" type="submit">Send Inquiry</button>
+        </form>
+        <p class="contact-note">
+          Or call us directly — we're happy to answer any questions.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+</main>
+<footer>
+  <div class="footer-logo">Kathak Kala Kendra</div>
+  <div class="footer-sub">Dharamshala · Himachal Pradesh · India</div>
+  <div class="footer-social">
+    <a class="social-btn" href="https://www.facebook.com/profile.php?id=100008042598278" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook">f</a>
+  </div>
+  <hr />
+  <p class="footer-copy">
+    © 2025 Kathak Kala Kendra · Guru Dharmendra Jain · All Rights Reserved
+  </p>
+</footer>
+
+<script>
+  /* ── Nav scroll ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  /* ── Mobile nav ── */
+  function toggleNav(forceState) {
+    const navLinks = document.getElementById('navLinks');
+    const navToggle = document.getElementById('navToggle');
+    const isOpen = typeof forceState === 'boolean'
+      ? forceState
+      : !navLinks.classList.contains('open');
+    navLinks.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', isOpen);
+  }
+  document.querySelectorAll('#navLinks a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 900) toggleNav(false);
+    });
+  });
+
+  /* ── Scroll-reveal ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── Gallery keyboard access ── */
+  document.querySelectorAll('.gallery-item').forEach(item => {
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        item.click();
+      }
+    });
+  });
+
+  /* ── Lightbox ── */
+  let lastFocusedElement = null;
+  function openLightbox(src) {
+    const lightbox = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = src;
+    lastFocusedElement = document.activeElement;
+    lightbox.classList.add('active');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = document.getElementById('lightboxClose');
+    if (closeBtn) closeBtn.focus();
+  }
+  function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocusedElement) lastFocusedElement.focus();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      toggleNav(false);
+    }
+    if (e.key === 'Escape' && document.getElementById('lightbox').classList.contains('active')) {
+      closeLightbox();
+    }
+  });
+
+  /* ── Facebook SDK ── */
+  (function(d, s, id) {
+    if (d.getElementById(id)) return;
+    const js = d.createElement(s);
+    js.id = id;
+    js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0';
+    const fjs = d.getElementsByTagName(s)[0];
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  /* ── Form submit ── */
+  const inquiryForm = document.getElementById('inquiryForm');
+  if (inquiryForm) {
+    inquiryForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const phone = document.getElementById('contact-phone').value.trim();
+      const interest = document.getElementById('contact-interest').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
+
+      const subject = encodeURIComponent('Kathak Kala Kendra Inquiry');
+      const bodyLines = [
+        `Name: ${name || 'Not provided'}`,
+        `Email: ${email || 'Not provided'}`,
+        `Phone: ${phone || 'Not provided'}`,
+        `Interested in: ${interest || 'Not specified'}`,
+        '',
+        message || 'Message: (no additional details)'
+      ];
+      const body = encodeURIComponent(bodyLines.join('\n'));
+      window.location.href = `mailto:dharmendrajainkathak@gmail.com?subject=${subject}&body=${body}`;
+    });
+  }
+</script>
+
+</body>
+</html>
