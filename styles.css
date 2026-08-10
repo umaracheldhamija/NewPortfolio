@@ -3981,7 +3981,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 }
 
 .research-flip-card {
-  height: 270px;
+  height: 300px;
   perspective: 1000px;
   cursor: pointer;
   outline: none;
@@ -4021,6 +4021,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 .flip-card-back {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--r-lg);
@@ -4104,15 +4105,11 @@ body.large-text .control-label { font-size: 0.68rem; }
   outline-offset: 3px;
 }
 
-/* Filled variant — used on the flip-card front so the CTA is visible without flipping.
-   The front face's icon/title/desc are left-aligned, so left-align this button too
-   instead of inheriting .view-results-btn's centered placement (built for the back
-   face, where it sits under a centered/italic quote). */
+/* Filled variant — used on the flip-card front so the CTA is visible without flipping. */
 .view-results-btn--primary {
   background: var(--accent-primary);
   color: var(--text-on-accent);
   border-color: var(--accent-primary);
-  align-self: flex-start;
 }
 
 .view-results-btn--primary:hover {
@@ -4285,10 +4282,6 @@ body.large-text .control-label { font-size: 0.68rem; }
   .flip-card-grid {
     grid-template-columns: 1fr 1fr;
     gap: var(--sp-3);
-  }
-
-  .research-flip-card {
-    height: 260px;
   }
 
   .om-callout {
