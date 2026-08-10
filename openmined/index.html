@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,11 +16,14 @@
   <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
-<body>
+<body data-project="openmined">
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <div class="cursor-dot" aria-hidden="true"></div>
-  <div class="light-cursor-glow" aria-hidden="true"></div>
+  <div class="project-badge" aria-hidden="true">
+    <img src="logo.jpg" alt="" class="project-badge-logo">
+    <span class="project-badge-name">OpenMined</span>
+  </div>
 
   <div class="bg-layer" aria-hidden="true">
     <div class="storm-base"></div>
@@ -68,12 +71,21 @@
 
   <main class="project-page" id="main-content">
     <header class="project-page-hero">
-      <a href="../index.html#work" class="back-link">
-        <i class="fas fa-arrow-left" aria-hidden="true"></i>
-        Back to Work
-      </a>
+      <div class="case-nav-header">
+        <a href="../index.html#work" class="back-link">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          Back to All Projects
+        </a>
+        <a href="../upmc/index.html" class="back-link next-link">
+          Next Project
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
 
-      <h1 class="project-page-title">OpenMined</h1>
+      <div class="project-title-row">
+        <img src="logo 1.png" alt="OpenMined logo" class="project-title-logo" loading="lazy" decoding="async" width="397" height="397">
+        <h1 class="project-page-title">OpenMined</h1>
+      </div>
       <h2 class="project-page-subtitle">MHCI Capstone</h2>
 
       <div class="project-cta">
@@ -114,7 +126,23 @@
         <span class="tool" data-tool="System Mapping"><i class="fas fa-project-diagram" aria-hidden="true"></i></span>
         <span class="tool" data-tool="AI Ethics"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
       </div>
+
     </header>
+
+    <div class="om-callout" data-reveal style="max-width: 640px; margin: 0 auto var(--sp-8);">
+      <span class="om-callout-eyebrow">Shipped, Summer 2026</span>
+      <h3 class="om-callout-title" style="margin-bottom: var(--sp-2);">Delivered as Kindred</h3>
+      <p style="margin-bottom: 0;">A verified peer support network for people living with chronic conditions: the product identity for what was scoped as "Informed Patient."</p>
+    </div>
+
+    <div class="kindred-hero-banner" data-reveal>
+      <img
+        src="kindred-hero-banner-full.png"
+        alt="Kindred: Private health, public wisdom. Phone mockups of the app showing the health timeline, learning modules, community Q&amp;A, and AI search. Powered by OpenMined. By Yukti Poddar, Uma Dhamija, Mridula Unni, and Tomi Olusina."
+        loading="eager"
+        decoding="async"
+      >
+    </div>
 
     <div class="project-body-content">
 
@@ -123,17 +151,37 @@
         <h2 class="case-section-title" id="om-exec">Executive Summary</h2>
         <div class="exec-summary-card">
           <ul class="exec-summary-list">
-            <li>Led consumer-to-consumer use-case discovery for a privacy-preserving AI, translating dense PETs (Privacy-Enhancing Technology) concepts into buildable product directions</li>
-            <li>Co-designed with 50+ people across interviews and sessions; synthesized 275+ data points into a weighted decision framework across 36 candidate use cases</li>
-            <li>From open ideation to a chosen use case - validated and prototyped in 2 months, and presented directly to CEO Andrew Trask, who is looking forward to the final deliverable</li>
+            <li>Led consumer-to-consumer use-case discovery for a privacy-preserving AI, translating dense PETs concepts into a buildable, validated product: Kindred</li>
+            <li>Co-designed with patients and clinicians across two research diamonds (spring discovery, summer design); synthesized findings into a weighted decision framework across 36 candidate use cases, narrowed to one validated concept</li>
+            <li>Delivered five validated features, a go-to-market strategy, and a build sequence, tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
           </ul>
           <div class="artifact-frame">
-            <img
-              src="overview.png"
-              alt="Research overview stats: 50 primary research articles, 73 secondary papers, 10 SME interviews, 82 survey responses, 36 use case generation sessions, 44 speed dating sessions"
-              loading="eager"
-              decoding="async"
-            >
+            <div class="artifact-frame-header">
+              <span class="artifact-label">Research Overview</span>
+              <span class="artifact-subtitle">Spring discovery + summer design, combined</span>
+            </div>
+            <div class="stat-grid">
+              <div class="stat-item">
+                <span class="stat-number">86</span>
+                <span class="stat-label">Survey Responses</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">50</span>
+                <span class="stat-label">Speed-Dating Intercepts</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">65</span>
+                <span class="stat-label">Interviews: Patients, Clinicians, SMEs</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Testing Rounds</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">4</span>
+                <span class="stat-label">Iterations</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -182,6 +230,9 @@
                 <span class="flip-card-icon"><i class="fas fa-users" aria-hidden="true"></i></span>
                 <strong class="flip-card-title">SME Interviews</strong>
                 <p class="flip-card-desc">Engage subject-matter experts in privacy-enhancing technologies to ground our technical understanding.</p>
+                <button class="view-results-btn view-results-btn--primary" data-modal="modal-sme-interviews" aria-label="View SME Interviews artifact">
+                  View results <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
               </div>
               <div class="flip-card-back">
                 <p class="flip-why">We needed to know what's actually buildable before proposing anything. Experts caught our assumptions early and gave us technical ground truth we couldn't get from papers alone.</p>
@@ -198,6 +249,9 @@
                 <span class="flip-card-icon"><i class="fas fa-book-open" aria-hidden="true"></i></span>
                 <strong class="flip-card-title">Primary &amp; Secondary Research</strong>
                 <p class="flip-card-desc">Synthesize academic literature, industry reports, and emerging use-case documentation across the PETs landscape.</p>
+                <button class="view-results-btn view-results-btn--primary" data-modal="modal-primary-research" aria-label="View Primary and Secondary Research artifact">
+                  View results <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
               </div>
               <div class="flip-card-back">
                 <p class="flip-why">PETs is a fast-moving field. Secondary research let us map the landscape before spending participant time on what was already known -or already abandoned.</p>
@@ -214,6 +268,9 @@
                 <span class="flip-card-icon"><i class="fas fa-globe" aria-hidden="true"></i></span>
                 <strong class="flip-card-title">PESTLE Analysis</strong>
                 <p class="flip-card-desc">Map political, economic, social, technological, legal, and environmental factors shaping privacy-AI adoption.</p>
+                <button class="view-results-btn view-results-btn--primary" data-modal="modal-pestle" aria-label="View PESTLE Analysis artifact">
+                  View results <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
               </div>
               <div class="flip-card-back">
                 <p class="flip-why">A use case that ignores regulatory barriers isn't a real use case. PESTLE forced every idea to face the world as it actually is, not as we hoped it would be.</p>
@@ -230,6 +287,9 @@
                 <span class="flip-card-icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span>
                 <strong class="flip-card-title">Competitive Analysis</strong>
                 <p class="flip-card-desc">Evaluate existing privacy-preserving solutions and their go-to-market strategies across key verticals.</p>
+                <button class="view-results-btn view-results-btn--primary" data-modal="modal-competitive" aria-label="View Competitive Analysis artifact">
+                  View results <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
               </div>
               <div class="flip-card-back">
                 <p class="flip-why">Understanding what exists helped us find genuine white space -rather than proposing what competitors had already launched, failed at, or quietly dropped.</p>
@@ -246,6 +306,9 @@
                 <span class="flip-card-icon"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
                 <strong class="flip-card-title">Assumption Mapping</strong>
                 <p class="flip-card-desc">Surface and challenge the core beliefs underlying different privacy approaches, then test them against evidence.</p>
+                <button class="view-results-btn view-results-btn--primary" data-modal="modal-hmws" aria-label="View Assumption Mapping artifact">
+                  View results <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
               </div>
               <div class="flip-card-back">
                 <p class="flip-why">Our most dangerous design mistakes live in our assumptions. Making them explicit let us test them deliberately instead of building them silently into every decision.</p>
@@ -262,6 +325,9 @@
                 <span class="flip-card-icon"><i class="fas fa-lightbulb" aria-hidden="true"></i></span>
                 <strong class="flip-card-title">Use Case Studies</strong>
                 <p class="flip-card-desc">Develop detailed scenarios exploring how privacy-preserving AI could solve real problems across sectors.</p>
+                <button class="view-results-btn view-results-btn--primary" data-modal="modal-use-cases" aria-label="View Use Case Studies artifact">
+                  View results <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
               </div>
               <div class="flip-card-back">
                 <p class="flip-why">Scenarios made abstract possibilities tangible enough for participants to react to -the fastest way to learn what people actually want to exist in the world.</p>
@@ -298,10 +364,79 @@
         </div>
       </section>
 
-      <!-- Where We Are Now -->
+      <!-- From Informed Patient to Kindred -->
       <section class="case-section" aria-labelledby="om-where-now" data-reveal>
-        <h2 class="case-section-title" id="om-where-now">Where We Are Now</h2>
-        <span class="om-callout-eyebrow">Use case selected</span>
+        <h2 class="case-section-title" id="om-where-now">From Informed Patient to Kindred</h2>
+        <p class="project-lead">
+          Kindred is a verified support network for people living with chronic conditions. It unifies scattered health records into one private timeline, where a medically trained AI and patients with similar diagnoses help interpret the information, powered by OpenMined's Attribution-Based Control, so insights are shared without the underlying data ever moving.
+        </p>
+
+        <div class="kindred-feature-grid" data-reveal-stagger>
+          <div class="artifact-frame">
+            <img
+              src="kindred-feature-timeline-of-you.png"
+              alt="Timeline of You: every diagnosis, lab, and prescription from connected providers on one private timeline"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+          <div class="artifact-frame">
+            <img
+              src="kindred-feature-community-qa.png"
+              alt="Community Q&A: answers from patients with a verified diagnosis, ranked by how closely they match you"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+          <div class="artifact-frame">
+            <img
+              src="kindred-feature-ai-search.png"
+              alt="AI Search: plain-language answers with every source shown and selectable; context, never a diagnosis"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+          <div class="artifact-frame">
+            <img
+              src="kindred-feature-learning-modules.png"
+              alt="Learning Modules: short explainers that turn complex numbers like eGFR into what it means day to day"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+        </div>
+
+        <div class="artifact-frame" style="margin-top: var(--sp-8);" data-reveal>
+          <img
+            src="kindred-codesign-session.png"
+            alt="Photo from a Kindred co-design session with patients gathered around a whiteboard of research artifacts"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        <p class="kindred-caption">Two co-design sessions with 11 chronic-condition patients, where we cut 17 candidate features to four and overturned our own model of the patient journey.</p>
+
+        <div class="artifact-frame" style="margin-top: var(--sp-8);" data-reveal>
+          <img
+            src="kindred-ideation-framework-diagram.png"
+            alt="Diagram of the reproducible ideation-to-selection framework: 3 Generative Activities to 36 Ideas to Value/Risk Assessment to 8 Use Cases to 3 High Viability Use Cases to Our Winner"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        <p class="kindred-caption">Our reproducible ideation-to-selection framework: 36 candidate applications narrowed to one validated use case. OpenMined can rerun it on any future idea.</p>
+
+        <div class="artifact-frame" style="margin-top: var(--sp-8);" data-reveal>
+          <img
+            src="kindred-decision-matrix.png"
+            alt="Decision matrix plotting all 36 candidate ideas by impact and risk, color-coded by category"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+        <p class="kindred-caption">The full impact/risk map behind that funnel: all 36 ideas, plotted and categorized, that fed the framework above.</p>
+
+        <span class="om-callout-eyebrow" style="display: block; margin-top: var(--sp-12);">Use case selected, spring 2026</span>
         <h3 class="om-callout-title" style="margin-bottom: var(--sp-4); margin-top: var(--sp-2)">Informed Patient - why this use case won</h3>
         <p>We ran a weighted decision matrix across our top 8 ideas, scoring each on technology fit, market need, and regulatory barriers. <strong>Informed Patient won</strong> - the largest underserved market, with the best technology fit.</p>
 
@@ -343,16 +478,12 @@
       <section class="case-section" aria-labelledby="om-accomplishments" data-reveal>
         <h2 class="case-section-title" id="om-accomplishments">Accomplishments</h2>
         <ul>
-          <li>Presented research to the OpenMined team -CEO Andrew Trask responded enthusiastically and is looking forward to the final deliverable.</li>
+          <li>Delivered a reproducible discovery framework, seven further use cases already scored against it, five validated Kindred features, a go-to-market strategy, and a build sequence.</li>
+          <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians.</li>
+          <li>The work reframed a data-permission problem into a trust problem. The larger impact is the repeatable ideation-to-validation process itself, which OpenMined can rerun on future ideas.</li>
+          <li>Presented research to the OpenMined team. CEO Andrew Trask responded enthusiastically to the direction that became Kindred.</li>
           <li>Madhava, principal engineer leading the BioVault project, validated our technical direction.</li>
-          <li>Interviewed and co-designed with 50+ people across the full research arc.</li>
-          <li>In ~1 month, moved from open exploration to a chosen use case, validated it through interviews and testing, and shipped mid-fidelity prototypes.</li>
         </ul>
-      </section>
-
-      <!-- More to come -->
-      <section class="case-section" data-reveal>
-        <p style="font-style: italic; color: var(--text-secondary);">More to come soon.</p>
       </section>
 
       <img
@@ -363,6 +494,17 @@
         decoding="async"
         width="500"
         height="500"
+        data-reveal
+      >
+
+      <img
+        src="../images/meg.png"
+        alt="The Kindred team presenting 'Private Health, Public Wisdom: The Future of Patient Support' to OpenMined and the CMU Human-Computer Interaction Institute"
+        class="case-img tilt-card"
+        loading="lazy"
+        decoding="async"
+        width="2060"
+        height="1730"
         data-reveal
       >
 
@@ -590,7 +732,7 @@
         });
       });
 
-      // Image lightbox — opens any .artifact-frame img full-screen on click
+      // Image lightbox: opens any .artifact-frame img full-screen on click
       const lb = document.createElement('div');
       lb.id = 'img-lightbox';
       lb.setAttribute('hidden', '');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,11 +15,14 @@
   <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
-<body>
+<body data-project="meditationwise">
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <div class="cursor-dot" aria-hidden="true"></div>
-  <div class="light-cursor-glow" aria-hidden="true"></div>
+  <div class="project-badge" aria-hidden="true">
+    <img src="logo.png" alt="" class="project-badge-logo">
+    <span class="project-badge-name">MeditationWise</span>
+  </div>
 
   <div class="bg-layer" aria-hidden="true">
     <div class="storm-base"></div>
@@ -69,10 +72,16 @@
 
   <main class="project-page" id="main-content">
     <header class="project-page-hero">
-      <a href="../index.html#work" class="back-link">
-        <i class="fas fa-arrow-left" aria-hidden="true"></i>
-        Back to Work
-      </a>
+      <div class="case-nav-header">
+        <a href="../index.html#work" class="back-link">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          Back to All Projects
+        </a>
+        <a href="../northwestern/index.html" class="back-link next-link">
+          Next Project
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
 
       <div class="project-title-row">
         <img src="logo.png" alt="MeditationWise logo" class="project-title-logo" loading="lazy" decoding="async" width="1368" height="1068">
@@ -112,6 +121,17 @@
       </div>
     </header>
 
+    <div class="case-hero-banner" data-reveal>
+      <img
+        src="MeditationWise — Portfolio Banner@1x.png"
+        alt="MeditationWise: Meditate with intention. Sixty techniques across every tradition, matched to how you actually feel, not to a generic streak. Phone mockups of the progress, meditation, and learn screens."
+        loading="eager"
+        decoding="async"
+        width="2880"
+        height="1620"
+      >
+    </div>
+
     <div class="project-body-content">
 
       <!-- Executive Summary -->
@@ -119,7 +139,7 @@
         <h2 class="case-section-title" id="mw-exec">Executive Summary</h2>
         <div class="exec-summary-card">
           <ul class="exec-summary-list">
-            <li>Lead designer on an end-to-end mobile UX redesign for a meditation startup — covering navigation, session flows, and a scalable design system</li>
+            <li>Lead designer on an end-to-end mobile UX redesign for a meditation startup, covering navigation, session flows, and a scalable design system</li>
             <li>9+ usability sessions over 4 months surfaced the core pitfall: discovery flows that overwhelmed users before they could form a practice</li>
             <li>Redesigned the onboarding and browse experience to reduce cognitive load while preserving the cultural depth that made MeditationWise distinct from generic wellness apps</li>
           </ul>
@@ -196,17 +216,6 @@
           <li>Tested wireframes and prototypes with users, then refined hierarchy and interaction patterns.</li>
         </ul>
       </section>
-
-      <img
-        src="design-draft.png"
-        alt="Design drafts and iterative prototype refinements"
-        class="case-img tilt-card"
-        loading="lazy"
-        decoding="async"
-        width="1680"
-        height="978"
-        data-reveal
-      >
 
       <section class="case-section" aria-labelledby="mw-solution" data-reveal>
         <h2 class="case-section-title" id="mw-solution">Solution</h2>

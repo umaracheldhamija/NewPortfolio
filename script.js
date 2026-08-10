@@ -61,8 +61,8 @@ const dom = {
   navLinksAll:      [...document.querySelectorAll('.nav-links a')],
   hero:             document.getElementById('hero'),
   stormReveal:      document.querySelector('.storm-reveal'),
-  lightGlow:        document.querySelector('.light-cursor-glow'),
   cursorDot:        document.querySelector('.cursor-dot'),
+  magneticEls:      [...document.querySelectorAll('.btn, .social-link, .control-btn')],
   themeToggle:      document.getElementById('theme-toggle'),
   quietToggle:      document.getElementById('quiet-toggle'),
   textSizeToggle:   document.getElementById('text-size-toggle'),
@@ -72,7 +72,7 @@ const dom = {
   explorationTriggers: [...document.querySelectorAll('.exploration-trigger')],
   explorationModalImage: document.getElementById('exploration-modal-image'),
   explorationModalCaption: document.getElementById('exploration-modal-caption'),
-  projectImages:    [...document.querySelectorAll('.project-page .case-img')],
+  projectImages:    [...document.querySelectorAll('.project-page .case-img, .project-page .kindred-hero-banner img, .project-page .case-hero-banner img, .project-page .case-hero-banner--breakout img, .project-page .project-image, .project-page .process-grid img')],
   sections:         [...document.querySelectorAll('section[id]')],
 };
 
@@ -176,14 +176,43 @@ function runBackgroundLoop() {
       dom.cursorDot.style.top  = `${state.target.y}px`;
     }
 
-    // --- Light cursor glow (light mode only, lerped for smoothness) ---
-    if (dom.lightGlow && !isDark) {
-      dom.lightGlow.style.left = `${state.reveal.x}px`;
-      dom.lightGlow.style.top  = `${state.reveal.y}px`;
-    }
+    // --- Magnetic elements — nearby buttons/social/control icons lean toward the cursor ---
+    runMagneticButtons();
   }
 
   requestAnimationFrame(runBackgroundLoop);
+}
+
+const MAGNET_RADIUS = 90; // px — how close the cursor needs to be to start pulling
+const MAGNET_STRENGTH = 10; // px — max lean at dead-center, main CTA buttons
+const MAGNET_STRENGTH_SUBTLE = 4; // px — social links + accessibility controls (60% less)
+
+function runMagneticButtons() {
+  if (!dom.magneticEls.length) return;
+
+  dom.magneticEls.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (!rect.width || !rect.height) return; // hidden (e.g. inside a closed modal)
+
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = state.target.x - cx;
+    const dy = state.target.y - cy;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < MAGNET_RADIUS) {
+      const strength = (el.classList.contains('social-link') || el.classList.contains('control-btn'))
+        ? MAGNET_STRENGTH_SUBTLE
+        : MAGNET_STRENGTH;
+      const pull = (1 - dist / MAGNET_RADIUS) * strength;
+      const angle = Math.atan2(dy, dx);
+      el.style.setProperty('--magnet-x', `${(Math.cos(angle) * pull).toFixed(2)}px`);
+      el.style.setProperty('--magnet-y', `${(Math.sin(angle) * pull).toFixed(2)}px`);
+    } else if (el.style.getPropertyValue('--magnet-x')) {
+      el.style.removeProperty('--magnet-x');
+      el.style.removeProperty('--magnet-y');
+    }
+  });
 }
 
 // Track whether user is in the hero section.
@@ -607,7 +636,7 @@ function savePreferences() {
 }
 
 function loadPreferences() {
-  applyTheme('dark');
+  applyTheme('light');
   state.themeExplicit = false;
 
   const isMobile = window.innerWidth < 768;
@@ -950,7 +979,6 @@ function setupCarousel(carouselElement, cardSelector, onCardClick) {
       if (index !== activeIndex) {
         event.preventDefault();
         setActiveIndex(index);
-        return;
       }
 
       if (onCardClick) {
@@ -1541,7 +1569,7 @@ function setupIntroScreen() {
   const cursor  = screen.querySelector('.intro-cursor');
   const skipBtn = screen.querySelector('.intro-skip-btn');
 
-  const TEXT      = 'designing technology for better healthcare.';
+  const TEXT      = 'designing technology for better services';
   const CHAR_MS   = 25;   // ms per character
   const END_PAUSE = 900;  // ms to hold completed text before fading
 

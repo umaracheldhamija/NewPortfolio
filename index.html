@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
-  <!-- Immediately hide intro for returning visitors this session — runs before paint -->
+  <!-- Immediately hide intro for returning visitors this session. Runs before paint -->
   <script>try{if(sessionStorage.getItem('intro-seen')==='true'){document.documentElement.classList.add('intro-skip');}}catch(e){}</script>
 </head>
 
@@ -42,7 +42,6 @@
        ============================================ -->
 
   <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
-  <div class="light-cursor-glow" aria-hidden="true"></div>
 
   <div class="bg-layer" aria-hidden="true">
     <div class="storm-base"></div>
@@ -104,7 +103,7 @@
   </nav>
 
 
-  <!-- Bio tab — slides in from left when hero is scrolled above viewport -->
+  <!-- Bio tab: slides in from left when hero is scrolled above viewport -->
   <button class="bio-tab" id="bio-tab" type="button" aria-label="Scroll up to see bio">
     <span class="bio-tab-label">About</span>
     <i class="fas fa-arrow-up bio-tab-icon" aria-hidden="true"></i>
@@ -122,7 +121,7 @@
     <div class="hero-content tilt-card" data-tilt-max="6">
 
       <h1 class="hero-name">Uma Dhamija</h1>
-      <p class="hero-role">designing for better healthcare<br>ai ux &bull; neurotech enthusiast &bull; kathak dancer</p>
+      <p class="hero-role">designing for better services<br>ai ux &bull; neurotech enthusiast &bull; kathak dancer</p>
 
       <!-- Social links original URLs preserved -->
       <div class="social-links" aria-label="Social links">
@@ -172,7 +171,7 @@
       <div class="projects-grid" data-reveal-stagger>
 
         <!-- 1. OpenMined Capstone -->
-        <a href="openmined/index.html" class="project-card tilt-card">
+        <a href="openmined/index.html" class="project-card tilt-card" data-project="openmined">
           <div class="project-thumb">
             <img
               src="openmined/logo.jpg"
@@ -187,8 +186,9 @@
             <h3>Securely training AI on private data</h3>
             <p class="card-subtitle">OpenMined · Capstone</p>
             <ul class="card-bullets">
-              <li>Co-designed with 50+ people to surface 36 ideas, then narrowed to the 1 concept OpenMined chose to build</li>
-              <li>Synthesized findings into 61 clusters and prototyped "The Informed Patient"</li>
+              <li>Led discovery for OpenMined's first consumer app, delivered as Kindred, a verified peer support network for people with chronic conditions</li>
+              <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
+              <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
             </ul>
             <div class="project-tags">
               <span class="tag">AI Ethics</span>
@@ -200,7 +200,7 @@
         </a>
 
         <!-- 2. UPMC Magee Hospital Designing w/CARE -->
-        <a href="upmc/index.html" class="project-card tilt-card">
+        <a href="upmc/index.html" class="project-card tilt-card" data-project="upmc">
           <div class="project-thumb">
             <img
               src="upmc/logo.jpg"
@@ -229,7 +229,7 @@
         </a>
 
         <!-- 3. MeditationWise -->
-        <a href="meditationwise/index.html" class="project-card tilt-card">
+        <a href="meditationwise/index.html" class="project-card tilt-card" data-project="meditationwise">
           <div class="project-thumb">
             <img
               src="meditationwise/logo.png"
@@ -261,7 +261,7 @@
         </a>
 
         <!-- 4. Northwestern Capstone GlowUp Eye Care -->
-        <a href="northwestern/index.html" class="project-card tilt-card">
+        <a href="northwestern/index.html" class="project-card tilt-card" data-project="northwestern">
           <div class="project-thumb">
             <img
               src="northwestern/photo.jpg"
@@ -290,7 +290,7 @@
         </a>
 
         <!-- 5. Electric Scooters for Kids -->
-        <a href="scooter/index.html" class="project-card tilt-card">
+        <a href="scooter/index.html" class="project-card tilt-card" data-project="scooter">
           <div class="project-thumb">
             <img
               src="scooter/photo.png"
@@ -319,7 +319,7 @@
         </a>
 
         <!-- 6. Kathak Kala Kendra -->
-        <a href="kathak/index.html" class="project-card tilt-card">
+        <a href="kathak/index.html" class="project-card tilt-card" data-project="kathak">
           <div class="project-thumb">
             <img
               src="kathak/photo.png"
@@ -348,6 +348,10 @@
         </a>
 
       </div>
+      <div class="work-scroll-hint" aria-hidden="true">
+        <span>Scroll for more</span>
+        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+      </div>
     </div>
   </section>
 
@@ -367,7 +371,7 @@
         <div class="education-logo-wrap">
           <img
             class="education-logo"
-            src="https://www.cmu.edu/brand/brand-guidelines/images/seal-4c-600x600-min.jpg"
+            src="images/cmu.png"
             alt="Carnegie Mellon University seal"
             loading="lazy"
             decoding="async"
@@ -405,12 +409,12 @@
         <div class="education-logo-wrap">
           <img
             class="education-logo"
-            src="https://upload.wikimedia.org/wikipedia/commons/1/16/New_York_University_Seal.svg"
+            src="images/nyu.png"
             alt="New York University seal"
             loading="lazy"
             decoding="async"
-            width="512"
-            height="512"
+            width="860"
+            height="900"
           >
         </div>
         <div class="education-body">
@@ -645,6 +649,74 @@
           <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
         </div>
 
+        <!-- Card 5 Designing Trust Into a Nation-Scale Health Record System (on-site modal) -->
+        <div
+          class="deck-card"
+          data-modal="blog-5"
+          role="button"
+          tabindex="-1"
+          aria-label="Read: Designing Trust Into a Nation-Scale Health Record System"
+        >
+          <div class="writing-meta">
+            <span class="writing-date">Aug 2026</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>Designing Trust Into a Nation-Scale Health Record System</h3>
+          <p>India's digital health mission has issued 900M+ health accounts. The infrastructure is remarkable. The UX, less so.</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
+
+        <!-- Card 6 Stitching Together the Fragmented Patient Journey (on-site modal) -->
+        <div
+          class="deck-card"
+          data-modal="blog-6"
+          role="button"
+          tabindex="-1"
+          aria-label="Read: Stitching Together the Fragmented Patient Journey"
+        >
+          <div class="writing-meta">
+            <span class="writing-date">Aug 2026</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>Stitching Together the Fragmented Patient Journey</h3>
+          <p>Care is real in India. Continuity isn't. Designing for the whole patient story, not just the single visit.</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
+
+        <!-- Card 7 Making Consent Actually Mean Something (on-site modal) -->
+        <div
+          class="deck-card"
+          data-modal="blog-7"
+          role="button"
+          tabindex="-1"
+          aria-label="Read: Making Consent Actually Mean Something"
+        >
+          <div class="writing-meta">
+            <span class="writing-date">Aug 2026</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>Making Consent Actually Mean Something</h3>
+          <p>As health data becomes easier to share, does anyone actually understand what they've agreed to?</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
+
+        <!-- Card 8 Getting Clinics and Providers to Actually Want the Tools They're Given (on-site modal) -->
+        <div
+          class="deck-card"
+          data-modal="blog-8"
+          role="button"
+          tabindex="-1"
+          aria-label="Read: Getting Clinics and Providers to Actually Want the Tools They're Given"
+        >
+          <div class="writing-meta">
+            <span class="writing-date">Aug 2026</span>
+            <span class="writing-read-time">On-site</span>
+          </div>
+          <h3>Getting Clinics and Providers to Actually Want the Tools They're Given</h3>
+          <p>Incentives can push adoption. They can't manufacture enthusiasm. The real problem is provider buy-in.</p>
+          <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </div>
+
       </div>
 
       <div class="deck-controls">
@@ -866,6 +938,74 @@
         <p>This essay examines a growing tension in creative practice: AI can accelerate output, but it can also flatten intention when creators stop questioning their own decisions. The issue is less about tools replacing people, and more about people outsourcing judgment.</p>
         <p>I am currently expanding this piece with examples from design workflows, writing, and student work to explore where AI support is useful, where it becomes dependency, and how we can protect authorship without rejecting progress.</p>
         <p style="color:var(--text-muted);font-style:italic;">Draft in progress. Full essay publishing soon.</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- blog-5: Designing Trust Into a Nation-Scale Health Record System -->
+  <div class="modal" id="blog-5" aria-labelledby="blog-5-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <button class="modal-close" aria-label="Close post">&times;</button>
+      <h2 id="blog-5-title">Designing Trust Into a Nation-Scale Health Record System</h2>
+      <div class="blog-meta">
+        <span class="blog-date">Uma Dhamija &middot; August 2026</span>
+      </div>
+      <div class="blog-body">
+        <p>India has quietly built one of the largest digital health infrastructures in the world. The Ayushman Bharat Digital Mission, the government's national digital health initiative, has issued over 900 million digital health accounts and linked more than a billion health records &mdash; comparable in ambition to India's UPI payments system, but for healthcare.</p>
+        <p>The technical infrastructure is remarkable. The user experience, less so. Patients across the country are being asked to link their medical history to a digital identity, share records between hospitals, and navigate consent screens, all while digital literacy varies enormously between a tech-fluent professional in Delhi and a first-time smartphone user in rural Uttar Pradesh. This is a design problem at a scale few designers ever get to touch: how do you build trust and comprehension into a system meant to serve over a billion people with wildly different relationships to technology?</p>
+        <p>The opportunity here isn't building another slick health app. It's rethinking basic interaction patterns, consent language, and onboarding flows so that the country's most ambitious digital health infrastructure actually works for the people it was built for.</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- blog-6: Stitching Together the Fragmented Patient Journey -->
+  <div class="modal" id="blog-6" aria-labelledby="blog-6-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <button class="modal-close" aria-label="Close post">&times;</button>
+      <h2 id="blog-6-title">Stitching Together the Fragmented Patient Journey</h2>
+      <div class="blog-meta">
+        <span class="blog-date">Uma Dhamija &middot; August 2026</span>
+      </div>
+      <div class="blog-body">
+        <p>Ask most patients in India to describe their medical history and you'll get a patchwork: a cardiologist visit here, a lab test there, a prescription from a clinic that's since lost the paper file. Care is real, but continuity isn't. Patients routinely start from zero with every new provider, repeating tests, re-explaining symptoms, and losing the thread of their own health story.</p>
+        <p>This is especially acute for chronic conditions, where the whole value of care compounds over time. A diabetes patient's data from six months ago should inform today's treatment plan. A patient managing multiple conditions across multiple specialists needs someone, or something, holding the full picture.</p>
+        <p>Designing for this means moving past single-visit interfaces and toward longitudinal, patient-centered records: tools that let a person carry their own health story with them, understand it, and share it selectively, rather than being at the mercy of whichever clinic happens to have the most recent file.</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- blog-7: Making Consent Actually Mean Something -->
+  <div class="modal" id="blog-7" aria-labelledby="blog-7-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <button class="modal-close" aria-label="Close post">&times;</button>
+      <h2 id="blog-7-title">Making Consent Actually Mean Something</h2>
+      <div class="blog-meta">
+        <span class="blog-date">Uma Dhamija &middot; August 2026</span>
+      </div>
+      <div class="blog-body">
+        <p>As digital health infrastructure makes sharing medical records dramatically easier, a subtler problem emerges: do patients actually understand what they're agreeing to?</p>
+        <p>Consent in healthcare has traditionally meant a signature on a form nobody reads closely. In a digital system where records can move between hospitals, insurers, and platforms in seconds, that old model breaks down fast. The design challenge isn't legal compliance, it's comprehension: helping a patient genuinely understand who can see their data, for how long, and why, in language and flows that don't require a law degree or a computer science background to parse.</p>
+        <p>Good consent design in healthcare isn't a checkbox at the end of a form. It's an ongoing relationship of transparency, built into every point where data changes hands.</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- blog-8: Getting Clinics and Providers to Actually Want the Tools They're Given -->
+  <div class="modal" id="blog-8" aria-labelledby="blog-8-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <button class="modal-close" aria-label="Close post">&times;</button>
+      <h2 id="blog-8-title">Getting Clinics and Providers to Actually Want the Tools They're Given</h2>
+      <div class="blog-meta">
+        <span class="blog-date">Uma Dhamija &middot; August 2026</span>
+      </div>
+      <div class="blog-body">
+        <p>Government incentive schemes can push adoption, but they can't manufacture enthusiasm. A huge, underexamined design problem in Indian health tech is the provider side: convincing doctors, clinics, and hospital staff, often overworked and under-resourced, that a new digital record system is worth the friction of learning it.</p>
+        <p>Too many health tech tools are designed top-down, built to satisfy a compliance requirement rather than a clinician's actual workflow. The result is half-hearted adoption: digital systems running alongside, not instead of, the paper processes they were meant to replace.</p>
+        <p>The real design opportunity is building tools clinics choose to use because they make daily work faster and easier, not because a scheme requires it. That means spending real time understanding clinical workflows, not just patient-facing screens, and designing for the people whose buy-in determines whether any of this infrastructure gets used at all.</p>
         <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2rem;">Uma Dhamija</p>
       </div>
     </div>
@@ -1109,7 +1249,7 @@
         });
       };
 
-      attachPoemTrigger(document.querySelector('img[src*="New_York_University"]'), 'nyu');
+      attachPoemTrigger(document.querySelector('img[src*="nyu.png"]'), 'nyu');
       attachPoemTrigger(document.querySelector('.poem-trigger[data-poem="paradox"]'), 'paradox');
       attachPoemTrigger(document.querySelector('[data-poem-trigger="name"]'), 'name');
       attachPoemTrigger(document.querySelector('[data-poem-trigger="website"]'), 'website');

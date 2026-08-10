@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,11 +15,14 @@
   <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
-<body>
+<body data-project="upmc">
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <div class="cursor-dot" aria-hidden="true"></div>
-  <div class="light-cursor-glow" aria-hidden="true"></div>
+  <div class="project-badge" aria-hidden="true">
+    <img src="icon.png" alt="" class="project-badge-logo">
+    <span class="project-badge-name">UPMC - Care2Care</span>
+  </div>
 
   <div class="bg-layer" aria-hidden="true">
     <div class="storm-base"></div>
@@ -69,12 +72,21 @@
 
   <main class="project-page" id="main-content">
     <header class="project-page-hero">
-      <a href="../index.html#work" class="back-link">
-        <i class="fas fa-arrow-left" aria-hidden="true"></i>
-        Back to Work
-      </a>
+      <div class="case-nav-header">
+        <a href="../index.html#work" class="back-link">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          Back to All Projects
+        </a>
+        <a href="../meditationwise/index.html" class="back-link next-link">
+          Next Project
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
 
-      <h1 class="project-page-title">Designing w/CARE</h1>
+      <div class="project-title-row">
+        <img src="upmc-logo.png" alt="UPMC Magee-Womens logo" class="project-title-logo" loading="lazy" decoding="async" width="479" height="180">
+        <h1 class="project-page-title">Designing w/CARE</h1>
+      </div>
 
       <p class="project-page-subtitle">
         A design project focused on supporting caregivers of gynaecological oncology patients and care teams at UPMC Magee-Womens Hospital.
@@ -109,14 +121,34 @@
 
     <div class="project-body-content">
 
+      <h2 class="case-section-title" id="upmc-milestone" style="text-align: center;" data-reveal>From Prototype to Funded Build: Care2Care</h2>
+
+      <div class="om-callout" data-reveal>
+        <span class="om-callout-eyebrow">Funded, 2026</span>
+        <h3 class="om-callout-title" style="margin-bottom: var(--sp-2);">Building Care2Care</h3>
+        <p style="margin-bottom: 0;">Care2Care won the Lucie Young Kelly Faculty Leadership Award, under the mentorship of Heidi Ann Scharf Donovan, a UPMC nurse and University of Pittsburgh research professor. That funding is what's moving the project from academic prototype to a real product in active development.</p>
+      </div>
+
+      <div class="case-hero-banner--breakout" data-reveal>
+        <img
+          src="care2care thumbnail.png"
+          alt="Care2Care app icon and tagline, 'Connecting caregivers to the support their need,' on a phone mockup with UPMC Magee-Womens branding"
+          loading="eager"
+          decoding="async"
+          width="2820"
+          height="1080"
+        >
+      </div>
+
       <!-- Executive Summary -->
       <section class="case-section" aria-labelledby="upmc-exec" data-reveal>
         <h2 class="case-section-title" id="upmc-exec">Executive Summary</h2>
         <div class="exec-summary-card">
           <ul class="exec-summary-list">
-            <li>Partnered with CancerBridges, the Family CARE Center at UPMC, University of Pittsburgh and CMU to design Care2Care — a caregiver support app delivered as a final prototype in 3 months</li>
+            <li>Partnered with CancerBridges, the Family CARE Center at UPMC, University of Pittsburgh and CMU to design Care2Care, a caregiver support app delivered as a final prototype in 3 months</li>
             <li>Focused on a population overlooked by existing healthcare tools: caregivers of gynaecological oncology patients navigating emotionally heavy, information-dense care journeys</li>
             <li>The Family CARE Center is now supporting development of the full app, validating the direction beyond the academic context</li>
+            <li>Awarded the Lucie Young Kelly Faculty Leadership Award, securing the funding now moving Care2Care from prototype to a real, built product</li>
           </ul>
         </div>
       </section>
@@ -222,6 +254,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               Research Objectives for Cancer Care Coordination
+              <span class="article-read-time">&middot; 4 min read</span>
             </a>
           </li>
           <li>
@@ -234,6 +267,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               Mapping the Cancer Care Terrain
+              <span class="article-read-time">&middot; 4 min read</span>
             </a>
           </li>
           <li>
@@ -246,6 +280,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               Redesigning Care Coordination Across Transitions
+              <span class="article-read-time">&middot; 4 min read</span>
             </a>
           </li>
           <li>
@@ -258,18 +293,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               A.E.I.O.U in Action at UPMC Magee
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://medium.com/@allenchen-desigh/mapping-the-cancer-care-terrain-e6a3af5eb972"
-              class="project-cta-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Read article on Medium: Mapping the cancer care terrain"
-            >
-              <i class="fa-brands fa-medium" aria-hidden="true"></i>
-              Mapping the Cancer Care Terrain
+              <span class="article-read-time">&middot; 4 min read</span>
             </a>
           </li>
           <li>
@@ -282,6 +306,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               The Big Idea: Designing a System that Cares for the Caregiver
+              <span class="article-read-time">&middot; 5 min read</span>
             </a>
           </li>
           <li>
@@ -294,6 +319,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               Three Concepts, One Direction
+              <span class="article-read-time">&middot; 4 min read</span>
             </a>
           </li>
           <li>
@@ -306,6 +332,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               From Direction to Discovery: Listening Before We Build
+              <span class="article-read-time">&middot; 6 min read</span>
             </a>
           </li>
           <li>
@@ -318,6 +345,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               What We Heard, What We Missed, and What Comes Next
+              <span class="article-read-time">&middot; 5 min read</span>
             </a>
           </li>
           <li>
@@ -330,6 +358,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               Building Together: A Team Reflection
+              <span class="article-read-time">&middot; 3 min read</span>
             </a>
           </li>
           <li>
@@ -342,6 +371,7 @@
             >
               <i class="fa-brands fa-medium" aria-hidden="true"></i>
               Designing for the Invisible Details of Caregiving
+              <span class="article-read-time">&middot; 4 min read</span>
             </a>
           </li>
         </ul>
@@ -350,16 +380,16 @@
       <section class="case-section" aria-labelledby="upmc-outcomes" data-reveal>
         <h2 class="case-section-title" id="upmc-outcomes">Outcomes</h2>
         <ul>
-          <li>To bridge the gap between caregivers of oncology patients and resources.</li>
-          <li>To create a more empathetic and effective care coordination system.</li>
-          <li>To produce design artifacts that meet the identified needs of caregivers.</li>
-          <li>To strengthen my confidence in service-design methods for high-stakes healthcare contexts.</li>
+          <li>Bridged the gap between caregivers of oncology patients and the support resources meant for them.</li>
+          <li>Delivered a more empathetic, effective care coordination concept, now advancing into real development with the Family CARE Center.</li>
+          <li>Produced design artifacts, personas, journey maps, and service concepts, that reflect caregivers' actual, identified needs.</li>
+          <li>Proved a service-design approach for high-stakes healthcare contexts sound enough to secure funding and continue past the capstone.</li>
         </ul>
       </section>
 
         <img
-          src="../images/care allenpng.png"
-          alt="Care allen exploration"
+          src="team.png"
+          alt="Care team image"
           class="case-img tilt-card"
           loading="lazy"
           decoding="async"
@@ -367,8 +397,30 @@
           height="500"
         >
 
-      <section class="case-section" data-reveal>
-        <p style="font-style: italic; color: var(--text-secondary);">More to come on this project.</p>
+      <section class="case-section" aria-label="Care2Care development, continued" data-reveal>
+        <p>
+          The capstone presentation to program faculty and UPMC partners, including Professor Kristin Hughes, Grace Campbell PhD RN, and Dr. Sarah Taylor, closed out the academic phase successfully. Work now continues on two fronts: usability and pilot testing with real caregivers and liaisons, and standing up the backend architecture, pending IRB approval.
+        </p>
+
+        <img
+          src="care overview thumbnail.png"
+          alt="Care2Care product walkthrough: Adaptive Onboarding to get matched with resources, Dynamic Screening and a Resource Hub for day-to-day check-ins, and Connecting with a Liaison for real human support"
+          class="case-img"
+          loading="eager"
+          decoding="async"
+          width="1920"
+          height="4060"
+        >
+
+        <img
+          src="testing.png"
+          alt="Early usability testing: two team members walking caregivers through the Care2Care prototype on laptops"
+          class="case-img tilt-card"
+          loading="eager"
+          decoding="async"
+          width="1352"
+          height="1412"
+        >
       </section>
 
       <div class="case-nav-footer" data-reveal>

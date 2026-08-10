@@ -96,8 +96,12 @@
 
   /* Text */
   --text-primary:   #1A1A1A;
-  --text-secondary: #6B6B6B;
-  --text-muted:     #8a857d;
+  /* Darkened from #6B6B6B — fell just under 4.5:1 on the darkest
+     per-project card tier (bg-elevated). */
+  --text-secondary: #626262;
+  /* Darkened from #8a857d — the original failed WCAG AA (4.5:1) for
+     body text against several of the site's own light backgrounds. */
+  --text-muted:     #66625c;
   --text-on-accent: #ffffff;
 
   /* Accents */
@@ -148,7 +152,9 @@
   /* Text */
   --text-primary:   #dde0f5;
   --text-secondary: #a8afdd;
-  --text-muted:     #747ca3;
+  /* Lightened from #747ca3 for the same WCAG AA reason as the light
+     mode value above. */
+  --text-muted:     #9096b5;
   --text-on-accent: #ffffff;
 
   /* Accents */
@@ -286,12 +292,11 @@ a, button, input, textarea, select, [tabindex]:not([tabindex="-1"]) {
    4. BACKGROUND SYSTEM
    
    Dark: storm-base (texture) + storm-reveal (lightning cursor)
-   Light: aurora orbs + cursor radial glow
-   
+   Light: aurora orbs
+
    Z-index stack:
    0 — bg-layer (contains all bg elements)
    1 — storm-reveal / aurora-layer
-   2 — light-cursor-glow
    10 — hero content
    900 — nav
    9000 — modals
@@ -354,9 +359,7 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 
 /* --- Light mode: living aurora orbs ---
    Three gradient orbs drift slowly in organic paths.
-   Pure CSS animation — no JS needed for this layer.
-   The cursor glow (light-cursor-glow) adds the
-   interactive element separately. */
+   Pure CSS animation — no JS needed for this layer. */
 .aurora-layer {
   position: absolute;
   inset: 0;
@@ -461,40 +464,6 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   opacity: 1;
 }
 
-/* --- Light mode: cursor radial warmth ---
-   MUCH more visible than before — increased opacity,
-   radius, and contrast. Uses a warm violet-peach mix
-   that reads clearly on the ivory background.
-   JS positions via left/top (lerped). */
-.light-cursor-glow {
-  position: fixed;
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(100, 80, 240, 0.28) 0%,
-    rgba(160, 80, 220, 0.18) 28%,
-    rgba(80, 70, 229, 0.1) 55%,
-    rgba(120, 100, 255, 0.04) 72%,
-    transparent 85%
-  );
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 0.5s var(--ease-smooth);
-  z-index: 2;
-  will-change: left, top;
-}
-
-/* Show in light mode when animations are active */
-[data-theme="light"] body:not(.quiet-mode) .light-cursor-glow {
-  opacity: 1;
-  /* Softer feathered edge — blur eliminates the hard circular boundary */
-  filter: blur(22px);
-}
-
-
 /* ============================================
    5. CUSTOM CURSOR
    Dark mode: accent-colored dot with additive blend.
@@ -521,12 +490,14 @@ body:not([data-theme="light"]) .cursor-dot {
   box-shadow: 0 0 6px 2px rgba(143, 162, 255, 0.4);
 }
 
-/* Light mode dot — warm dark dot, visible against ivory */
+/* Light mode dot — tracks --accent-primary, so it (and the magnet
+   trail, which already used --accent-glow) pick up each project's
+   theme color automatically via the data-project overrides below. */
 [data-theme="light"] .cursor-dot {
-  background: #3730a3;  /* deep indigo — high contrast on ivory */
+  background: var(--accent-primary);
   opacity: 0.75;
   mix-blend-mode: normal;
-  box-shadow: 0 0 0 2px rgba(80, 70, 229, 0.15);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 /* Hide on touch/coarse devices */
@@ -705,7 +676,10 @@ body:not([data-theme="light"]) .cursor-dot {
   background: transparent;
   box-shadow: none;
   color: var(--text-secondary);
-  transition: transform var(--dur-fast) ease,
+  /* Magnetic hover — same --magnet-x/--magnet-y as .btn (JS treats
+     .control-btn as magnetic too, see dom.magneticBtns) */
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+  transition: transform var(--dur-fast) var(--ease-spring),
               background-color var(--t-base),
               border-color var(--t-base),
               color var(--t-base);
@@ -733,7 +707,7 @@ body:not([data-theme="light"]) .cursor-dot {
   color: var(--text-primary);
   border-color: var(--glass-border-hover);
   background: var(--accent-subtle);
-  transform: translateY(-1px);
+  transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 1px));
 }
 
 .control-btn:hover::before { opacity: 0.65; }
@@ -876,7 +850,10 @@ body:not([data-theme="light"]) .cursor-dot {
   background: var(--glass-bg);
   box-shadow: var(--shadow-sm);
   color: var(--text-secondary);
-  transition: transform var(--dur-fast) ease,
+  /* Magnetic hover — same --magnet-x/--magnet-y as .btn (JS treats
+     .social-link as magnetic too, see dom.magneticBtns) */
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+  transition: transform var(--dur-fast) var(--ease-spring),
               background-color var(--t-base),
               border-color var(--t-base),
               color var(--t-base);
@@ -925,7 +902,7 @@ body:not([data-theme="light"]) .cursor-dot {
   color: var(--text-primary);
   border-color: var(--glass-border-hover);
   background: var(--accent-subtle);
-  transform: translateY(-1px);
+  transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 1px));
 }
 
 .social-link:hover::before { opacity: 0.7; }
@@ -951,6 +928,8 @@ body:not([data-theme="light"]) .cursor-dot {
    ============================================ */
 
 .btn {
+  appearance: none;
+  -webkit-appearance: none;
   padding: 0.78rem 1.7rem;
   border-radius: var(--r-pill);
   font-weight: 550;
@@ -969,7 +948,10 @@ body:not([data-theme="light"]) .cursor-dot {
   background: rgba(12, 16, 34, 0.72);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   color: var(--text-primary);
-  transition: transform var(--dur-fast) ease,
+  /* Magnetic hover — JS sets --magnet-x/--magnet-y (px) when the cursor
+     is nearby; 0px when it isn't, so idle buttons sit exactly in place. */
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+  transition: transform var(--dur-fast) var(--ease-spring),
               background-color var(--t-base),
               border-color var(--t-base),
               box-shadow var(--t-base),
@@ -998,17 +980,17 @@ body:not([data-theme="light"]) .cursor-dot {
 
 .btn::after { content: none; }
 
-/* Hover: lift */
+/* Hover: lift (layered on top of whatever magnet offset is active) */
 .btn:hover {
-  transform: translateY(-1px);
+  transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 1px));
   border-color: var(--glass-border-hover);
   background: rgba(20, 26, 52, 0.82);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
 }
 
-/* Press: sink */
+/* Press: sink back to the magnet position */
 .btn:active {
-  transform: translateY(0);
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
 }
 
@@ -1240,7 +1222,7 @@ body:not([data-theme="light"]) .cursor-dot {
 .project-card {
   display: block;
   background: var(--bg-card);
-  border: 1px solid rgba(217, 216, 213, 0.35);
+  border: 1px solid var(--project-card-border, rgba(217, 216, 213, 0.35));
   border-radius: var(--r-xl);
   overflow: hidden;
   position: relative;
@@ -1254,7 +1236,7 @@ body:not([data-theme="light"]) .cursor-dot {
 
 .project-card:not(.coming-soon):hover {
   box-shadow: var(--shadow-hover);
-  border-color: var(--glass-border-hover);
+  border-color: var(--project-card-border-hover, var(--glass-border-hover));
 }
 
 .project-card:not(.coming-soon):hover:not(.tilt-card) {
@@ -1413,6 +1395,7 @@ body:not([data-theme="light"]) .cursor-dot {
   color: var(--text-primary);
   margin-bottom: var(--sp-2);
   line-height: 1.3;
+  
 }
 
 .project-body p {
@@ -1434,12 +1417,73 @@ body:not([data-theme="light"]) .cursor-dot {
 .tag {
   padding: 0.3rem 0.875rem;
   background: var(--accent-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--project-card-border, var(--border-subtle));
   border-radius: var(--r-pill);
   font-size: var(--text-xs);
   color: var(--accent-primary);
   font-weight: 500;
   letter-spacing: 0.03em;
+}
+
+/* --- Homepage Work-section cards: border picks up each project's
+   own color (data-project on the card itself, since the homepage
+   isn't scoped to a single project the way case study pages are).
+   Tag pills stay the site-wide purple by request — only the border
+   is per-project. Values match each project's own theme — see
+   PER-PROJECT CASE STUDY THEMES further down if these ever need to
+   change together. --- */
+.project-card[data-project="openmined"] {
+  --project-card-border: rgba(59, 79, 224, 0.12);
+  --project-card-border-hover: rgba(59, 79, 224, 0.24);
+}
+[data-theme="dark"] .project-card[data-project="openmined"] {
+  --project-card-border: rgba(141, 160, 255, 0.14);
+  --project-card-border-hover: rgba(141, 160, 255, 0.3);
+}
+
+.project-card[data-project="kathak"] {
+  --project-card-border: rgba(184, 84, 26, 0.14);
+  --project-card-border-hover: rgba(184, 84, 26, 0.28);
+}
+[data-theme="dark"] .project-card[data-project="kathak"] {
+  --project-card-border: rgba(227, 145, 90, 0.16);
+  --project-card-border-hover: rgba(227, 145, 90, 0.32);
+}
+
+.project-card[data-project="upmc"] {
+  --project-card-border: rgba(201, 123, 46, 0.13);
+  --project-card-border-hover: rgba(201, 123, 46, 0.26);
+}
+[data-theme="dark"] .project-card[data-project="upmc"] {
+  --project-card-border: rgba(227, 165, 103, 0.16);
+  --project-card-border-hover: rgba(227, 165, 103, 0.32);
+}
+
+.project-card[data-project="meditationwise"] {
+  --project-card-border: rgba(21, 129, 140, 0.13);
+  --project-card-border-hover: rgba(21, 129, 140, 0.26);
+}
+[data-theme="dark"] .project-card[data-project="meditationwise"] {
+  --project-card-border: rgba(95, 196, 206, 0.15);
+  --project-card-border-hover: rgba(95, 196, 206, 0.3);
+}
+
+.project-card[data-project="scooter"] {
+  --project-card-border: rgba(232, 89, 12, 0.14);
+  --project-card-border-hover: rgba(232, 89, 12, 0.28);
+}
+[data-theme="dark"] .project-card[data-project="scooter"] {
+  --project-card-border: rgba(255, 138, 76, 0.16);
+  --project-card-border-hover: rgba(255, 138, 76, 0.32);
+}
+
+.project-card[data-project="northwestern"] {
+  --project-card-border: rgba(33, 88, 214, 0.12);
+  --project-card-border-hover: rgba(33, 88, 214, 0.24);
+}
+[data-theme="dark"] .project-card[data-project="northwestern"] {
+  --project-card-border: rgba(124, 168, 255, 0.14);
+  --project-card-border-hover: rgba(124, 168, 255, 0.3);
 }
 
 /* Tool icons row */
@@ -1627,8 +1671,6 @@ body:not([data-theme="light"]) .cursor-dot {
 .carousel-track {
   position: relative;
   height: 360px;
-  perspective: 1800px;
-  transform-style: preserve-3d;
 }
 
 .carousel-card {
@@ -1643,7 +1685,6 @@ body:not([data-theme="light"]) .cursor-dot {
   -webkit-appearance: none;
   cursor: pointer;
   text-align: center;
-  transform-style: preserve-3d;
   transform-origin: center center;
   opacity: 0;
   pointer-events: none;
@@ -1663,33 +1704,41 @@ body:not([data-theme="light"]) .cursor-dot {
   pointer-events: none;
 }
 
+/* Positioning below is intentionally plain 2D (translate/scale/rotate only —
+   no rotateY/translateZ/perspective). A 3D coverflow tilt here previously
+   caused getBoundingClientRect() to stop matching the actual painted
+   position for off-center cards, so real clicks (and taps) landed on the
+   track behind the card instead of the card itself — clicking them did
+   nothing. Plain 2D transforms keep the same fanned-out look without that
+   hit-testing mismatch. */
+
 .carousel-card.active {
   opacity: 1;
-  transform: translateX(-50%) rotateY(0deg) scale(1) translateZ(0);
+  transform: translateX(-50%) scale(1);
   z-index: 5;
 }
 
 .carousel-card.prev {
   opacity: 0.88;
-  transform: translateX(calc(-50% - 12rem)) rotateY(35deg) scale(0.88) translateZ(-80px);
+  transform: translateX(calc(-50% - 12rem)) scale(0.88) rotate(-4deg);
   z-index: 4;
 }
 
 .carousel-card.prev2 {
   opacity: 0.52;
-  transform: translateX(calc(-50% - 21rem)) rotateY(55deg) scale(0.75) translateZ(-160px);
+  transform: translateX(calc(-50% - 21rem)) scale(0.75) rotate(-7deg);
   z-index: 3;
 }
 
 .carousel-card.next {
   opacity: 0.88;
-  transform: translateX(calc(-50% + 12rem)) rotateY(-35deg) scale(0.88) translateZ(-80px);
+  transform: translateX(calc(-50% + 12rem)) scale(0.88) rotate(4deg);
   z-index: 4;
 }
 
 .carousel-card.next2 {
   opacity: 0.52;
-  transform: translateX(calc(-50% + 21rem)) rotateY(-55deg) scale(0.75) translateZ(-160px);
+  transform: translateX(calc(-50% + 21rem)) scale(0.75) rotate(7deg);
   z-index: 3;
 }
 
@@ -2540,6 +2589,17 @@ footer {
   justify-content: flex-end;
 }
 
+/* Same back/next pair, mirrored at the top of the page */
+.case-nav-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-8);
+}
+
+.case-nav-header .back-link { margin-bottom: 0; }
+
 .project-lead {
   font-size: var(--text-lg);
   color: var(--text-secondary);
@@ -2585,7 +2645,7 @@ footer {
   height: 100%;
 }
 
-.project-page .case-img.expandable-media {
+.project-page .expandable-media {
   cursor: zoom-in;
 }
 
@@ -2617,26 +2677,43 @@ footer {
   margin-top: 0;
 }
 
+.article-read-time {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* Most recent piece gets a bit more visual weight — no label, just a
+   slightly stronger version of the same pill styling. */
+.article-links li:last-child .project-cta-link {
+  background: var(--accent-glow);
+  border-color: var(--accent-primary);
+  font-weight: 600;
+}
+
 
 /* ============================================
    18. RESPONSIVE
    ============================================ */
 
 @media (max-width: 1100px) {
+  /* Plain 2D transforms — see note at the base .carousel-card rules on
+     why rotateY/translateZ were removed (they broke click hit-testing). */
   .carousel-card.prev {
-    transform: translateX(calc(-50% - 10rem)) rotateY(35deg) scale(0.88) translateZ(-80px);
+    transform: translateX(calc(-50% - 10rem)) scale(0.88) rotate(-4deg);
   }
 
   .carousel-card.prev2 {
-    transform: translateX(calc(-50% - 16rem)) rotateY(55deg) scale(0.75) translateZ(-160px);
+    transform: translateX(calc(-50% - 16rem)) scale(0.75) rotate(-7deg);
   }
 
   .carousel-card.next {
-    transform: translateX(calc(-50% + 10rem)) rotateY(-35deg) scale(0.88) translateZ(-80px);
+    transform: translateX(calc(-50% + 10rem)) scale(0.88) rotate(4deg);
   }
 
   .carousel-card.next2 {
-    transform: translateX(calc(-50% + 16rem)) rotateY(-55deg) scale(0.75) translateZ(-160px);
+    transform: translateX(calc(-50% + 16rem)) scale(0.75) rotate(7deg);
   }
 }
 
@@ -2718,19 +2795,19 @@ footer {
   }
 
   .carousel-card.prev {
-    transform: translateX(calc(-50% - 7.75rem)) rotateY(35deg) scale(0.88) translateZ(-80px);
+    transform: translateX(calc(-50% - 7.75rem)) scale(0.88) rotate(-4deg);
   }
 
   .carousel-card.prev2 {
-    transform: translateX(calc(-50% - 12rem)) rotateY(55deg) scale(0.75) translateZ(-160px);
+    transform: translateX(calc(-50% - 12rem)) scale(0.75) rotate(-7deg);
   }
 
   .carousel-card.next {
-    transform: translateX(calc(-50% + 7.75rem)) rotateY(-35deg) scale(0.88) translateZ(-80px);
+    transform: translateX(calc(-50% + 7.75rem)) scale(0.88) rotate(4deg);
   }
 
   .carousel-card.next2 {
-    transform: translateX(calc(-50% + 12rem)) rotateY(-55deg) scale(0.75) translateZ(-160px);
+    transform: translateX(calc(-50% + 12rem)) scale(0.75) rotate(7deg);
   }
 
   #education {
@@ -2804,7 +2881,8 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .case-nav-footer {
+  .case-nav-footer,
+  .case-nav-header {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -2880,7 +2958,6 @@ footer {
   /* Disable decorative animations — keep functional state transitions */
   .scroll-indicator,
   .storm-reveal,
-  .light-cursor-glow,
   .cursor-dot {
     display: none !important;
   }
@@ -2963,7 +3040,6 @@ footer {
 /* User-toggled quiet mode — more permissive than prefers-reduced-motion
    (keeps some transitions for usability) */
 body.quiet-mode .storm-reveal,
-body.quiet-mode .light-cursor-glow,
 body.quiet-mode .cursor-dot { display: none !important; }
 
 @media (pointer: fine) {
@@ -3134,6 +3210,61 @@ body.large-text .control-label { font-size: 0.68rem; }
 
 
 /* ============================================
+   23b. PROJECT BADGE — fixed bottom-left logo + name
+   Replaces the old cursor-trailing companion. Static, decorative
+   (aria-hidden — the project name is already the page's own H1),
+   present on every case study page only.
+   ============================================ */
+
+.project-badge {
+  position: fixed;
+  bottom: var(--sp-6);
+  left: var(--sp-6);
+  z-index: 902;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+}
+
+.project-badge-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+}
+
+.project-badge-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-on-accent);
+  background: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.project-badge-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+
+/* ============================================
    24. WORK SECTION — HORIZONTAL SCROLL
    ============================================ */
 
@@ -3150,13 +3281,10 @@ body.large-text .control-label { font-size: 0.68rem; }
   gap: clamp(1.5rem, 2.5vw, 2rem);
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-4) 120px var(--sp-6) var(--sp-6);
+  padding: var(--sp-4) var(--sp-6) var(--sp-6);
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
   grid-template-columns: unset;
-  /* Fade cards out at the right edge without any color overlay */
-  mask-image: linear-gradient(to right, black 0%, black 84%, transparent 98%);
-  -webkit-mask-image: linear-gradient(to right, black 0%, black 84%, transparent 98%);
 }
 
 .projects-grid::-webkit-scrollbar { height: 3px; }
@@ -3230,12 +3358,42 @@ body.large-text .control-label { font-size: 0.68rem; }
   line-height: 1.3;
 }
 
+/* Horizontal-scroll hint — sits under the grid, right-aligned.
+   Purely decorative (aria-hidden); native swipe/scrollbar does the work. */
+.work-scroll-hint {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: calc(var(--sp-2) * -1);
+  padding-right: var(--sp-6);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.work-scroll-hint i {
+  color: var(--accent-primary);
+  animation: work-scroll-nudge 1.6s ease-in-out infinite;
+}
+
+@keyframes work-scroll-nudge {
+  0%, 100% { transform: translateX(0); opacity: 0.5; }
+  50%      { transform: translateX(6px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-scroll-hint i { animation: none; opacity: 0.7; }
+}
+
 @media (max-width: 768px) {
+  /* Swipe is self-evident on touch — hide the hint */
+  .work-scroll-hint { display: none; }
+
   .projects-grid {
     padding-right: 60px;
-    /* Remove gradient mask on mobile — causes rendering glitches */
-    mask-image: none;
-    -webkit-mask-image: none;
     /* Ensure grid doesn't expand body width */
     width: 100%;
     box-sizing: border-box;
@@ -3271,10 +3429,11 @@ body.large-text .control-label { font-size: 0.68rem; }
   margin-bottom: calc(var(--sp-8) + 20px);
 }
 
-/* Give the stack container horizontal breathing room so rotated
-   card corners don't clip against anything */
+/* Give the stack container horizontal breathing room so rotated,
+   fanned-out card corners don't clip against anything.
+   Widened alongside the deck-card fan/tilt increase below. */
 .writing-stack {
-  padding: 0 var(--sp-6);
+  padding: 0 var(--sp-16);
 }
 
 .deck-card {
@@ -3308,21 +3467,21 @@ body.large-text .control-label { font-size: 0.68rem; }
   pointer-events: auto;
 }
 
-/* 1 behind — tilted clockwise; right side peeks right, left side peeks left */
+/* 1 behind — fanned out to the right and tilted clockwise */
 .deck-card[data-deck-pos="1"] {
-  transform: translateY(10px) rotate(3deg);
+  transform: translate(28px, 18px) rotate(10deg);
   z-index: 9;
-  opacity: 0.82;
+  opacity: 0.9;
   box-shadow: var(--shadow-card);
   pointer-events: none;
   background: var(--bg-elevated);
 }
 
-/* 2 behind — tilted counter-clockwise; opposite corners peek out */
+/* 2 behind — fanned out further to the left and tilted counter-clockwise */
 .deck-card[data-deck-pos="2"] {
-  transform: translateY(18px) rotate(-2.5deg);
+  transform: translate(-34px, 32px) rotate(-11deg);
   z-index: 8;
-  opacity: 0.58;
+  opacity: 0.75;
   box-shadow: var(--shadow-sm);
   pointer-events: none;
   background: var(--bg-elevated);
@@ -3449,7 +3608,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 }
 
 @media (max-width: 480px) {
-  .writing-stack { max-width: 100%; }
+  .writing-stack { max-width: 100%; padding: 0 var(--sp-6); }
   .deck-viewport { height: 340px; }
   .deck-card { padding: var(--sp-6); }
 }
@@ -3945,6 +4104,18 @@ body.large-text .control-label { font-size: 0.68rem; }
   outline-offset: 3px;
 }
 
+/* Filled variant — used on the flip-card front so the CTA is visible without flipping */
+.view-results-btn--primary {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border-color: var(--accent-primary);
+}
+
+.view-results-btn--primary:hover {
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+}
+
 
 /* --- Artifact modal --- */
 .artifact-modal {
@@ -4418,8 +4589,8 @@ html.intro-skip #intro-screen { display: none !important; }
   .aurora-layer,
   .storm-base,
   .storm-reveal,
-  .light-cursor-glow,
   .cursor-dot,
+  .project-badge,
   .aurora-blobs,
   .vibe-badge,
   .scroll-indicator {
@@ -4500,4 +4671,382 @@ html.intro-skip #intro-screen { display: none !important; }
   .nav-links a::after {
     transition: none !important;
   }
+}
+
+
+/* ============================================
+   27b. KINDRED (OpenMined case study — summer results)
+   ============================================ */
+
+/* Stat grid — replaces the old flat overview.png stat image with
+   editable markup, styled after the existing .meta-value/.meta-label
+   pattern already used in the project hero. */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--sp-6);
+  padding: var(--sp-8);
+}
+
+.stat-item { text-align: center; }
+
+.stat-number {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  color: var(--accent-primary);
+  line-height: 1.1;
+}
+
+.stat-label {
+  display: block;
+  margin-top: var(--sp-2);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Hero banner — full-width case-study banner/thumbnail, wider than the
+   740px body column. .kindred-hero-banner is OpenMined's original name for
+   this treatment; .case-hero-banner is the generic alias other projects use. */
+.kindred-hero-banner,
+.case-hero-banner {
+  max-width: 960px;
+  margin: var(--sp-8) auto var(--sp-12);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.kindred-hero-banner img,
+.case-hero-banner img { width: 100%; display: block; }
+
+/* Same 960px treatment, but usable nested inside the 740px .project-body-content
+   column (e.g. mid-page, next to a callout) — breaks out symmetrically instead
+   of just capping at the column width. */
+.case-hero-banner--breakout {
+  width: min(960px, calc(100vw - 2 * var(--sp-8)));
+  margin-top: var(--sp-8);
+  margin-bottom: var(--sp-12);
+  margin-left: calc(50% - min(480px, calc(50vw - var(--sp-8))));
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.case-hero-banner--breakout img { width: 100%; display: block; }
+
+/* Feature grid — 4(+1) validated features. Cards reuse .artifact-frame
+   for the border/radius/lightbox-click behavior already wired up
+   site-wide, plus this class for grid placement. */
+.kindred-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+  /* Cards size to their own image height instead of stretching to
+     match the tallest row-mate — these screenshots vary in aspect
+     ratio, and stretching left uneven empty space that read as
+     misalignment. */
+  align-items: start;
+}
+
+.kindred-feature-grid .artifact-frame {
+  margin-bottom: 0;
+  /* Center each card's image within its column so slightly
+     different-width source exports still line up visually. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.kindred-feature-grid .artifact-frame img {
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Co-design photo + framework diagrams share the same artifact-frame
+   treatment as the rest of the page, with a caption underneath. */
+.kindred-caption {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-top: var(--sp-3);
+}
+
+
+/* ============================================
+   28. PER-PROJECT CASE STUDY THEMES
+
+   Each case study page carries data-project="x" on <body>.
+   Overriding the same tokens the rest of the site already reads
+   (--accent-*, --glass-border*, --tilt-stroke-*) means every
+   button, tag, glow, tilt-card border, and shadow on that page
+   re-themes automatically — no component rules duplicated.
+
+   Light-mode values first (the site default); each project also
+   gets a [data-theme="dark"] pairing so the accent stays legible
+   if a visitor switches themes mid-page.
+   ============================================ */
+
+/* --- OpenMined: privacy-preserving AI — cool indigo-electric,
+   quiet mesh-grid texture nodding to encrypted/networked data --- */
+body[data-project="openmined"] {
+  --accent-primary:   #3B4FE0;
+  /* Darkened slightly from #6C4EF0 — fell just under 4.5:1 on this
+     project's darkest card tier. */
+  --accent-secondary: #6545EF;
+  --accent-subtle:    rgba(59, 79, 224, 0.07);
+  --accent-glow:      rgba(59, 79, 224, 0.13);
+  --accent-glow-lg:   rgba(59, 79, 224, 0.22);
+  --glass-border:       rgba(59, 79, 224, 0.12);
+  --glass-border-hover: rgba(59, 79, 224, 0.24);
+  --tilt-stroke-1: rgba(59, 79, 224, 0.55);
+  --tilt-stroke-2: rgba(108, 78, 240, 0.4);
+  --tilt-stroke-3: rgba(59, 79, 224, 0.2);
+  /* Tinted page background — carries the theme through the whole
+     scroll, not just the hero */
+  --bg:           #F3F3FA;
+  --surface:      #EBEBF5;
+  --bg-card:      #EBEBF5;
+  --bg-elevated:  #E4E4F0;
+}
+
+[data-theme="dark"] body[data-project="openmined"] {
+  --accent-primary:   #8DA0FF;
+  --accent-secondary: #B39BFF;
+  --accent-subtle:    rgba(141, 160, 255, 0.1);
+  --accent-glow:      rgba(141, 160, 255, 0.2);
+  --accent-glow-lg:   rgba(141, 160, 255, 0.34);
+  --glass-border:       rgba(141, 160, 255, 0.14);
+  --glass-border-hover: rgba(141, 160, 255, 0.3);
+  --bg:           #0A0D1C;
+  --surface:      #0F1330;
+  --bg-card:      #151A3E;
+  --bg-elevated:  #1B2150;
+}
+
+body[data-project="openmined"] .project-page-hero {
+  background-image: radial-gradient(var(--accent-subtle) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+/* --- Kathak Kala Kendra: warm, cultural, marigold/terracotta --- */
+body[data-project="kathak"] {
+  /* Darkened from #B8541A/#D68A2E — originals fell short of 4.5:1
+     body-text contrast against this project's own light background. */
+  --accent-primary:   #A74C18;
+  --accent-secondary: #8E5A1C;
+  --accent-subtle:    rgba(184, 84, 26, 0.08);
+  --accent-glow:      rgba(184, 84, 26, 0.15);
+  --accent-glow-lg:   rgba(184, 84, 26, 0.24);
+  --glass-border:       rgba(184, 84, 26, 0.14);
+  --glass-border-hover: rgba(184, 84, 26, 0.28);
+  --tilt-stroke-1: rgba(184, 84, 26, 0.55);
+  --tilt-stroke-2: rgba(214, 138, 46, 0.4);
+  --tilt-stroke-3: rgba(184, 84, 26, 0.2);
+  --bg:           #FAF4EE;
+  --surface:      #F4EBE0;
+  --bg-card:      #F4EBE0;
+  --bg-elevated:  #EFE3D4;
+}
+
+[data-theme="dark"] body[data-project="kathak"] {
+  --accent-primary:   #E3915A;
+  --accent-secondary: #F0B15E;
+  --accent-subtle:    rgba(227, 145, 90, 0.12);
+  --accent-glow:      rgba(227, 145, 90, 0.22);
+  --accent-glow-lg:   rgba(227, 145, 90, 0.34);
+  --glass-border:       rgba(227, 145, 90, 0.16);
+  --glass-border-hover: rgba(227, 145, 90, 0.32);
+  --bg:           #150F0A;
+  --surface:      #1D140D;
+  --bg-card:      #251A10;
+  --bg-elevated:  #2E2114;
+}
+
+body[data-project="kathak"] .project-page-hero {
+  background-image: linear-gradient(180deg, var(--accent-subtle) 0%, transparent 60%);
+}
+
+/* --- UPMC / Designing w/CARE: warm amber-orange, softer corners
+   for an empathetic feel --- */
+body[data-project="upmc"] {
+  /* Darkened from #C97B2E/#E0A15C — originals fell as low as 2.47:1
+     against this project's own light background, well under the
+     4.5:1 AA minimum for body text. */
+  --accent-primary:   #8D5620;
+  --accent-secondary: #8C561A;
+  --accent-subtle:    rgba(201, 123, 46, 0.08);
+  --accent-glow:      rgba(201, 123, 46, 0.15);
+  --accent-glow-lg:   rgba(201, 123, 46, 0.24);
+  --glass-border:       rgba(201, 123, 46, 0.13);
+  --glass-border-hover: rgba(201, 123, 46, 0.26);
+  --tilt-stroke-1: rgba(201, 123, 46, 0.55);
+  --tilt-stroke-2: rgba(224, 161, 92, 0.4);
+  --tilt-stroke-3: rgba(201, 123, 46, 0.2);
+  --r-xl: 28px;
+  --r-2xl: 36px;
+  --bg:           #FAF3EC;
+  --surface:      #F4E8DA;
+  --bg-card:      #F4E8DA;
+  --bg-elevated:  #EEDCC7;
+}
+
+[data-theme="dark"] body[data-project="upmc"] {
+  --accent-primary:   #E3A567;
+  --accent-secondary: #F0C08A;
+  --accent-subtle:    rgba(227, 165, 103, 0.12);
+  --accent-glow:      rgba(227, 165, 103, 0.22);
+  --accent-glow-lg:   rgba(227, 165, 103, 0.34);
+  --glass-border:       rgba(227, 165, 103, 0.16);
+  --glass-border-hover: rgba(227, 165, 103, 0.32);
+  --bg:           #150E08;
+  --surface:      #1E140A;
+  --bg-card:      #271A0D;
+  --bg-elevated:  #302110;
+}
+
+/* --- MeditationWise: slow, breathing rhythm — calming teal-blue,
+   a gentle pulse behind the hero title --- */
+body[data-project="meditationwise"] {
+  /* Darkened from #15818C/#3FA7AE for 4.5:1 AA against this
+     project's own light background (secondary was as low as 2.47:1). */
+  --accent-primary:   #13737D;
+  --accent-secondary: #2B7176;
+  --accent-subtle:    rgba(21, 129, 140, 0.08);
+  --accent-glow:      rgba(21, 129, 140, 0.15);
+  --accent-glow-lg:   rgba(21, 129, 140, 0.24);
+  --glass-border:       rgba(21, 129, 140, 0.13);
+  --glass-border-hover: rgba(21, 129, 140, 0.26);
+  --tilt-stroke-1: rgba(21, 129, 140, 0.5);
+  --tilt-stroke-2: rgba(63, 167, 174, 0.4);
+  --tilt-stroke-3: rgba(21, 129, 140, 0.2);
+  --bg:           #EFF7F7;
+  --surface:      #E5F1F1;
+  --bg-card:      #E5F1F1;
+  --bg-elevated:  #DCEAEA;
+}
+
+[data-theme="dark"] body[data-project="meditationwise"] {
+  --accent-primary:   #5FC4CE;
+  --accent-secondary: #8AD9DF;
+  --accent-subtle:    rgba(95, 196, 206, 0.12);
+  --accent-glow:      rgba(95, 196, 206, 0.2);
+  --accent-glow-lg:   rgba(95, 196, 206, 0.32);
+  --glass-border:       rgba(95, 196, 206, 0.15);
+  --glass-border-hover: rgba(95, 196, 206, 0.3);
+  --bg:           #081514;
+  --surface:      #0D1E1D;
+  --bg-card:      #122B29;
+  --bg-elevated:  #173534;
+}
+
+body[data-project="meditationwise"] .project-page-hero {
+  position: relative;
+}
+
+body[data-project="meditationwise"] .project-page-hero::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(1);
+  animation: meditationwise-breathe 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes meditationwise-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.7; }
+  50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-project="meditationwise"] .project-page-hero::before {
+    animation: none;
+  }
+}
+
+/* --- Scooter: playful, bright, bouncier micro-interactions --- */
+body[data-project="scooter"] {
+  /* Darkened from #E8590C/#F2A33D — secondary was as low as 1.76:1
+     against this project's own light background. */
+  --accent-primary:   #AE4309;
+  --accent-secondary: #93570A;
+  --accent-subtle:    rgba(232, 89, 12, 0.08);
+  --accent-glow:      rgba(232, 89, 12, 0.16);
+  --accent-glow-lg:   rgba(232, 89, 12, 0.26);
+  --glass-border:       rgba(232, 89, 12, 0.14);
+  --glass-border-hover: rgba(232, 89, 12, 0.28);
+  --tilt-stroke-1: rgba(232, 89, 12, 0.55);
+  --tilt-stroke-2: rgba(242, 163, 61, 0.42);
+  --tilt-stroke-3: rgba(232, 89, 12, 0.22);
+  --r-pill: 9999px;
+  --bg:           #FBF4EC;
+  --surface:      #F7EADC;
+  --bg-card:      #F7EADC;
+  --bg-elevated:  #F2E0CD;
+}
+
+[data-theme="dark"] body[data-project="scooter"] {
+  --accent-primary:   #FF8A4C;
+  --accent-secondary: #FFC069;
+  --accent-subtle:    rgba(255, 138, 76, 0.12);
+  --accent-glow:      rgba(255, 138, 76, 0.22);
+  --accent-glow-lg:   rgba(255, 138, 76, 0.34);
+  --glass-border:       rgba(255, 138, 76, 0.16);
+  --glass-border-hover: rgba(255, 138, 76, 0.32);
+  --bg:           #170F08;
+  --surface:      #20150A;
+  --bg-card:      #2A1B0D;
+  --bg-elevated:  #352210;
+}
+
+body[data-project="scooter"] .btn:hover,
+body[data-project="scooter"] .tilt-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+
+/* --- GlowUp Eye Care (Northwestern): clean clinical-modern, clear blue --- */
+body[data-project="northwestern"] {
+  --accent-primary:   #2158D6;
+  /* Darkened from #4C8CF0 — was as low as 2.73:1 against this
+     project's own light background. */
+  --accent-secondary: #1362DE;
+  --accent-subtle:    rgba(33, 88, 214, 0.07);
+  --accent-glow:      rgba(33, 88, 214, 0.13);
+  --accent-glow-lg:   rgba(33, 88, 214, 0.22);
+  --glass-border:       rgba(33, 88, 214, 0.12);
+  --glass-border-hover: rgba(33, 88, 214, 0.24);
+  --tilt-stroke-1: rgba(33, 88, 214, 0.5);
+  --tilt-stroke-2: rgba(76, 140, 240, 0.38);
+  --tilt-stroke-3: rgba(33, 88, 214, 0.2);
+  --bg:           #F1F5FC;
+  --surface:      #E8EFFA;
+  --bg-card:      #E8EFFA;
+  --bg-elevated:  #DFEAF7;
+}
+
+[data-theme="dark"] body[data-project="northwestern"] {
+  --accent-primary:   #7CA8FF;
+  --accent-secondary: #9DC2FF;
+  --accent-subtle:    rgba(124, 168, 255, 0.1);
+  --accent-glow:      rgba(124, 168, 255, 0.2);
+  --accent-glow-lg:   rgba(124, 168, 255, 0.32);
+  --glass-border:       rgba(124, 168, 255, 0.14);
+  --glass-border-hover: rgba(124, 168, 255, 0.3);
+  --bg:           #0A0E1A;
+  --surface:      #0F1428;
+  --bg-card:      #141B38;
+  --bg-elevated:  #1A2247;
 }
