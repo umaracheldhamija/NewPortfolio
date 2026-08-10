@@ -4104,11 +4104,15 @@ body.large-text .control-label { font-size: 0.68rem; }
   outline-offset: 3px;
 }
 
-/* Filled variant — used on the flip-card front so the CTA is visible without flipping */
+/* Filled variant — used on the flip-card front so the CTA is visible without flipping.
+   The front face's icon/title/desc are left-aligned, so left-align this button too
+   instead of inheriting .view-results-btn's centered placement (built for the back
+   face, where it sits under a centered/italic quote). */
 .view-results-btn--primary {
   background: var(--accent-primary);
   color: var(--text-on-accent);
   border-color: var(--accent-primary);
+  align-self: flex-start;
 }
 
 .view-results-btn--primary:hover {
