@@ -35,7 +35,15 @@ const state = {
   reveal:   { x: window.innerWidth / 2,  y: window.innerHeight / 2 },
   target:   { x: window.innerWidth / 2,  y: window.innerHeight / 2 },
   isInHero: true,
+  isInWork: false,
   navOpen:  false,
+  // Neural field: fires its "storm calming to signal" burst once, timed to
+  // the intro-screen reveal (or immediately if the intro screen is skipped)
+  // so it's never hidden entirely behind the cover.
+  introCovering: false,
+  neuralBurstPlayed: false,
+  heroSettleInPlayed: false,
+  pendingTypeGrid: null,
   // System preference — checked once at load
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   // User preferences (populated by loadPreferences())
@@ -60,6 +68,8 @@ const dom = {
   navLinks:         document.querySelector('.nav-links'),
   navLinksAll:      [...document.querySelectorAll('.nav-links a')],
   hero:             document.getElementById('hero'),
+  work:             document.getElementById('work'),
+  neuralCanvas:     document.getElementById('neural-canvas'),
   stormReveal:      document.querySelector('.storm-reveal'),
   cursorDot:        document.querySelector('.cursor-dot'),
   magneticEls:      [...document.querySelectorAll('.btn, .social-link, .control-btn')],
@@ -148,7 +158,7 @@ function setupMouseTracking() {
   }, { passive: true });
 }
 
-function runBackgroundLoop() {
+function runBackgroundLoop(now) {
   // Skip rendering effects on mobile, quiet mode, or system reduced-motion
   if (!state.quietMode && !state.reducedMotion && window.innerWidth >= 768) {
     const easing = 0.12;
@@ -178,6 +188,9 @@ function runBackgroundLoop() {
 
     // --- Magnetic elements — nearby buttons/social/control icons lean toward the cursor ---
     runMagneticButtons();
+
+    // --- Neural signal field — hero + work only ---
+    drawNeuralField(now);
   }
 
   requestAnimationFrame(runBackgroundLoop);
@@ -215,17 +228,218 @@ function runMagneticButtons() {
   });
 }
 
+
+/* ============================================
+   3b. NEURAL SIGNAL FIELD
+   A drifting node network rendered on a fixed, full-viewport
+   canvas — visible behind the hero AND the work section (Uma's
+   "landing view", since setupBioTab() scrolls straight to work).
+   Nodes brighten and fire a line toward the cursor when it's
+   nearby, like a live signal reading. Drawn from inside
+   runBackgroundLoop(), so it inherits the same quiet-mode /
+   reduced-motion / mobile guards as everything else there.
+
+   playNeuralBurst() kicks off a one-time "storm calming into a
+   steady signal" opening: nodes spawn hot/chaotic and damp into
+   idle drift over NEURAL_BURST_MS. It's triggered from the intro
+   reveal hook (see 16a), not from raw page load, so it's never
+   spent hidden behind the intro-screen cover.
+   ============================================ */
+
+let neuralNodes = [];
+let neuralW = 0, neuralH = 0, neuralDPR = 1;
+let neuralBurstStart = 0;
+let neuralSized = false;
+
+const NEURAL_MAX_LINK_DIST = 130;
+const NEURAL_INTERACT_RADIUS = 150;
+const NEURAL_DRIFT_SPEED = 0.18;
+const NEURAL_BURST_MS = 1600;
+
+function neuralEaseOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function neuralThemeColor() {
+  const isLight = dom.html.getAttribute('data-theme') === 'light';
+  return {
+    line: isLight ? '80, 70, 229' : '143, 162, 255',
+    node: isLight ? '116, 78, 240' : '195, 143, 255',
+  };
+}
+
+function sizeNeuralCanvas() {
+  if (!dom.neuralCanvas) return;
+  neuralDPR = Math.min(window.devicePixelRatio || 1, 2);
+  neuralW = window.innerWidth;
+  neuralH = window.innerHeight;
+  dom.neuralCanvas.width = neuralW * neuralDPR;
+  dom.neuralCanvas.height = neuralH * neuralDPR;
+  dom.neuralCanvas.style.width = neuralW + 'px';
+  dom.neuralCanvas.style.height = neuralH + 'px';
+  const ctx = dom.neuralCanvas.getContext('2d');
+  ctx.setTransform(neuralDPR, 0, 0, neuralDPR, 0, 0);
+}
+
+function seedNeuralNodes() {
+  const count = window.innerWidth < 900 ? 26 : 42;
+  const cx = neuralW / 2, cy = neuralH / 2;
+  neuralNodes = Array.from({ length: count }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1.4 + Math.random() * 2.4;
+    return {
+      x: cx + (Math.random() - 0.5) * 60,
+      y: cy + (Math.random() - 0.5) * 60,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      r: 1.4 + Math.random() * 1.6,
+    };
+  });
+}
+
+// Called once, timed to the intro reveal — see playHeroIntroEffects().
+function playNeuralBurst() {
+  if (state.neuralBurstPlayed || !dom.neuralCanvas) return;
+  state.neuralBurstPlayed = true;
+  sizeNeuralCanvas();
+  seedNeuralNodes();
+  neuralBurstStart = performance.now();
+  neuralSized = true;
+}
+
+let neuralWasActive = false;
+
+function drawNeuralField(now) {
+  if (!dom.neuralCanvas) return;
+
+  const active = state.isInHero || state.isInWork;
+
+  if (!active) {
+    if (neuralWasActive) {
+      dom.neuralCanvas.getContext('2d').clearRect(0, 0, neuralW, neuralH);
+      neuralWasActive = false;
+    }
+    return;
+  }
+  neuralWasActive = true;
+
+  // First time it's needed (e.g. reduced-motion path never called
+  // playNeuralBurst — draw a plain settled field with no burst).
+  if (!neuralSized) {
+    sizeNeuralCanvas();
+    seedNeuralNodes();
+    neuralSized = true;
+  }
+
+  const ctx = dom.neuralCanvas.getContext('2d');
+  ctx.clearRect(0, 0, neuralW, neuralH);
+  const { line, node } = neuralThemeColor();
+
+  const introT = neuralBurstStart ? Math.min(1, (now - neuralBurstStart) / NEURAL_BURST_MS) : 1;
+  const calm = neuralEaseOutCubic(introT); // 0 = full storm, 1 = fully calm
+  const storm = 1 - calm;
+
+  const linkDist = NEURAL_MAX_LINK_DIST + storm * 90;
+  const linkAlphaBoost = 1 + storm * 0.7;
+
+  neuralNodes.forEach((n) => {
+    n.x += n.vx;
+    n.y += n.vy;
+
+    const damp = neuralBurstStart ? storm * 0.05 : 0;
+    n.vx *= (1 - damp);
+    n.vy *= (1 - damp);
+    if (Math.abs(n.vx) < 0.05 && Math.abs(n.vy) < 0.05) {
+      n.vx += (Math.random() - 0.5) * NEURAL_DRIFT_SPEED * 0.02;
+      n.vy += (Math.random() - 0.5) * NEURAL_DRIFT_SPEED * 0.02;
+    }
+
+    if (n.x < -20) n.x = neuralW + 20;
+    if (n.x > neuralW + 20) n.x = -20;
+    if (n.y < -20) n.y = neuralH + 20;
+    if (n.y > neuralH + 20) n.y = -20;
+  });
+
+  for (let i = 0; i < neuralNodes.length; i++) {
+    for (let j = i + 1; j < neuralNodes.length; j++) {
+      const a = neuralNodes[i], b = neuralNodes[j];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      if (dist < linkDist) {
+        const alpha = Math.min((1 - dist / linkDist) * 0.35 * linkAlphaBoost, 0.9);
+        ctx.strokeStyle = `rgba(${line}, ${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  neuralNodes.forEach((n) => {
+    let r = n.r;
+    let alpha = 0.7;
+
+    const dist = Math.hypot(n.x - state.target.x, n.y - state.target.y);
+    if (dist < NEURAL_INTERACT_RADIUS) {
+      const strength = 1 - dist / NEURAL_INTERACT_RADIUS;
+      r = n.r + strength * 2.2;
+      alpha = 0.7 + strength * 0.3;
+      ctx.strokeStyle = `rgba(${line}, ${strength * 0.6})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(n.x, n.y);
+      ctx.lineTo(state.target.x, state.target.y);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = `rgba(${node}, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+window.addEventListener('resize', debounce(() => {
+  if (neuralSized) sizeNeuralCanvas();
+}, 150));
+
+
 // Track whether user is in the hero section.
-// Storm reveal only applies to hero (visual clarity on other sections).
+// Storm reveal + neural field only apply to hero (visual clarity elsewhere).
 function setupHeroObserver() {
   if (!dom.hero) return;
 
   const obs = new IntersectionObserver(
-    (entries) => entries.forEach(e => { state.isInHero = e.isIntersecting; }),
+    (entries) => entries.forEach(e => {
+      state.isInHero = e.isIntersecting;
+
+      // First time the hero is actually scrolled into view (usually via the
+      // About tab, since setupBioTab() lands on Work by default) — play a
+      // one-time settle-in on the glass card, echoing the neural burst.
+      if (e.isIntersecting && !state.heroSettleInPlayed && !state.reducedMotion && !state.quietMode) {
+        state.heroSettleInPlayed = true;
+        dom.body.classList.add('intro-active');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          dom.body.classList.remove('intro-active');
+        }));
+      }
+    }),
     { threshold: 0 }
   );
 
   obs.observe(dom.hero);
+}
+
+// Track whether user is in the work section — the neural field also
+// renders here, since it's what's actually shown on first load.
+function setupWorkObserver() {
+  if (!dom.work) return;
+
+  const obs = new IntersectionObserver(
+    (entries) => entries.forEach(e => { state.isInWork = e.isIntersecting; }),
+    { threshold: 0 }
+  );
+
+  obs.observe(dom.work);
 }
 
 
@@ -374,12 +588,63 @@ function setupScrollReveal() {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('in-view');
+
+        // Project titles type themselves in once their card has settled.
+        // If the intro-screen cover is still up, queue it instead of
+        // typing it out unseen — revealPageEffects() releases it.
+        if (entry.target.classList.contains('projects-grid')) {
+          if (state.introCovering) {
+            state.pendingTypeGrid = entry.target;
+          } else {
+            typeProjectTitles(entry.target);
+          }
+        }
+
         obs.unobserve(entry.target);
       });
     }, staggerOpts);
 
     dom.revealStaggerEls.forEach(el => obs.observe(el));
   }
+}
+
+// Types each project card's <h3> in, left to right, staggered to land
+// right as its card finishes settling (mirrors the CSS stagger-delay
+// steps: 0, 85, 170ms...). Reuses the .intro-cursor blink already
+// established on the intro screen. Fires once, called from
+// setupScrollReveal() (or revealPageEffects() if it was queued).
+function typeProjectTitles(grid) {
+  const cards = [...grid.querySelectorAll('.project-card')];
+  const CHAR_MS = 16;
+  const START_OFFSET = 480; // let the card's own fade/slide settle first
+
+  cards.forEach((card, i) => {
+    const h3 = card.querySelector('h3');
+    if (!h3) return;
+    const text = h3.textContent.trim();
+    const delay = i * 85 + START_OFFSET;
+
+    window.setTimeout(() => {
+      h3.textContent = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'intro-cursor';
+      h3.appendChild(cursor);
+
+      let charIndex = 0;
+      function typeNext() {
+        charIndex++;
+        h3.textContent = text.slice(0, charIndex);
+        h3.appendChild(cursor);
+        if (charIndex < text.length) {
+          window.setTimeout(typeNext, CHAR_MS);
+        } else {
+          cursor.classList.add('intro-cursor-done');
+          window.setTimeout(() => cursor.remove(), 400);
+        }
+      }
+      typeNext();
+    }, delay);
+  });
 }
 
 
@@ -1549,21 +1814,40 @@ function updateQuietIcon() {
    5. sessionStorage key set before fade starts.
    ============================================ */
 
+// Fires once the page is actually visible to the visitor — either right
+// away (intro screen skipped/hidden) or the moment the intro-screen cover
+// finishes fading. Kicks off the neural field's storm-to-calm burst and
+// releases any project title typing that was queued up while covered, so
+// neither ever plays out invisibly behind the opaque intro screen.
+function revealPageEffects() {
+  playNeuralBurst();
+  if (state.pendingTypeGrid) {
+    typeProjectTitles(state.pendingTypeGrid);
+    state.pendingTypeGrid = null;
+  }
+}
+
 function setupIntroScreen() {
   const screen = document.getElementById('intro-screen');
-  if (!screen) return;
+  if (!screen) { revealPageEffects(); return; }
 
   // Skip for reduced-motion users and mobile — purely decorative
   if (state.reducedMotion || window.innerWidth < 768) {
     screen.classList.add('intro-hidden');
+    revealPageEffects();
     return;
   }
 
   // Already seen this session (set by inline script in <head>)
   if (document.documentElement.classList.contains('intro-skip')) {
     screen.classList.add('intro-hidden');
+    revealPageEffects();
     return;
   }
+
+  // From here on the cover is actually showing — hold off on anything
+  // that should be seen, not spent finishing behind it.
+  state.introCovering = true;
 
   const typedEl = document.getElementById('intro-typed');
   const cursor  = screen.querySelector('.intro-cursor');
@@ -1581,6 +1865,8 @@ function setupIntroScreen() {
     isFading = true;
     try { sessionStorage.setItem('intro-seen', 'true'); } catch (_) {}
     screen.classList.add('intro-fade');
+    state.introCovering = false;
+    revealPageEffects();
     screen.addEventListener('transitionend', (e) => {
       if (e.propertyName === 'opacity') screen.classList.add('intro-hidden');
     }, { once: true });
@@ -1697,6 +1983,7 @@ function init() {
   // Wire up all interactions
   setupMouseTracking();
   setupHeroObserver();
+  setupWorkObserver();
   setupNavScroll();
   setupMobileNav();
   setupActiveLinks();

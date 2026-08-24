@@ -371,6 +371,19 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 [data-theme="light"] .aurora-layer { opacity: 1; }
 
 
+/* --- Neural signal field ---
+   Fixed, full-viewport canvas. Drawn from runBackgroundLoop() in
+   script.js — renders behind the hero AND the work section (work is
+   what's actually shown on load, since setupBioTab() scrolls there),
+   fading out elsewhere. Sits in the same stacking tier as storm-reveal. */
+.neural-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+
 /* ============================================
    INTERACTIVE AURORA BLOBS
    Colorful expanding ripples behind glass card.
@@ -752,6 +765,29 @@ body:not([data-theme="light"]) .cursor-dot {
   border: 1px solid var(--glass-border);
   border-radius: var(--r-2xl);
   box-shadow: var(--shadow-glass);
+}
+
+/* Settle-in transition: re-declares .tilt-card's transition list
+   (specificity tie, source order would otherwise let .tilt-card win
+   and silently drop transform/filter/opacity) plus adds them. Scale
+   rides in via --intro-scale, merged into .tilt-card's own transform
+   stack below, so it never fights the mouse-tilt rotate/lift. */
+.hero-content.tilt-card {
+  transition: transform 1.1s cubic-bezier(.16,.8,.24,1),
+              filter 1.1s ease,
+              opacity 0.9s ease,
+              box-shadow var(--t-base),
+              border-color var(--t-base);
+}
+
+/* One-time settle-in the first time the hero scrolls into view
+   (script.js toggles body.intro-active via setupHeroObserver()) —
+   the card resolves out of a soft blur, echoing the neural field's
+   own storm-to-calm burst. */
+body.intro-active .hero-content {
+  --intro-scale: 1.05;
+  filter: blur(11px);
+  opacity: 0.7;
 }
 
 .hero-content.tilt-card {
@@ -1251,9 +1287,10 @@ body:not([data-theme="light"]) .cursor-dot {
   --lift: 0px;
   --tilt-lift: -6px;
   --reveal-y: 0px;
+  --intro-scale: 1; /* only ever changed on .hero-content, see settle-in above */
   position: relative;
   isolation: isolate;
-  transform: perspective(1100px) translateY(calc(var(--lift) + var(--reveal-y))) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform: perspective(1100px) translateY(calc(var(--lift) + var(--reveal-y))) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(var(--intro-scale));
   transform-style: preserve-3d;
   transition: box-shadow var(--t-base),
               border-color var(--t-base);
@@ -2958,7 +2995,8 @@ footer {
   /* Disable decorative animations — keep functional state transitions */
   .scroll-indicator,
   .storm-reveal,
-  .cursor-dot {
+  .cursor-dot,
+  .neural-canvas {
     display: none !important;
   }
 
@@ -3040,7 +3078,8 @@ footer {
 /* User-toggled quiet mode — more permissive than prefers-reduced-motion
    (keeps some transitions for usability) */
 body.quiet-mode .storm-reveal,
-body.quiet-mode .cursor-dot { display: none !important; }
+body.quiet-mode .cursor-dot,
+body.quiet-mode .neural-canvas { display: none !important; }
 
 @media (pointer: fine) {
   body.quiet-mode { cursor: auto !important; }
@@ -4589,6 +4628,7 @@ html.intro-skip #intro-screen { display: none !important; }
   .cursor-dot,
   .project-badge,
   .aurora-blobs,
+  .neural-canvas,
   .vibe-badge,
   .scroll-indicator {
     display: none !important;
