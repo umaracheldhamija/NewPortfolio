@@ -371,19 +371,6 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 [data-theme="light"] .aurora-layer { opacity: 1; }
 
 
-/* --- Neural signal field ---
-   Fixed, full-viewport canvas. Drawn from runBackgroundLoop() in
-   script.js — renders behind the hero AND the work section (work is
-   what's actually shown on load, since setupBioTab() scrolls there),
-   fading out elsewhere. Sits in the same stacking tier as storm-reveal. */
-.neural-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-
 /* ============================================
    INTERACTIVE AURORA BLOBS
    Colorful expanding ripples behind glass card.
@@ -782,8 +769,7 @@ body:not([data-theme="light"]) .cursor-dot {
 
 /* One-time settle-in the first time the hero scrolls into view
    (script.js toggles body.intro-active via setupHeroObserver()) —
-   the card resolves out of a soft blur, echoing the neural field's
-   own storm-to-calm burst. */
+   the card resolves out of a soft blur/scale. */
 body.intro-active .hero-content {
   --intro-scale: 1.05;
   filter: blur(11px);
@@ -2995,8 +2981,7 @@ footer {
   /* Disable decorative animations — keep functional state transitions */
   .scroll-indicator,
   .storm-reveal,
-  .cursor-dot,
-  .neural-canvas {
+  .cursor-dot {
     display: none !important;
   }
 
@@ -3078,8 +3063,7 @@ footer {
 /* User-toggled quiet mode — more permissive than prefers-reduced-motion
    (keeps some transitions for usability) */
 body.quiet-mode .storm-reveal,
-body.quiet-mode .cursor-dot,
-body.quiet-mode .neural-canvas { display: none !important; }
+body.quiet-mode .cursor-dot { display: none !important; }
 
 @media (pointer: fine) {
   body.quiet-mode { cursor: auto !important; }
@@ -4628,7 +4612,6 @@ html.intro-skip #intro-screen { display: none !important; }
   .cursor-dot,
   .project-badge,
   .aurora-blobs,
-  .neural-canvas,
   .vibe-badge,
   .scroll-indicator {
     display: none !important;
