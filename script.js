@@ -36,12 +36,7 @@ const state = {
   target:   { x: window.innerWidth / 2,  y: window.innerHeight / 2 },
   isInHero: true,
   navOpen:  false,
-  // introCovering: true while the intro-screen opaquely covers the page,
-  // so anything tied to the reveal (see revealPageEffects()) can wait
-  // instead of playing out unseen behind it.
-  introCovering: false,
   heroSettleInPlayed: false,
-  pendingTypeGrid: null,
   // System preference — checked once at load
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   // User preferences (populated by loadPreferences())
@@ -394,63 +389,12 @@ function setupScrollReveal() {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('in-view');
-
-        // Project titles type themselves in once their card has settled.
-        // If the intro-screen cover is still up, queue it instead of
-        // typing it out unseen — revealPageEffects() releases it.
-        if (entry.target.classList.contains('projects-grid')) {
-          if (state.introCovering) {
-            state.pendingTypeGrid = entry.target;
-          } else {
-            typeProjectTitles(entry.target);
-          }
-        }
-
         obs.unobserve(entry.target);
       });
     }, staggerOpts);
 
     dom.revealStaggerEls.forEach(el => obs.observe(el));
   }
-}
-
-// Types each project card's <h3> in, left to right, staggered to land
-// right as its card finishes settling (mirrors the CSS stagger-delay
-// steps: 0, 85, 170ms...). Reuses the .intro-cursor blink already
-// established on the intro screen. Fires once, called from
-// setupScrollReveal() (or revealPageEffects() if it was queued).
-function typeProjectTitles(grid) {
-  const cards = [...grid.querySelectorAll('.project-card')];
-  const CHAR_MS = 16;
-  const START_OFFSET = 480; // let the card's own fade/slide settle first
-
-  cards.forEach((card, i) => {
-    const h3 = card.querySelector('h3');
-    if (!h3) return;
-    const text = h3.textContent.trim();
-    const delay = i * 85 + START_OFFSET;
-
-    window.setTimeout(() => {
-      h3.textContent = '';
-      const cursor = document.createElement('span');
-      cursor.className = 'intro-cursor';
-      h3.appendChild(cursor);
-
-      let charIndex = 0;
-      function typeNext() {
-        charIndex++;
-        h3.textContent = text.slice(0, charIndex);
-        h3.appendChild(cursor);
-        if (charIndex < text.length) {
-          window.setTimeout(typeNext, CHAR_MS);
-        } else {
-          cursor.classList.add('intro-cursor-done');
-          window.setTimeout(() => cursor.remove(), 400);
-        }
-      }
-      typeNext();
-    }, delay);
-  });
 }
 
 
@@ -1378,29 +1322,6 @@ function setupInteractiveAuroraBlobs() {
 
 
 /* ============================================
-   19. VIBE-CODED BADGE — fades on scroll
-   ============================================ */
-
-function setupVibeBadge() {
-  const badge = document.getElementById('vibe-badge');
-  if (!badge) return;
-
-  let lastScrollY = -1;
-
-  function updateBadge() {
-    const scrolled = window.scrollY > 60;
-    if (scrolled !== (lastScrollY > 60)) {
-      badge.classList.toggle('scrolled-away', scrolled);
-    }
-    lastScrollY = window.scrollY;
-  }
-
-  window.addEventListener('scroll', debounce(updateBadge, 80), { passive: true });
-  updateBadge();
-}
-
-
-/* ============================================
    20. WRITING — STACKED CARD DECK
    ============================================ */
 
@@ -1620,38 +1541,21 @@ function updateQuietIcon() {
    5. sessionStorage key set before fade starts.
    ============================================ */
 
-// Fires once the page is actually visible to the visitor — either right
-// away (intro screen skipped/hidden) or the moment the intro-screen cover
-// finishes fading. Releases any project title typing that was queued up
-// while covered, so it never plays out invisibly behind the opaque screen.
-function revealPageEffects() {
-  if (state.pendingTypeGrid) {
-    typeProjectTitles(state.pendingTypeGrid);
-    state.pendingTypeGrid = null;
-  }
-}
-
 function setupIntroScreen() {
   const screen = document.getElementById('intro-screen');
-  if (!screen) { revealPageEffects(); return; }
+  if (!screen) return;
 
   // Skip for reduced-motion users and mobile — purely decorative
   if (state.reducedMotion || window.innerWidth < 768) {
     screen.classList.add('intro-hidden');
-    revealPageEffects();
     return;
   }
 
   // Already seen this session (set by inline script in <head>)
   if (document.documentElement.classList.contains('intro-skip')) {
     screen.classList.add('intro-hidden');
-    revealPageEffects();
     return;
   }
-
-  // From here on the cover is actually showing — hold off on anything
-  // that should be seen, not spent finishing behind it.
-  state.introCovering = true;
 
   const typedEl = document.getElementById('intro-typed');
   const cursor  = screen.querySelector('.intro-cursor');
@@ -1669,8 +1573,6 @@ function setupIntroScreen() {
     isFading = true;
     try { sessionStorage.setItem('intro-seen', 'true'); } catch (_) {}
     screen.classList.add('intro-fade');
-    state.introCovering = false;
-    revealPageEffects();
     screen.addEventListener('transitionend', (e) => {
       if (e.propertyName === 'opacity') screen.classList.add('intro-hidden');
     }, { once: true });
@@ -1804,7 +1706,6 @@ function init() {
   setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();
-  setupVibeBadge();
   setupResumeModal();
   updateQuietIcon();
 

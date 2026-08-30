@@ -49,10 +49,6 @@
     <div class="aurora-layer"></div>
   </div>
 
-  <!-- Vibe badge fades on scroll -->
-  <p class="vibe-badge" id="vibe-badge" aria-hidden="true">Vibe-coded with Claude in VSCode</p>
-
-
   <!-- ============================================
        ACCESSIBILITY CONTROLS
        Motion button: pause icon when playing, play icon when paused.
@@ -820,6 +816,7 @@
         <button type="button" class="footer-resume-btn" data-action="view-resume" aria-label="View resume">View Resume</button>
       </nav>
       <p class="footer-copy">&copy; 2026 Uma Dhamija.</p>
+      <p class="footer-vibe">Vibe-coded with Claude in VSCode</p>
     </div>
   </footer>
 
@@ -844,22 +841,12 @@
   <div class="modal" id="contact-success-modal" aria-labelledby="contact-success-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content contact-success-modal-content" role="document">
       <button class="modal-close" aria-label="Close success message">&times;</button>
-      <h2 id="contact-success-title">Message Sent</h2>
-      <div class="success-meme" role="img" aria-label="Meme: You hit send and it actually worked.">
-        <p class="success-meme-top">YOU HIT SEND</p>
-        <img
-          src="images/Headshot.jpeg"
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          decoding="async"
-          width="3592"
-          height="3403"
-        >
-        <p class="success-meme-bottom">AND IT ACTUALLY WORKED</p>
+      <div class="success-icon" aria-hidden="true">
+        <i class="fas fa-check"></i>
       </div>
-      <p class="success-meme-caption">Thanks for reaching out. I will get back to you soon.</p>
-      <a href="#hero" class="btn btn-primary success-meme-cta">
+      <h2 id="contact-success-title">Message Sent</h2>
+      <p class="success-caption">Thanks for reaching out. I'll get back to you soon.</p>
+      <a href="#hero" class="btn btn-primary success-cta">
         <span>Back Home</span>
         <i class="fas fa-house" aria-hidden="true"></i>
       </a>

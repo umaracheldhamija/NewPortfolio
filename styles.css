@@ -2221,43 +2221,39 @@ body.intro-active .hero-content {
   text-align: center;
 }
 
-.success-meme {
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  background: linear-gradient(160deg, var(--bg-card), var(--bg-secondary));
-  margin: var(--sp-4) 0 var(--sp-6);
+@keyframes success-icon-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-.success-meme-top,
-.success-meme-bottom {
-  margin: 0;
-  padding: var(--sp-3) var(--sp-4);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  background: rgba(0, 0, 0, 0.25);
+.success-icon {
+  width: 64px;
+  height: 64px;
+  margin: var(--sp-4) auto var(--sp-5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-subtle);
+  box-shadow: 0 0 0 8px var(--accent-subtle);
+  color: var(--accent-primary);
+  font-size: 1.4rem;
+  animation: success-icon-pop 0.5s var(--ease-out) both;
 }
 
-[data-theme="light"] .success-meme-top,
-[data-theme="light"] .success-meme-bottom {
-  background: rgba(80, 70, 229, 0.1);
+@media (prefers-reduced-motion: reduce) {
+  .success-icon {
+    animation: none;
+  }
 }
 
-.success-meme img {
-  width: 100%;
-  max-height: min(44vh, 380px);
-  object-fit: cover;
-}
-
-.success-meme-caption {
+.success-caption {
   color: var(--text-secondary);
   margin-bottom: var(--sp-6);
 }
 
-.success-meme-cta {
+.success-cta {
   margin: 0 auto;
 }
 
@@ -2318,6 +2314,14 @@ footer {
   color: var(--text-muted);
   font-size: var(--text-xs);
   letter-spacing: 0.05em;
+}
+
+.footer-vibe {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  margin-top: var(--sp-2);
 }
 
 .footer-resume-btn {
@@ -3202,33 +3206,6 @@ body.large-text .control-label { font-size: 0.68rem; }
   letter-spacing: 0.05em;
   white-space: nowrap;
   flex-shrink: 0;
-}
-
-
-/* ============================================
-   23. VIBE-CODED BADGE
-   ============================================ */
-
-.vibe-badge {
-  position: fixed;
-  bottom: var(--sp-6);
-  left: var(--sp-6);
-  z-index: 902;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.6s var(--ease-smooth);
-  line-height: 1.2;
-}
-
-.vibe-badge.scrolled-away {
-  opacity: 0;
-}
-
-[data-theme="dark"] .vibe-badge {
-  color: rgba(168, 175, 221, 0.45);
 }
 
 
@@ -4612,7 +4589,6 @@ html.intro-skip #intro-screen { display: none !important; }
   .cursor-dot,
   .project-badge,
   .aurora-blobs,
-  .vibe-badge,
   .scroll-indicator {
     display: none !important;
   }
