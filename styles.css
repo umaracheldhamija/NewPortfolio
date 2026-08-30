@@ -492,6 +492,16 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   pointer-events: none;
 }
 
+/* Multi-origin neural signal field — hero only. Drawn in
+   drawNeuralField() (script.js), behind .hero-content, above the
+   storm/aurora bg-layer. */
+.neural-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
@@ -3073,7 +3083,8 @@ footer {
   /* Disable decorative animations — keep functional state transitions */
   .scroll-indicator,
   .storm-reveal,
-  .cursor-dot {
+  .cursor-dot,
+  .neural-canvas {
     display: none !important;
   }
 
@@ -3155,7 +3166,8 @@ footer {
 /* User-toggled quiet mode — more permissive than prefers-reduced-motion
    (keeps some transitions for usability) */
 body.quiet-mode .storm-reveal,
-body.quiet-mode .cursor-dot { display: none !important; }
+body.quiet-mode .cursor-dot,
+body.quiet-mode .neural-canvas { display: none !important; }
 
 @media (pointer: fine) {
   body.quiet-mode { cursor: auto !important; }
@@ -4704,6 +4716,7 @@ html.intro-skip #intro-screen { display: none !important; }
   .cursor-dot,
   .project-badge,
   .aurora-blobs,
+  .neural-canvas,
   .vibe-badge,
   .scroll-indicator {
     display: none !important;

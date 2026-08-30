@@ -37,6 +37,7 @@ const state = {
   isInHero: true,
   navOpen:  false,
   heroSettleInPlayed: false,
+  neuralBurstPlayed: false,
   // System preference — checked once at load
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   // User preferences (populated by loadPreferences())
@@ -61,6 +62,7 @@ const dom = {
   navLinks:         document.querySelector('.nav-links'),
   navLinksAll:      [...document.querySelectorAll('.nav-links a')],
   hero:             document.getElementById('hero'),
+  neuralCanvas:     document.getElementById('neural-canvas'),
   stormReveal:      document.querySelector('.storm-reveal'),
   cursorDot:        document.querySelector('.cursor-dot'),
   magneticEls:      [...document.querySelectorAll('.btn, .social-link, .control-btn')],
@@ -149,7 +151,7 @@ function setupMouseTracking() {
   }, { passive: true });
 }
 
-function runBackgroundLoop() {
+function runBackgroundLoop(now) {
   // Skip rendering effects on mobile, quiet mode, or system reduced-motion
   if (!state.quietMode && !state.reducedMotion && window.innerWidth >= 768) {
     const easing = 0.12;
@@ -179,6 +181,9 @@ function runBackgroundLoop() {
 
     // --- Magnetic elements — nearby buttons/social/control icons lean toward the cursor ---
     runMagneticButtons();
+
+    // --- Neural signal field (hero only) ---
+    if (dom.neuralCanvas && neuralNodes.length) drawNeuralField(now);
   }
 
   requestAnimationFrame(runBackgroundLoop);
@@ -217,6 +222,224 @@ function runMagneticButtons() {
 }
 
 
+/* ============================================
+   3b. NEURAL SIGNAL FIELD (hero only)
+   A drifting, multi-colored node network confined to the hero canvas.
+   On first appearance, it wakes from 5 scattered origins (not one
+   center burst — reads as several synapse clusters activating, not
+   a single firework), each on its own slight stagger. Every node
+   stays fully invisible for a head-start window before fading in, so
+   the dense, tangled moment right after "birth" is never actually
+   shown — by the time a node is visible, it's already drifted into
+   open space. Each origin keeps its own signature hue (drawn from
+   design-system tones) with connecting lines in a single neutral
+   thread, so the color reads as accents, not a busy multicolor web.
+   Drawn from inside runBackgroundLoop(), so it inherits the same
+   quiet-mode / reduced-motion / mobile guards as everything there.
+   Triggered once from setupHeroObserver() — see playNeuralBurst().
+   ============================================ */
+
+const NEURAL_ORIGIN_FRACTIONS = [
+  { x: 0.22, y: 0.32 },
+  { x: 0.50, y: 0.58 },
+  { x: 0.80, y: 0.28 },
+  { x: 0.32, y: 0.78 },
+  { x: 0.72, y: 0.74 },
+];
+const NEURAL_ORIGIN_STAGGER_MS = 110;  // gap between each origin's own wake-up
+const NEURAL_BURST_SETTLE_MS   = 1700; // how long a node takes to calm, from ITS OWN birth
+const NEURAL_ALPHA_DELAY_MS    = 550;  // fully invisible head-start before any fade-in
+const NEURAL_ALPHA_FADE_MS     = 950;  // then a smooth fade-in, once already spread out
+const NEURAL_MAX_LINK_DIST     = 125;
+const NEURAL_INTERACT_RADIUS   = 150;
+const NEURAL_DRIFT_SPEED       = 0.16;
+
+const NEURAL_PALETTE_LIGHT = [
+  '171, 156, 250',  // violet   (--aurora-violet)
+  '222, 158, 116',  // peach    (--aurora-peach, deepened for dot visibility)
+  '128, 176, 224',  // sky      (--aurora-sky, deepened)
+  '227, 122, 152',  // rose     (--aurora-rose, deepened)
+  '96, 82, 216',    // indigo   (near --accent-primary, anchors the set)
+];
+const NEURAL_PALETTE_DARK = [
+  '143, 162, 255',  // periwinkle (--accent-primary dark)
+  '195, 143, 255',  // lavender   (--accent-secondary dark)
+  '255, 150, 180',  // rose
+  '110, 210, 225',  // cyan
+  '235, 185, 120',  // amber
+];
+
+let neuralNodes = [];
+let neuralW = 0, neuralH = 0, neuralDPR = 1;
+let neuralCtx = null;
+
+function neuralEaseOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+function neuralEaseOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function neuralThemeColor() {
+  const isLight = dom.html.getAttribute('data-theme') === 'light';
+  return {
+    line: isLight ? '80, 70, 229' : '143, 162, 255',
+    palette: isLight ? NEURAL_PALETTE_LIGHT : NEURAL_PALETTE_DARK,
+  };
+}
+
+function sizeNeuralCanvas() {
+  if (!dom.neuralCanvas || !dom.hero) return;
+  if (!neuralCtx) neuralCtx = dom.neuralCanvas.getContext('2d');
+  const rect = dom.hero.getBoundingClientRect();
+  neuralDPR = Math.min(window.devicePixelRatio || 1, 2);
+  neuralW = rect.width;
+  neuralH = rect.height;
+  dom.neuralCanvas.width = neuralW * neuralDPR;
+  dom.neuralCanvas.height = neuralH * neuralDPR;
+  dom.neuralCanvas.style.width = neuralW + 'px';
+  dom.neuralCanvas.style.height = neuralH + 'px';
+  neuralCtx.setTransform(neuralDPR, 0, 0, neuralDPR, 0, 0);
+}
+
+function seedNeuralNodes(now) {
+  const total = window.innerWidth < 900 ? 30 : 50;
+  const originCount = NEURAL_ORIGIN_FRACTIONS.length;
+  neuralNodes = [];
+
+  for (let i = 0; i < total; i++) {
+    // Round-robin across origins — every origin ends up with its own
+    // small cluster, each on a slightly different stagger below.
+    const originIndex = i % originCount;
+    const origin = NEURAL_ORIGIN_FRACTIONS[originIndex];
+    const ox = origin.x * neuralW + (Math.random() - 0.5) * 46;
+    const oy = origin.y * neuralH + (Math.random() - 0.5) * 46;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.9 + Math.random() * 1.8;
+
+    neuralNodes.push({
+      x: ox,
+      y: oy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      // Squaring the random value biases toward small nodes, with
+      // occasional larger ones standing out — reads like stars of
+      // varying brightness rather than a uniform dot grid.
+      r: 1 + Math.pow(Math.random(), 2) * 4,
+      birth: now + originIndex * NEURAL_ORIGIN_STAGGER_MS + Math.random() * 60,
+      colorIndex: originIndex, // each origin cluster keeps its own hue
+    });
+  }
+}
+
+// Called once, timed to the hero's first appearance — see setupHeroObserver().
+function playNeuralBurst() {
+  if (state.neuralBurstPlayed || !dom.neuralCanvas) return;
+  state.neuralBurstPlayed = true;
+  sizeNeuralCanvas();
+  seedNeuralNodes(performance.now());
+}
+
+function drawNeuralField(now) {
+  if (!dom.neuralCanvas || !neuralCtx || !dom.hero) return;
+
+  neuralCtx.clearRect(0, 0, neuralW, neuralH);
+  const { line, palette } = neuralThemeColor();
+  const isLight = dom.html.getAttribute('data-theme') === 'light';
+  const glowBlur = isLight ? 3 : 5;
+
+  neuralNodes.forEach((n) => {
+    const age = now - n.birth;
+    if (age < 0) { n.alpha = 0; return; } // hasn't been born yet
+
+    const settleT = Math.min(1, age / NEURAL_BURST_SETTLE_MS);
+    const calm = neuralEaseOutQuint(settleT); // 0 = just born/hot, 1 = fully calm
+    const storm = 1 - calm;
+
+    // Fully invisible for NEURAL_ALPHA_DELAY_MS — a genuine head start
+    // to drift clear of the dense, tangled cluster near its origin —
+    // then a smooth fade-in. This is what hides the tangle itself.
+    const alphaT = Math.max(0, (age - NEURAL_ALPHA_DELAY_MS) / NEURAL_ALPHA_FADE_MS);
+    n.alpha = neuralEaseOutCubic(Math.min(1, alphaT));
+
+    n.x += n.vx;
+    n.y += n.vy;
+
+    // per-node eased damping — smooth, not a linear/instant snap
+    const damp = storm * 0.045;
+    n.vx *= (1 - damp);
+    n.vy *= (1 - damp);
+    if (Math.abs(n.vx) < 0.04 && Math.abs(n.vy) < 0.04) {
+      n.vx += (Math.random() - 0.5) * NEURAL_DRIFT_SPEED * 0.02;
+      n.vy += (Math.random() - 0.5) * NEURAL_DRIFT_SPEED * 0.02;
+    }
+
+    if (n.x < -20) n.x = neuralW + 20;
+    if (n.x > neuralW + 20) n.x = -20;
+    if (n.y < -20) n.y = neuralH + 20;
+    if (n.y > neuralH + 20) n.y = -20;
+  });
+
+  // connections — a single neutral thread; color variety lives at the
+  // nodes only, so the web stays calm rather than a busy rainbow.
+  for (let i = 0; i < neuralNodes.length; i++) {
+    const a = neuralNodes[i];
+    if (a.alpha <= 0) continue;
+    for (let j = i + 1; j < neuralNodes.length; j++) {
+      const b = neuralNodes[j];
+      if (b.alpha <= 0) continue;
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      if (dist < NEURAL_MAX_LINK_DIST) {
+        const alpha = Math.min((1 - dist / NEURAL_MAX_LINK_DIST) * 0.22, 0.6) * Math.min(a.alpha, b.alpha);
+        neuralCtx.strokeStyle = `rgba(${line}, ${alpha})`;
+        neuralCtx.lineWidth = 1;
+        neuralCtx.beginPath();
+        neuralCtx.moveTo(a.x, a.y);
+        neuralCtx.lineTo(b.x, b.y);
+        neuralCtx.stroke();
+      }
+    }
+  }
+
+  // nodes + cursor interaction — each draws in its own origin's hue,
+  // with a matching soft glow (restrained, not neon).
+  const heroRect = dom.hero.getBoundingClientRect();
+  const pointerX = state.target.x - heroRect.left;
+  const pointerY = state.target.y - heroRect.top;
+
+  neuralNodes.forEach((n) => {
+    if (n.alpha <= 0) return;
+    const color = palette[n.colorIndex % palette.length];
+    let r = n.r;
+    let alpha = 0.56 * n.alpha;
+
+    if (state.isInHero) {
+      const dist = Math.hypot(n.x - pointerX, n.y - pointerY);
+      if (dist < NEURAL_INTERACT_RADIUS) {
+        const strength = 1 - dist / NEURAL_INTERACT_RADIUS;
+        r = n.r + strength * 2.1;
+        alpha = (0.56 + strength * 0.34) * n.alpha;
+        neuralCtx.strokeStyle = `rgba(${line}, ${strength * 0.5 * n.alpha})`;
+        neuralCtx.lineWidth = 1;
+        neuralCtx.beginPath();
+        neuralCtx.moveTo(n.x, n.y);
+        neuralCtx.lineTo(pointerX, pointerY);
+        neuralCtx.stroke();
+      }
+    }
+
+    neuralCtx.shadowColor = `rgba(${color}, 0.55)`;
+    neuralCtx.shadowBlur = glowBlur + n.r * 0.6; // bigger nodes glow a touch more
+    neuralCtx.fillStyle = `rgba(${color}, ${alpha})`;
+    neuralCtx.beginPath();
+    neuralCtx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    neuralCtx.fill();
+  });
+
+  neuralCtx.shadowBlur = 0;
+}
+
+window.addEventListener('resize', debounce(() => {
+  if (state.neuralBurstPlayed) sizeNeuralCanvas();
+}, 150));
+
+
 // Track whether user is in the hero section.
 // Storm reveal only applies to hero (visual clarity on other sections).
 function setupHeroObserver() {
@@ -228,13 +451,15 @@ function setupHeroObserver() {
 
       // First time the hero is actually scrolled into view (usually via the
       // About tab, since setupBioTab() lands on Work by default) — play a
-      // one-time blur/scale settle-in on the glass card.
+      // one-time blur/scale settle-in on the glass card, together with
+      // the neural field's multi-origin burst.
       if (e.isIntersecting && !state.heroSettleInPlayed && !state.reducedMotion && !state.quietMode) {
         state.heroSettleInPlayed = true;
         dom.body.classList.add('intro-active');
         requestAnimationFrame(() => requestAnimationFrame(() => {
           dom.body.classList.remove('intro-active');
         }));
+        playNeuralBurst();
       }
     }),
     { threshold: 0 }
