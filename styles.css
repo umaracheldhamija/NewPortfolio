@@ -26,6 +26,102 @@
 
 
 /* ============================================
+   0. CROSS-DOCUMENT VIEW TRANSITIONS
+   Every page links this stylesheet, so this one opt-in gives every
+   internal navigation (home → project page, project page → home,
+   nav links) a smooth crossfade instead of a hard reload — the site
+   feels like one continuous app rather than six static HTML files.
+   Pure progressive enhancement: unsupported browsers (Firefox,
+   older Safari) just navigate normally, nothing to fall back to.
+   Gated on prefers-reduced-motion so those users get instant nav.
+   ============================================ */
+
+@media not (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  /* Shared-element pairing: give the homepage thumbnail and the small
+     logo badge next to the matching project page's title the same
+     view-transition-name, so instead of a plain crossfade, the
+     thumbnail visibly shrinks and blends into that logo across the
+     navigation (and grows back out again, in reverse).
+
+     Only OpenMined, UPMC, and MeditationWise have a .project-title-logo
+     next to their <h1> (see each project's project-title-row markup).
+     GlowUp Eye Care, Electric Scooters for Kids, and Kathak Kala Kendra
+     don't, so those three just get the default whole-page crossfade
+     above — nothing suitably small to blend into. */
+
+  [data-project="openmined"] .project-thumb img,
+  body[data-project="openmined"] .project-title-logo {
+    view-transition-name: hero-openmined;
+  }
+
+  [data-project="upmc"] .project-thumb img,
+  body[data-project="upmc"] .project-title-logo {
+    view-transition-name: hero-upmc;
+  }
+
+  [data-project="meditationwise"] .project-thumb img,
+  body[data-project="meditationwise"] .project-title-logo {
+    view-transition-name: hero-meditationwise;
+  }
+}
+
+/* Browsers default the old/new snapshot pair to mix-blend-mode:
+   plus-lighter, which additively brightens overlapping pixels — fine
+   when old/new are near-identical, but it's exactly what makes a
+   crossfade between two different images look washed-out/"patchy"
+   mid-transition. Normal blending gives a clean dissolve instead. */
+::view-transition-old(*),
+::view-transition-new(*) {
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: var(--ease-smooth);
+}
+
+/* The 3 shared-element crossings run a touch slower than the plain root
+   crossfade above — there's more visual distance for the image to
+   travel/resize across, so it reads as a blend rather than a snap. */
+@media not (prefers-reduced-motion: reduce) {
+  ::view-transition-group(hero-openmined),
+  ::view-transition-group(hero-upmc),
+  ::view-transition-group(hero-meditationwise) {
+    animation-duration: 0.5s;
+  }
+
+  /* When old/new differ enough that a crossfade would look muddy
+     (different logo crops/files), a straight cut reads cleaner than
+     a blend — the resize/reposition still carries the "expand" feel
+     on its own. */
+  ::view-transition-image-pair(hero-openmined),
+  ::view-transition-image-pair(hero-upmc),
+  ::view-transition-image-pair(hero-meditationwise) {
+    isolation: isolate;
+  }
+
+  ::view-transition-old(hero-openmined),
+  ::view-transition-old(hero-upmc),
+  ::view-transition-old(hero-meditationwise) {
+    animation: none;
+    opacity: 0;
+  }
+
+  ::view-transition-new(hero-openmined),
+  ::view-transition-new(hero-upmc),
+  ::view-transition-new(hero-meditationwise) {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+
+/* ============================================
    1. DESIGN TOKENS
    Using semantic names (intent, not value).
    All spacing on 8pt grid.
@@ -2316,14 +2412,6 @@ footer {
   letter-spacing: 0.05em;
 }
 
-.footer-vibe {
-  color: var(--text-muted);
-  font-size: var(--text-xs);
-  letter-spacing: 0.05em;
-  opacity: 0.6;
-  margin-top: var(--sp-2);
-}
-
 .footer-resume-btn {
   background: none;
   border: none;
@@ -3206,6 +3294,33 @@ body.large-text .control-label { font-size: 0.68rem; }
   letter-spacing: 0.05em;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+
+/* ============================================
+   23. VIBE-CODED BADGE
+   ============================================ */
+
+.vibe-badge {
+  position: fixed;
+  bottom: var(--sp-6);
+  left: var(--sp-6);
+  z-index: 902;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.6s var(--ease-smooth);
+  line-height: 1.2;
+}
+
+.vibe-badge.scrolled-away {
+  opacity: 0;
+}
+
+[data-theme="dark"] .vibe-badge {
+  color: rgba(168, 175, 221, 0.45);
 }
 
 
@@ -4589,6 +4704,7 @@ html.intro-skip #intro-screen { display: none !important; }
   .cursor-dot,
   .project-badge,
   .aurora-blobs,
+  .vibe-badge,
   .scroll-indicator {
     display: none !important;
   }
@@ -4834,8 +4950,25 @@ body[data-project="kathak"] {
   --bg-elevated:  #2E2114;
 }
 
+/* Full-bleed wash — .project-page-hero itself is a centered 880px
+   column (see base rule above), so painting the gradient directly on
+   it left a hard-edged rectangle instead of a soft page-wide tint.
+   This pseudo-element breaks out to full viewport width instead. */
 body[data-project="kathak"] .project-page-hero {
+  position: relative;
+}
+
+body[data-project="kathak"] .project-page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
   background-image: linear-gradient(180deg, var(--accent-subtle) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* --- UPMC / Designing w/CARE: warm amber-orange, softer corners
