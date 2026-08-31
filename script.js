@@ -247,7 +247,12 @@ function runMagneticButtons() {
 const SPLASH_TEAL = '#1F9E93', SPLASH_CYAN = '#3FC6E0', SPLASH_INDIGO = '#4A3F9E', SPLASH_LAVENDER = '#B49CE8';
 const SPLASH_ART_SIZE = 460; // viewBox units — see buildSplashSVG()
 const SPLASH_DESIGN_COUNT = 8;
-const SPLASH_MAX_BLOOMS = 8;
+// The ambient system keeps its own presence low (idle default is 1–2
+// splashes) — a separate, higher ceiling only exists so a click can
+// still add one on top without being blocked by the ambient cap; those
+// extras just fade back out on their own normal lifecycle afterward.
+const SPLASH_AMBIENT_MAX = 2;
+const SPLASH_MAX_BLOOMS = 6;
 const SPLASH_SPAWN_MIN = 2200, SPLASH_SPAWN_MAX = 4000;
 
 let splashCtx = null;
@@ -407,11 +412,11 @@ function makeSplashBloom(now, ageOffsetMs, pos) {
 function seedInitialSplashBlooms(now) {
   computeSplashDocMetrics();
   splashBlooms = [];
-  // Stagger a handful of fresh blooms across the first ~1.3s rather
-  // than randomizing their age across the whole lifecycle — the page
-  // always has at least one bloom starting from scale 0, growing in
-  // front of you, instead of only ever showing already-grown blooms.
-  for (let i = 0; i < 4; i++) {
+  // Only the ambient ceiling's worth (1–2) at load, staggered slightly
+  // so at least one is visibly still growing rather than all appearing
+  // pre-grown — anything more than that is left for the user's own
+  // clicks to add, not the page itself.
+  for (let i = 0; i < SPLASH_AMBIENT_MAX; i++) {
     const b = makeSplashBloom(now, 0);
     b.born = now - i * 320;
     splashBlooms.push(b);
@@ -473,7 +478,12 @@ function drawSplashField(now) {
   const scrollY = window.scrollY;
   const isLight = dom.html.getAttribute('data-theme') === 'light';
 
-  if (now - splashLastSpawn > splashNextSpawnDelay && splashBlooms.length < SPLASH_MAX_BLOOMS) {
+  // Ambient auto-spawn only tops back up to SPLASH_AMBIENT_MAX (the
+  // idle 1–2 baseline) — it will never grow the count past that on
+  // its own. Clicking is the only thing that pushes past it (see
+  // setupSplashClickSpawn(), which checks the higher SPLASH_MAX_BLOOMS
+  // ceiling instead) — those extras just fade out normally afterward.
+  if (now - splashLastSpawn > splashNextSpawnDelay && splashBlooms.length < SPLASH_AMBIENT_MAX) {
     splashBlooms.push(makeSplashBloom(now, 0));
     splashLastSpawn = now;
     splashNextSpawnDelay = SPLASH_SPAWN_MIN + Math.random() * (SPLASH_SPAWN_MAX - SPLASH_SPAWN_MIN);
