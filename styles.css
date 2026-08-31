@@ -466,6 +466,16 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 
 [data-theme="light"] .aurora-layer { opacity: 1; }
 
+/* Living watercolor splash field — fixed, full-viewport, present on
+   every section (drawn in drawSplashField(), script.js). Sits above
+   the storm/aurora bg-layer, below all real page content. */
+.splash-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
 
 /* ============================================
    INTERACTIVE AURORA BLOBS
@@ -489,16 +499,6 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  pointer-events: none;
-}
-
-/* Multi-origin neural signal field — hero only. Drawn in
-   drawNeuralField() (script.js), behind .hero-content, above the
-   storm/aurora bg-layer. */
-.neural-canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
   pointer-events: none;
 }
 
@@ -3084,7 +3084,7 @@ footer {
   .scroll-indicator,
   .storm-reveal,
   .cursor-dot,
-  .neural-canvas {
+  .splash-canvas {
     display: none !important;
   }
 
@@ -3167,7 +3167,7 @@ footer {
    (keeps some transitions for usability) */
 body.quiet-mode .storm-reveal,
 body.quiet-mode .cursor-dot,
-body.quiet-mode .neural-canvas { display: none !important; }
+body.quiet-mode .splash-canvas { display: none !important; }
 
 @media (pointer: fine) {
   body.quiet-mode { cursor: auto !important; }
@@ -4716,7 +4716,7 @@ html.intro-skip #intro-screen { display: none !important; }
   .cursor-dot,
   .project-badge,
   .aurora-blobs,
-  .neural-canvas,
+  .splash-canvas,
   .vibe-badge,
   .scroll-indicator {
     display: none !important;

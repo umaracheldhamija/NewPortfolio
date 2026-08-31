@@ -37,7 +37,6 @@ const state = {
   isInHero: true,
   navOpen:  false,
   heroSettleInPlayed: false,
-  neuralBurstPlayed: false,
   // System preference — checked once at load
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   // User preferences (populated by loadPreferences())
@@ -62,7 +61,8 @@ const dom = {
   navLinks:         document.querySelector('.nav-links'),
   navLinksAll:      [...document.querySelectorAll('.nav-links a')],
   hero:             document.getElementById('hero'),
-  neuralCanvas:     document.getElementById('neural-canvas'),
+  work:             document.getElementById('work'),
+  splashCanvas:     document.getElementById('splash-canvas'),
   stormReveal:      document.querySelector('.storm-reveal'),
   cursorDot:        document.querySelector('.cursor-dot'),
   magneticEls:      [...document.querySelectorAll('.btn, .social-link, .control-btn')],
@@ -182,8 +182,8 @@ function runBackgroundLoop(now) {
     // --- Magnetic elements — nearby buttons/social/control icons lean toward the cursor ---
     runMagneticButtons();
 
-    // --- Neural signal field (hero only) ---
-    if (dom.neuralCanvas && neuralNodes.length) drawNeuralField(now);
+    // --- Living watercolor splash field ---
+    drawSplashField(now);
   }
 
   requestAnimationFrame(runBackgroundLoop);
@@ -223,221 +223,309 @@ function runMagneticButtons() {
 
 
 /* ============================================
-   3b. NEURAL SIGNAL FIELD (hero only)
-   A drifting, multi-colored node network confined to the hero canvas.
-   On first appearance, it wakes from 5 scattered origins (not one
-   center burst — reads as several synapse clusters activating, not
-   a single firework), each on its own slight stagger. Every node
-   stays fully invisible for a head-start window before fading in, so
-   the dense, tangled moment right after "birth" is never actually
-   shown — by the time a node is visible, it's already drifted into
-   open space. Each origin keeps its own signature hue (drawn from
-   design-system tones) with connecting lines in a single neutral
-   thread, so the color reads as accents, not a busy multicolor web.
-   Drawn from inside runBackgroundLoop(), so it inherits the same
-   quiet-mode / reduced-motion / mobile guards as everything there.
-   Triggered once from setupHeroObserver() — see playNeuralBurst().
+   3b. LIVING WATERCOLOR SPLASH FIELD
+   One fixed, full-viewport canvas — same architecture as .bg-layer —
+   so there is no per-section boundary to clip against. Blooms live
+   in document coordinates and are drawn at (worldY - scrollY) each
+   frame, so they scroll naturally with the page while the canvas
+   itself never resizes or gets cut at a section edge. That's what
+   makes Hero → Work feel continuous rather than fragmented.
+
+   All the expensive work — SVG feTurbulence/feDisplacementMap for
+   wet, deckled bleeding edges; layered multi-tone radial gradients
+   (teal/cyan/indigo/lavender); a desaturated turbulence pass for
+   paper grain; scattered salt speckles; satellite splatter droplets
+   — happens ONCE per design, at load, building an SVG string and
+   rasterizing it into an Image (see buildSplashLibrary()). The
+   per-frame draw never touches turbulence or gradients again:
+   growing/fading a bloom is one drawImage() call with a scale and
+   alpha, same cost as any other canvas sprite. Drawn from inside
+   runBackgroundLoop(), so it inherits the same quiet-mode /
+   reduced-motion / mobile guards as everything else there.
    ============================================ */
 
-const NEURAL_ORIGIN_FRACTIONS = [
-  { x: 0.22, y: 0.32 },
-  { x: 0.50, y: 0.58 },
-  { x: 0.80, y: 0.28 },
-  { x: 0.32, y: 0.78 },
-  { x: 0.72, y: 0.74 },
-];
-const NEURAL_ORIGIN_STAGGER_MS = 110;  // gap between each origin's own wake-up
-const NEURAL_BURST_SETTLE_MS   = 1700; // how long a node takes to calm, from ITS OWN birth
-const NEURAL_ALPHA_DELAY_MS    = 550;  // fully invisible head-start before any fade-in
-const NEURAL_ALPHA_FADE_MS     = 950;  // then a smooth fade-in, once already spread out
-const NEURAL_MAX_LINK_DIST     = 125;
-const NEURAL_INTERACT_RADIUS   = 150;
-const NEURAL_DRIFT_SPEED       = 0.16;
+const SPLASH_TEAL = '#1F9E93', SPLASH_CYAN = '#3FC6E0', SPLASH_INDIGO = '#4A3F9E', SPLASH_LAVENDER = '#B49CE8';
+const SPLASH_ART_SIZE = 460; // viewBox units — see buildSplashSVG()
+const SPLASH_DESIGN_COUNT = 8;
+const SPLASH_MAX_BLOOMS = 8;
+const SPLASH_SPAWN_MIN = 2200, SPLASH_SPAWN_MAX = 4000;
 
-const NEURAL_PALETTE_LIGHT = [
-  '171, 156, 250',  // violet   (--aurora-violet)
-  '222, 158, 116',  // peach    (--aurora-peach, deepened for dot visibility)
-  '128, 176, 224',  // sky      (--aurora-sky, deepened)
-  '227, 122, 152',  // rose     (--aurora-rose, deepened)
-  '96, 82, 216',    // indigo   (near --accent-primary, anchors the set)
-];
-const NEURAL_PALETTE_DARK = [
-  '143, 162, 255',  // periwinkle (--accent-primary dark)
-  '195, 143, 255',  // lavender   (--accent-secondary dark)
-  '255, 150, 180',  // rose
-  '110, 210, 225',  // cyan
-  '235, 185, 120',  // amber
-];
+let splashCtx = null;
+let splashW = 0, splashH = 0, splashDPR = 1;
+let splashDocHeight = 0;
+let splashHeroWorkBottom = 0; // px from document top to bottom of #work — the "landing" zone
+let splashImages = []; // { img, ready }
+let splashBlooms = [];
+let splashLastSpawn = 0;
+let splashNextSpawnDelay = 0;
 
-let neuralNodes = [];
-let neuralW = 0, neuralH = 0, neuralDPR = 1;
-let neuralCtx = null;
+function splashRnd(min, max) { return min + Math.random() * (max - min); }
 
-function neuralEaseOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
-function neuralEaseOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function sizeSplashCanvas() {
+  if (!dom.splashCanvas) return;
+  if (!splashCtx) splashCtx = dom.splashCanvas.getContext('2d');
+  splashDPR = Math.min(window.devicePixelRatio || 1, 2);
+  splashW = window.innerWidth;
+  splashH = window.innerHeight;
+  dom.splashCanvas.width = splashW * splashDPR;
+  dom.splashCanvas.height = splashH * splashDPR;
+  dom.splashCanvas.style.width = splashW + 'px';
+  dom.splashCanvas.style.height = splashH + 'px';
+  splashCtx.setTransform(splashDPR, 0, 0, splashDPR, 0, 0);
+}
 
-function neuralThemeColor() {
-  const isLight = dom.html.getAttribute('data-theme') === 'light';
+function computeSplashDocMetrics() {
+  splashDocHeight = document.body.scrollHeight;
+  splashHeroWorkBottom = dom.work ? (dom.work.offsetTop + dom.work.offsetHeight) : splashDocHeight * 0.4;
+}
+
+function buildSplashSVG(seed) {
+  const size = SPLASH_ART_SIZE;
+  const cx = size * splashRnd(0.42, 0.5), cy = size * splashRnd(0.42, 0.5);
+  const maxR = size * splashRnd(0.3, 0.35);
+  const fId = `sf${seed}`, gId = `sg${seed}`, grainId = `sgrain${seed}`, clipId = `sclip${seed}`;
+
+  const e1 = { cx: cx - maxR * 0.12, cy: cy - maxR * 0.08, rx: maxR * 1.0, ry: maxR * 0.86 };
+  const e2 = { cx: cx + maxR * 0.22, cy: cy + maxR * 0.18, rx: maxR * 0.82, ry: maxR * 0.7 };
+
+  // Salt speckles — crisp, small, NOT run through the turbulence filter
+  let speckles = '';
+  const speckleCount = 24 + Math.floor(Math.random() * 16);
+  for (let i = 0; i < speckleCount; i++) {
+    const a = Math.random() * Math.PI * 2, d = Math.random() * maxR * 0.75;
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * 0.85;
+    speckles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${splashRnd(0.6, 2.2).toFixed(1)}" fill="#FFFFFF" fill-opacity="${splashRnd(0.25, 0.65).toFixed(2)}"/>`;
+  }
+
+  // Satellite splatter droplets around the perimeter — mostly small,
+  // a few medium — same turbulence filter so their edges match.
+  let satellites = '';
+  const satCount = 10 + Math.floor(Math.random() * 7);
+  const satColors = [SPLASH_TEAL, SPLASH_CYAN, SPLASH_INDIGO, SPLASH_LAVENDER];
+  for (let i = 0; i < satCount; i++) {
+    const a = Math.random() * Math.PI * 2, d = maxR * splashRnd(0.9, 1.55);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * 0.9;
+    const r = Math.random() < 0.75 ? splashRnd(2, 6) : splashRnd(7, 13);
+    const c = satColors[Math.floor(Math.random() * satColors.length)];
+    satellites += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${r.toFixed(1)}" ry="${(r * splashRnd(0.7, 1)).toFixed(1)}" fill="${c}" fill-opacity="${splashRnd(0.25, 0.5).toFixed(2)}" filter="url(#${fId})"/>`;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}">
+    <defs>
+      <filter id="${fId}" x="-60%" y="-60%" width="220%" height="220%">
+        <feTurbulence type="fractalNoise" baseFrequency="${splashRnd(0.011, 0.016).toFixed(4)} ${splashRnd(0.016, 0.022).toFixed(4)}" numOctaves="4" seed="${seed}" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="${splashRnd(38, 52).toFixed(0)}" xChannelSelector="R" yChannelSelector="G"/>
+        <feGaussianBlur stdDeviation="1.6"/>
+      </filter>
+      <filter id="${grainId}" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${seed + 50}" result="grain"/>
+        <feColorMatrix in="grain" type="saturate" values="0"/>
+      </filter>
+      <radialGradient id="${gId}-teal" cx="35%" cy="35%" r="75%">
+        <stop offset="0%" stop-color="${SPLASH_TEAL}" stop-opacity="0.65"/>
+        <stop offset="55%" stop-color="${SPLASH_TEAL}" stop-opacity="0.32"/>
+        <stop offset="100%" stop-color="${SPLASH_TEAL}" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="${gId}-cyan" cx="65%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="${SPLASH_CYAN}" stop-opacity="0.5"/>
+        <stop offset="55%" stop-color="${SPLASH_CYAN}" stop-opacity="0.24"/>
+        <stop offset="100%" stop-color="${SPLASH_CYAN}" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="${gId}-indigo" cx="55%" cy="70%" r="70%">
+        <stop offset="0%" stop-color="${SPLASH_INDIGO}" stop-opacity="0.55"/>
+        <stop offset="55%" stop-color="${SPLASH_INDIGO}" stop-opacity="0.28"/>
+        <stop offset="100%" stop-color="${SPLASH_INDIGO}" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="${gId}-lav" cx="30%" cy="65%" r="65%">
+        <stop offset="0%" stop-color="${SPLASH_LAVENDER}" stop-opacity="0.4"/>
+        <stop offset="60%" stop-color="${SPLASH_LAVENDER}" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="${SPLASH_LAVENDER}" stop-opacity="0"/>
+      </radialGradient>
+      <clipPath id="${clipId}">
+        <ellipse cx="${e1.cx}" cy="${e1.cy}" rx="${e1.rx}" ry="${e1.ry}" filter="url(#${fId})"/>
+      </clipPath>
+    </defs>
+    ${satellites}
+    <g filter="url(#${fId})">
+      <ellipse cx="${e1.cx}" cy="${e1.cy}" rx="${e1.rx}" ry="${e1.ry}" fill="url(#${gId}-teal)"/>
+      <ellipse cx="${e2.cx}" cy="${e2.cy}" rx="${e2.rx}" ry="${e2.ry}" fill="url(#${gId}-indigo)"/>
+      <ellipse cx="${e1.cx + maxR * 0.15}" cy="${e1.cy - maxR * 0.2}" rx="${e1.rx * 0.75}" ry="${e1.ry * 0.75}" fill="url(#${gId}-cyan)"/>
+      <ellipse cx="${e2.cx - maxR * 0.2}" cy="${e2.cy + maxR * 0.1}" rx="${e2.rx * 0.7}" ry="${e2.ry * 0.7}" fill="url(#${gId}-lav)"/>
+    </g>
+    <rect x="0" y="0" width="${size}" height="${size}" filter="url(#${grainId})" opacity="0.05" clip-path="url(#${clipId})"/>
+    <g clip-path="url(#${clipId})">${speckles}</g>
+  </svg>`;
+}
+
+function buildSplashLibrary() {
+  for (let i = 0; i < SPLASH_DESIGN_COUNT; i++) {
+    const svg = buildSplashSVG(10 + i * 17);
+    const entry = { img: new Image(), ready: false };
+    entry.img.onload = () => { entry.ready = true; };
+    entry.img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    splashImages.push(entry);
+  }
+}
+
+// pos: optional {x, y} in WORLD coordinates (document-relative — see
+// spawnClickSplash()) for a click-triggered bloom at a specific spot.
+// Omitted for the ambient system's own randomly-placed spawns.
+function makeSplashBloom(now, ageOffsetMs, pos) {
+  let worldX, worldY;
+  if (pos) {
+    worldX = pos.x;
+    worldY = pos.y;
+  } else {
+    // 65% of spawns land within the hero+work "landing" zone — the
+    // part of the page actually seen by default (setupBioTab() lands
+    // on Work) — the rest scatter across the remaining sections.
+    const inLanding = Math.random() < 0.65;
+    worldY = inLanding
+      ? Math.random() * splashHeroWorkBottom
+      : splashHeroWorkBottom + Math.random() * Math.max(1, splashDocHeight - splashHeroWorkBottom);
+
+    // Bias X away from dead-center, toward the outer thirds, so blooms
+    // read as background rather than sitting under text.
+    worldX = (Math.random() < 0.5 ? Math.random() * 0.34 : 0.66 + Math.random() * 0.34) * splashW;
+  }
+
   return {
-    line: isLight ? '80, 70, 229' : '143, 162, 255',
-    palette: isLight ? NEURAL_PALETTE_LIGHT : NEURAL_PALETTE_DARK,
+    worldX, worldY,
+    design: splashImages[Math.floor(Math.random() * splashImages.length)],
+    rotation: splashRnd(0, Math.PI * 2),
+    flipX: Math.random() < 0.5 ? -1 : 1,
+    displaySize: 340 + Math.random() * 260, // final on-screen diameter, px
+    born: now - ageOffsetMs,
+    // A click reacts faster than the slow ambient wind-up — feels like
+    // a direct response to the press, not a coincidence.
+    growMs: pos ? 800 + Math.random() * 350 : 2200 + Math.random() * 700,
+    holdMs: 3400 + Math.random() * 2400,
+    fadeMs: 2600 + Math.random() * 1000,
   };
 }
 
-function sizeNeuralCanvas() {
-  if (!dom.neuralCanvas || !dom.hero) return;
-  if (!neuralCtx) neuralCtx = dom.neuralCanvas.getContext('2d');
-  const rect = dom.hero.getBoundingClientRect();
-  neuralDPR = Math.min(window.devicePixelRatio || 1, 2);
-  neuralW = rect.width;
-  neuralH = rect.height;
-  dom.neuralCanvas.width = neuralW * neuralDPR;
-  dom.neuralCanvas.height = neuralH * neuralDPR;
-  dom.neuralCanvas.style.width = neuralW + 'px';
-  dom.neuralCanvas.style.height = neuralH + 'px';
-  neuralCtx.setTransform(neuralDPR, 0, 0, neuralDPR, 0, 0);
-}
-
-function seedNeuralNodes(now) {
-  const total = window.innerWidth < 900 ? 30 : 50;
-  const originCount = NEURAL_ORIGIN_FRACTIONS.length;
-  neuralNodes = [];
-
-  for (let i = 0; i < total; i++) {
-    // Round-robin across origins — every origin ends up with its own
-    // small cluster, each on a slightly different stagger below.
-    const originIndex = i % originCount;
-    const origin = NEURAL_ORIGIN_FRACTIONS[originIndex];
-    const ox = origin.x * neuralW + (Math.random() - 0.5) * 46;
-    const oy = origin.y * neuralH + (Math.random() - 0.5) * 46;
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 0.9 + Math.random() * 1.8;
-
-    neuralNodes.push({
-      x: ox,
-      y: oy,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      // Squaring the random value biases toward small nodes, with
-      // occasional larger ones standing out — reads like stars of
-      // varying brightness rather than a uniform dot grid.
-      r: 1 + Math.pow(Math.random(), 2) * 4,
-      birth: now + originIndex * NEURAL_ORIGIN_STAGGER_MS + Math.random() * 60,
-      colorIndex: originIndex, // each origin cluster keeps its own hue
-    });
+function seedInitialSplashBlooms(now) {
+  computeSplashDocMetrics();
+  splashBlooms = [];
+  // Stagger a handful of fresh blooms across the first ~1.3s rather
+  // than randomizing their age across the whole lifecycle — the page
+  // always has at least one bloom starting from scale 0, growing in
+  // front of you, instead of only ever showing already-grown blooms.
+  for (let i = 0; i < 4; i++) {
+    const b = makeSplashBloom(now, 0);
+    b.born = now - i * 320;
+    splashBlooms.push(b);
   }
+  splashLastSpawn = now;
+  splashNextSpawnDelay = SPLASH_SPAWN_MIN + Math.random() * (SPLASH_SPAWN_MAX - SPLASH_SPAWN_MIN);
 }
 
-// Called once, timed to the hero's first appearance — see setupHeroObserver().
-function playNeuralBurst() {
-  if (state.neuralBurstPlayed || !dom.neuralCanvas) return;
-  state.neuralBurstPlayed = true;
-  sizeNeuralCanvas();
-  seedNeuralNodes(performance.now());
+// Returns false once the bloom's full lifecycle (grow+hold+fade) is
+// over. The heavy lifting already happened in buildSplashSVG() — this
+// is just one drawImage() per bloom, scaled/faded per its lifecycle.
+function drawSplashBloom(b, now, scrollY, isLight) {
+  const age = now - b.born;
+  const total = b.growMs + b.holdMs + b.fadeMs;
+  if (age > total) return false;
+  if (!b.design.ready) return true; // not decoded yet — try again next frame
+
+  // Scale is never flat: a fast initial spread (0 -> 1, ink hitting the
+  // surface), then it KEEPS creeping outward the rest of its life —
+  // slower and slower, like water continuing to wick into paper
+  // fibers, only truly stopping once it starts to fade.
+  const SPLASH_CREEP_CAP = 1.3;
+  let scale;
+  if (age < b.growMs) {
+    const t = age / b.growMs;
+    scale = 1 - Math.pow(1 - t, 3); // fast ease-out spread
+  } else {
+    const creepT = Math.min(1, (age - b.growMs) / b.holdMs);
+    const eased = 1 - Math.pow(1 - creepT, 1.6); // gentle, stretched ease
+    scale = 1 + (SPLASH_CREEP_CAP - 1) * eased;
+  }
+
+  let alpha;
+  if (age < b.growMs) alpha = age / b.growMs;
+  else if (age < b.growMs + b.holdMs) alpha = 1;
+  else alpha = 1 - (age - b.growMs - b.holdMs) / b.fadeMs;
+
+  const halfDisplay = (b.displaySize * scale) / 2;
+  const cy = b.worldY - scrollY;
+  if (cy + halfDisplay < -60 || cy - halfDisplay > splashH + 60) return true; // alive, off-screen
+
+  const peak = isLight ? 0.85 : 0.7;
+  splashCtx.save();
+  splashCtx.globalAlpha = Math.max(0, alpha) * peak;
+  splashCtx.translate(b.worldX, cy);
+  splashCtx.rotate(b.rotation);
+  splashCtx.scale(b.flipX * scale, scale);
+  const half = b.displaySize / 2;
+  splashCtx.drawImage(b.design.img, -half, -half, b.displaySize, b.displaySize);
+  splashCtx.restore();
+
+  return true;
 }
 
-function drawNeuralField(now) {
-  if (!dom.neuralCanvas || !neuralCtx || !dom.hero) return;
+function drawSplashField(now) {
+  if (!dom.splashCanvas || !splashCtx || !splashBlooms) return;
 
-  neuralCtx.clearRect(0, 0, neuralW, neuralH);
-  const { line, palette } = neuralThemeColor();
+  splashCtx.clearRect(0, 0, splashW, splashH);
+  const scrollY = window.scrollY;
   const isLight = dom.html.getAttribute('data-theme') === 'light';
-  const glowBlur = isLight ? 3 : 5;
 
-  neuralNodes.forEach((n) => {
-    const age = now - n.birth;
-    if (age < 0) { n.alpha = 0; return; } // hasn't been born yet
-
-    const settleT = Math.min(1, age / NEURAL_BURST_SETTLE_MS);
-    const calm = neuralEaseOutQuint(settleT); // 0 = just born/hot, 1 = fully calm
-    const storm = 1 - calm;
-
-    // Fully invisible for NEURAL_ALPHA_DELAY_MS — a genuine head start
-    // to drift clear of the dense, tangled cluster near its origin —
-    // then a smooth fade-in. This is what hides the tangle itself.
-    const alphaT = Math.max(0, (age - NEURAL_ALPHA_DELAY_MS) / NEURAL_ALPHA_FADE_MS);
-    n.alpha = neuralEaseOutCubic(Math.min(1, alphaT));
-
-    n.x += n.vx;
-    n.y += n.vy;
-
-    // per-node eased damping — smooth, not a linear/instant snap
-    const damp = storm * 0.045;
-    n.vx *= (1 - damp);
-    n.vy *= (1 - damp);
-    if (Math.abs(n.vx) < 0.04 && Math.abs(n.vy) < 0.04) {
-      n.vx += (Math.random() - 0.5) * NEURAL_DRIFT_SPEED * 0.02;
-      n.vy += (Math.random() - 0.5) * NEURAL_DRIFT_SPEED * 0.02;
-    }
-
-    if (n.x < -20) n.x = neuralW + 20;
-    if (n.x > neuralW + 20) n.x = -20;
-    if (n.y < -20) n.y = neuralH + 20;
-    if (n.y > neuralH + 20) n.y = -20;
-  });
-
-  // connections — a single neutral thread; color variety lives at the
-  // nodes only, so the web stays calm rather than a busy rainbow.
-  for (let i = 0; i < neuralNodes.length; i++) {
-    const a = neuralNodes[i];
-    if (a.alpha <= 0) continue;
-    for (let j = i + 1; j < neuralNodes.length; j++) {
-      const b = neuralNodes[j];
-      if (b.alpha <= 0) continue;
-      const dist = Math.hypot(a.x - b.x, a.y - b.y);
-      if (dist < NEURAL_MAX_LINK_DIST) {
-        const alpha = Math.min((1 - dist / NEURAL_MAX_LINK_DIST) * 0.22, 0.6) * Math.min(a.alpha, b.alpha);
-        neuralCtx.strokeStyle = `rgba(${line}, ${alpha})`;
-        neuralCtx.lineWidth = 1;
-        neuralCtx.beginPath();
-        neuralCtx.moveTo(a.x, a.y);
-        neuralCtx.lineTo(b.x, b.y);
-        neuralCtx.stroke();
-      }
-    }
+  if (now - splashLastSpawn > splashNextSpawnDelay && splashBlooms.length < SPLASH_MAX_BLOOMS) {
+    splashBlooms.push(makeSplashBloom(now, 0));
+    splashLastSpawn = now;
+    splashNextSpawnDelay = SPLASH_SPAWN_MIN + Math.random() * (SPLASH_SPAWN_MAX - SPLASH_SPAWN_MIN);
   }
 
-  // nodes + cursor interaction — each draws in its own origin's hue,
-  // with a matching soft glow (restrained, not neon).
-  const heroRect = dom.hero.getBoundingClientRect();
-  const pointerX = state.target.x - heroRect.left;
-  const pointerY = state.target.y - heroRect.top;
-
-  neuralNodes.forEach((n) => {
-    if (n.alpha <= 0) return;
-    const color = palette[n.colorIndex % palette.length];
-    let r = n.r;
-    let alpha = 0.56 * n.alpha;
-
-    if (state.isInHero) {
-      const dist = Math.hypot(n.x - pointerX, n.y - pointerY);
-      if (dist < NEURAL_INTERACT_RADIUS) {
-        const strength = 1 - dist / NEURAL_INTERACT_RADIUS;
-        r = n.r + strength * 2.1;
-        alpha = (0.56 + strength * 0.34) * n.alpha;
-        neuralCtx.strokeStyle = `rgba(${line}, ${strength * 0.5 * n.alpha})`;
-        neuralCtx.lineWidth = 1;
-        neuralCtx.beginPath();
-        neuralCtx.moveTo(n.x, n.y);
-        neuralCtx.lineTo(pointerX, pointerY);
-        neuralCtx.stroke();
-      }
-    }
-
-    neuralCtx.shadowColor = `rgba(${color}, 0.55)`;
-    neuralCtx.shadowBlur = glowBlur + n.r * 0.6; // bigger nodes glow a touch more
-    neuralCtx.fillStyle = `rgba(${color}, ${alpha})`;
-    neuralCtx.beginPath();
-    neuralCtx.arc(n.x, n.y, r, 0, Math.PI * 2);
-    neuralCtx.fill();
-  });
-
-  neuralCtx.shadowBlur = 0;
+  splashBlooms = splashBlooms.filter((b) => drawSplashBloom(b, now, scrollY, isLight));
 }
 
-window.addEventListener('resize', debounce(() => {
-  if (state.neuralBurstPlayed) sizeNeuralCanvas();
-}, 150));
+function setupSplashField() {
+  if (!dom.splashCanvas) return;
+  // reducedMotion is a static OS-level setting (checked once, never
+  // changes this session) — skip the one-time build cost entirely for
+  // those users. quietMode is a live, user-toggleable setting instead
+  // (CSS already hides the canvas instantly; runBackgroundLoop's own
+  // gate skips drawing) — building anyway means toggling it back off
+  // mid-session resumes normally rather than staying permanently blank.
+  if (state.reducedMotion) return;
+  sizeSplashCanvas();
+  buildSplashLibrary();
+  seedInitialSplashBlooms(performance.now());
+
+  window.addEventListener('resize', debounce(() => {
+    sizeSplashCanvas();
+    computeSplashDocMetrics();
+  }, 150));
+  // Document height can change as images/fonts finish loading.
+  window.addEventListener('load', computeSplashDocMetrics);
+
+  setupSplashClickSpawn();
+}
+
+// A press on empty background — not on anything interactive — drops a
+// new splash right where the cursor/finger landed, growing noticeably
+// faster than the ambient ones since it's a direct reaction to the
+// press. `click` (rather than pointerdown) is deliberate: the browser
+// already suppresses it after a drag/text-selection gesture, so this
+// naturally ignores those without any extra bookkeeping.
+const SPLASH_CLICK_INTERACTIVE_SELECTOR =
+  'a, button, input, textarea, select, [role="button"], [tabindex]:not([tabindex="-1"]), .modal';
+
+function setupSplashClickSpawn() {
+  document.addEventListener('click', (e) => {
+    if (state.reducedMotion || state.quietMode || window.innerWidth < 768) return;
+    if (e.target.closest(SPLASH_CLICK_INTERACTIVE_SELECTOR)) return;
+
+    const pos = { x: e.clientX, y: e.clientY + window.scrollY };
+    const b = makeSplashBloom(performance.now(), 0, pos);
+    if (splashBlooms.length >= SPLASH_MAX_BLOOMS) splashBlooms.shift();
+    splashBlooms.push(b);
+  });
+}
+
 
 
 // Track whether user is in the hero section.
@@ -451,15 +539,13 @@ function setupHeroObserver() {
 
       // First time the hero is actually scrolled into view (usually via the
       // About tab, since setupBioTab() lands on Work by default) — play a
-      // one-time blur/scale settle-in on the glass card, together with
-      // the neural field's multi-origin burst.
+      // one-time blur/scale settle-in on the glass card.
       if (e.isIntersecting && !state.heroSettleInPlayed && !state.reducedMotion && !state.quietMode) {
         state.heroSettleInPlayed = true;
         dom.body.classList.add('intro-active');
         requestAnimationFrame(() => requestAnimationFrame(() => {
           dom.body.classList.remove('intro-active');
         }));
-        playNeuralBurst();
       }
     }),
     { threshold: 0 }
@@ -1956,6 +2042,7 @@ function init() {
   setupInteractiveAuroraBlobs();
   setupVibeBadge();
   setupResumeModal();
+  setupSplashField();
   updateQuietIcon();
 
   // Start the single animation loop

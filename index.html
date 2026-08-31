@@ -49,6 +49,11 @@
     <div class="aurora-layer"></div>
   </div>
 
+  <!-- Living watercolor splash field — spans the whole page (fixed,
+       document-coordinate blooms), so Hero and Work read as one
+       continuous background. See drawSplashField() in script.js. -->
+  <canvas class="splash-canvas" id="splash-canvas" aria-hidden="true"></canvas>
+
   <!-- Vibe badge fades on scroll -->
   <p class="vibe-badge" id="vibe-badge" aria-hidden="true">Vibe-coded with Claude in VSCode</p>
 
@@ -117,10 +122,6 @@
   <section class="hero-section" id="hero" aria-label="Introduction">
     <!-- Interactive aurora blobs container (behind glass card) -->
     <div class="aurora-blobs" id="aurora-blobs-container" aria-hidden="true"></div>
-
-    <!-- Multi-origin neural signal field — plays once on first hero
-         appearance (see playNeuralBurst() in script.js) -->
-    <canvas class="neural-canvas" id="neural-canvas" aria-hidden="true"></canvas>
 
     <div class="hero-content tilt-card" data-tilt-max="6">
 
