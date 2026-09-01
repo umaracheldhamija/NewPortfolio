@@ -306,6 +306,14 @@ html {
   /* scroll-behavior: smooth is set here as fallback;
      JS overrides with reduced-motion awareness */
   scroll-behavior: smooth;
+  /* Safety net: fixed-position elements (e.g. .accessibility-controls)
+     are positioned relative to the viewport itself, so they bypass
+     body's own overflow-x:clip below and can inflate the page's real
+     scrollWidth, forcing page-level horizontal scroll on narrow
+     viewports. This traps that at the root without touching any
+     element's own internal scrolling (.projects-grid keeps its
+     horizontal overflow-x:auto carousel working normally). */
+  overflow-x: hidden;
 }
 
 body {
@@ -2886,23 +2894,17 @@ footer {
 
   .nav-links a { font-size: var(--text-base); }
 
+  /* Removed entirely on mobile — the panel ate too much screen space
+     and its text labels ran past the viewport edge. Dark/motion/text-size
+     preferences remain reachable on desktop/tablet. */
   .accessibility-controls {
-    right: var(--sp-4);
-    top: 4.25rem;
-  }
-
-  /* Hide accessibility controls on mobile scroll to save space */
-  .accessibility-controls.hidden {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transform: translateX(calc(100% + var(--sp-6))) !important;
+    display: none !important;
   }
 
   .section {
     padding: var(--sp-16) var(--sp-4);
   }
 
-  .projects-grid,
   .writing-grid {
     grid-template-columns: 1fr;
   }
@@ -2965,6 +2967,16 @@ footer {
 
   .hero-content {
     padding: var(--sp-8) var(--sp-6);
+  }
+
+  /* .hero-section vertically centers .hero-content across its own box
+     (80svh, see section 20) — with no top clearance that centering can
+     land the name/title right under the fixed nav, cutting it off.
+     Nav is ~64-72px tall on mobile (matches #work's scroll-margin-top
+     below); push the centering zone down by that much plus breathing
+     room so the top of the card always clears it. */
+  .hero-section {
+    padding-top: calc(72px + var(--sp-6));
   }
 
   .modal-content {
@@ -3525,18 +3537,20 @@ body.large-text .control-label { font-size: 0.68rem; }
     width: 100%;
     box-sizing: border-box;
   }
+
+  /* Was a flat 280px — cramped the 3 bullet points + tags into a narrow
+     column and read as "squished." Scale with the viewport instead
+     (capped so it doesn't balloon on tablets), with the next card
+     still peeking in at the right edge as the "swipe for more" cue. */
   .project-card {
-    flex: 0 0 280px;
-    height: 620px;
+    flex: 0 0 86vw;
+    max-width: 340px;
+    height: 560px;
   }
 }
 
-@media (max-width: 480px) {
-  .project-card {
-    flex: 0 0 260px;
-    height: 640px;
-  }
-}
+/* No separate <480px override needed — the 86vw/340px rule above
+   already scales down proportionally on the smallest phones. */
 
 
 /* ============================================
@@ -3680,6 +3694,17 @@ body.large-text .control-label { font-size: 0.68rem; }
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+/* Stacked cards alone don't read as swipeable — the fanned edges are
+   subtle and the prev/next buttons are easy to miss on first glance
+   (reported unclear on both mobile and desktop). Spell it out. */
+.deck-hint {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  margin: 0 0 var(--sp-4);
 }
 
 .deck-controls {
