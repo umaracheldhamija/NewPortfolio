@@ -231,35 +231,62 @@ function runMagneticButtons() {
    itself never resizes or gets cut at a section edge. That's what
    makes Hero → Work feel continuous rather than fragmented.
 
-   All the expensive work — SVG feTurbulence/feDisplacementMap for
-   wet, deckled bleeding edges; layered multi-tone radial gradients
-   (teal/cyan/indigo/lavender); a desaturated turbulence pass for
-   paper grain; scattered salt speckles; satellite splatter droplets
-   — happens ONCE per design, at load, building an SVG string and
-   rasterizing it into an Image (see buildSplashLibrary()). The
-   per-frame draw never touches turbulence or gradients again:
-   growing/fading a bloom is one drawImage() call with a scale and
-   alpha, same cost as any other canvas sprite. Drawn from inside
+   All the expensive work — SVG feTurbulence/feDisplacementMap for the
+   wet, deckled bleeding edge; layered multi-tone radial pigments; a
+   desaturated turbulence pass for paper grain; salt speckles;
+   satellite splatter droplets — happens ONCE per design, and once per
+   colourway (teal/cyan → periwinkle → indigo/lavender), building an
+   SVG string and rasterizing it into an Image. That build is sliced
+   across requestIdleCallback (buildSplashLibrary()) so it never blocks
+   load or first interaction. The per-frame draw never touches
+   turbulence or gradients again: a bloom is two drawImage() calls —
+   the two bracketing colourways, cross-fading as it expands so the
+   pigment appears to shift hue. Drawn from inside
    runBackgroundLoop(), so it inherits the same quiet-mode /
    reduced-motion / mobile guards as everything else there.
    ============================================ */
 
-const SPLASH_TEAL = '#1F9E93', SPLASH_CYAN = '#3FC6E0', SPLASH_INDIGO = '#4A3F9E', SPLASH_LAVENDER = '#B49CE8';
-const SPLASH_ART_SIZE = 460; // viewBox units — see buildSplashSVG()
-const SPLASH_DESIGN_COUNT = 8;
-// The ambient system keeps its own presence low (idle default is 1–2
-// splashes) — a separate, higher ceiling only exists so a click can
-// still add one on top without being blocked by the ambient cap; those
-// extras just fade back out on their own normal lifecycle afterward.
+// Each geometry is rasterized once per colourway; a bloom cross-fades
+// along this list as it expands, so the pigment appears to shift hue
+// (teal → cyan → periwinkle → lavender) while it spreads. All three
+// share turbulence geometry, so the cross-fade is pixel-aligned — a
+// colour morph, not a visible double image.
+const SPLASH_COLORWAYS = [
+  ['#1F9E93', '#3FC6E0', '#37B4C6', '#5EC6D6'], // teal / cyan
+  ['#3FC6E0', '#57A9DA', '#6E90CF', '#7E8AC9'], // cyan / periwinkle
+  ['#584FAF', '#7A6AC8', '#9B86DA', '#B49CE8'], // indigo / lavender
+];
+const SPLASH_ART_SIZE = 460;  // viewBox units — see renderSplashSVG()
+const SPLASH_RASTER   = 540;  // px the SVG is rasterized at (kept modest — blooms
+                              // are heavily blurred, so upscaling is invisible and
+                              // smaller sprites keep the per-frame draw cheap)
+const SPLASH_DESIGN_COUNT = 4;
+
+// Final on-screen ink strength. Deliberately low — the field is a tonal
+// haze, not paint. Bump these two if it reads too faint.
+const SPLASH_PEAK_DARK  = 0.30;
+const SPLASH_PEAK_LIGHT = 0.36;
+const SPLASH_START_SCALE = 0.34; // ambient blooms open from here, never a hard dot
+const SPLASH_CREEP_CAP   = 1.7;  // how far past full size a bloom keeps wicking
+
+// A click lands a small, saturated drop that sits for a beat, then
+// releases outward and dilutes into the ambient field.
+const SPLASH_CLICK_START_SCALE = 0.10;
+const SPLASH_CLICK_PUNCH_MS    = 620;  // how long the concentrated drop lasts
+const SPLASH_CLICK_PUNCH_AMP   = 2.6;  // peak alpha multiplier at the moment of impact
+
+// The ambient system keeps its presence low — a separate, higher
+// ceiling only exists so a click can still add one on top without being
+// blocked by the ambient cap; those extras fade out on their own after.
 const SPLASH_AMBIENT_MAX = 2;
-const SPLASH_MAX_BLOOMS = 6;
-const SPLASH_SPAWN_MIN = 2200, SPLASH_SPAWN_MAX = 4000;
+const SPLASH_MAX_BLOOMS = 5;
+const SPLASH_SPAWN_MIN = 4500, SPLASH_SPAWN_MAX = 9000;
 
 let splashCtx = null;
 let splashW = 0, splashH = 0, splashDPR = 1;
 let splashDocHeight = 0;
 let splashHeroWorkBottom = 0; // px from document top to bottom of #work — the "landing" zone
-let splashImages = []; // { img, ready }
+let splashImages = []; // { imgs: [colorway Image, ...], ready }
 let splashBlooms = [];
 let splashLastSpawn = 0;
 let splashNextSpawnDelay = 0;
@@ -269,7 +296,9 @@ function splashRnd(min, max) { return min + Math.random() * (max - min); }
 function sizeSplashCanvas() {
   if (!dom.splashCanvas) return;
   if (!splashCtx) splashCtx = dom.splashCanvas.getContext('2d');
-  splashDPR = Math.min(window.devicePixelRatio || 1, 2);
+  // Cap at 1.5 — the field is soft/blurred, so full retina backing store
+  // buys nothing visible and just makes every drawImage fill more pixels.
+  splashDPR = Math.min(window.devicePixelRatio || 1, 1.5);
   splashW = window.innerWidth;
   splashH = window.innerHeight;
   dom.splashCanvas.width = splashW * splashDPR;
@@ -284,92 +313,141 @@ function computeSplashDocMetrics() {
   splashHeroWorkBottom = dom.work ? (dom.work.offsetTop + dom.work.offsetHeight) : splashDocHeight * 0.4;
 }
 
-function buildSplashSVG(seed) {
+// One design = a fixed set of overlapping ellipses + a fixed turbulence
+// seed. renderSplashSVG() paints that same geometry in a given colourway;
+// building all colourways off ONE geometry is what lets the runtime
+// cross-fade between them without ghosting.
+function buildSplashGeometry(seed) {
   const size = SPLASH_ART_SIZE;
-  const cx = size * splashRnd(0.42, 0.5), cy = size * splashRnd(0.42, 0.5);
-  const maxR = size * splashRnd(0.3, 0.35);
-  const fId = `sf${seed}`, gId = `sg${seed}`, grainId = `sgrain${seed}`, clipId = `sclip${seed}`;
+  const cx = size * splashRnd(0.44, 0.5), cy = size * splashRnd(0.44, 0.5);
+  const maxR = size * splashRnd(0.30, 0.36);
 
-  const e1 = { cx: cx - maxR * 0.12, cy: cy - maxR * 0.08, rx: maxR * 1.0, ry: maxR * 0.86 };
-  const e2 = { cx: cx + maxR * 0.22, cy: cy + maxR * 0.18, rx: maxR * 0.82, ry: maxR * 0.7 };
-
-  // Salt speckles — crisp, small, NOT run through the turbulence filter
-  let speckles = '';
-  const speckleCount = 24 + Math.floor(Math.random() * 16);
+  // Salt speckles — crisp white flecks scattered across the wash, NOT
+  // run through the turbulence filter. Fixed here so all three
+  // colourways of this design carry the exact same texture.
+  const speckles = [];
+  const speckleCount = 22 + Math.floor(Math.random() * 14);
   for (let i = 0; i < speckleCount; i++) {
-    const a = Math.random() * Math.PI * 2, d = Math.random() * maxR * 0.75;
-    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * 0.85;
-    speckles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${splashRnd(0.6, 2.2).toFixed(1)}" fill="#FFFFFF" fill-opacity="${splashRnd(0.25, 0.65).toFixed(2)}"/>`;
+    const a = Math.random() * Math.PI * 2, d = Math.random() * maxR * 0.78;
+    speckles.push({
+      x: cx + Math.cos(a) * d,
+      y: cy + Math.sin(a) * d * 0.85,
+      r: splashRnd(0.6, 2.2),
+      o: splashRnd(0.2, 0.55),
+    });
   }
 
-  // Satellite splatter droplets around the perimeter — mostly small,
-  // a few medium — same turbulence filter so their edges match.
-  let satellites = '';
-  const satCount = 10 + Math.floor(Math.random() * 7);
-  const satColors = [SPLASH_TEAL, SPLASH_CYAN, SPLASH_INDIGO, SPLASH_LAVENDER];
+  // Satellite splatter droplets around the perimeter — same turbulence
+  // filter as the main body so their edges match. colourIdx picks which
+  // colourway slot they take, so they shift hue with the wash.
+  const satellites = [];
+  const satCount = 9 + Math.floor(Math.random() * 6);
   for (let i = 0; i < satCount; i++) {
-    const a = Math.random() * Math.PI * 2, d = maxR * splashRnd(0.9, 1.55);
-    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * 0.9;
-    const r = Math.random() < 0.75 ? splashRnd(2, 6) : splashRnd(7, 13);
-    const c = satColors[Math.floor(Math.random() * satColors.length)];
-    satellites += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${r.toFixed(1)}" ry="${(r * splashRnd(0.7, 1)).toFixed(1)}" fill="${c}" fill-opacity="${splashRnd(0.25, 0.5).toFixed(2)}" filter="url(#${fId})"/>`;
+    const a = Math.random() * Math.PI * 2, d = maxR * splashRnd(0.95, 1.6);
+    const r = Math.random() < 0.78 ? splashRnd(2, 6) : splashRnd(7, 12);
+    satellites.push({
+      x: cx + Math.cos(a) * d,
+      y: cy + Math.sin(a) * d * 0.9,
+      rx: r,
+      ry: r * splashRnd(0.7, 1),
+      ci: Math.floor(Math.random() * 4),
+      o: splashRnd(0.22, 0.46),
+    });
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}">
+  return {
+    seed,
+    e1: { cx: cx - maxR * 0.10, cy: cy - maxR * 0.06, rx: maxR * 1.00, ry: maxR * 0.88 },
+    e2: { cx: cx + maxR * 0.20, cy: cy + maxR * 0.16, rx: maxR * 0.84, ry: maxR * 0.72 },
+    e3: { cx: cx + maxR * 0.14, cy: cy - maxR * 0.22, rx: maxR * 0.74, ry: maxR * 0.70 },
+    e4: { cx: cx - maxR * 0.24, cy: cy + maxR * 0.12, rx: maxR * 0.66, ry: maxR * 0.62 },
+    freqX: splashRnd(0.009, 0.014),
+    freqY: splashRnd(0.013, 0.019),
+    dispScale: splashRnd(34, 46),
+    speckles,
+    satellites,
+  };
+}
+
+// A single soft wash — layered radial pigments, one wet deckled edge
+// (feTurbulence + feDisplacementMap), satellite splatter droplets, salt
+// speckles, and a whisper of paper grain.
+function renderSplashSVG(g, colors) {
+  const size = SPLASH_ART_SIZE;
+  const s = g.seed;
+  const grad = (id, c, cxp, cyp, r, o0) => `
+      <radialGradient id="${id}" cx="${cxp}%" cy="${cyp}%" r="${r}%">
+        <stop offset="0%" stop-color="${c}" stop-opacity="${o0}"/>
+        <stop offset="52%" stop-color="${c}" stop-opacity="${(o0 * 0.42).toFixed(3)}"/>
+        <stop offset="100%" stop-color="${c}" stop-opacity="0"/>
+      </radialGradient>`;
+  const ell = (e, id) => `<ellipse cx="${e.cx.toFixed(1)}" cy="${e.cy.toFixed(1)}" rx="${e.rx.toFixed(1)}" ry="${e.ry.toFixed(1)}" fill="url(#${id})"/>`;
+
+  const satelliteEls = g.satellites.map((sp) =>
+    `<ellipse cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" rx="${sp.rx.toFixed(1)}" ry="${sp.ry.toFixed(1)}" fill="${colors[sp.ci]}" fill-opacity="${sp.o.toFixed(2)}" filter="url(#f${s})"/>`
+  ).join('');
+  const speckleEls = g.speckles.map((sp) =>
+    `<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${sp.r.toFixed(1)}" fill="#FFFFFF" fill-opacity="${sp.o.toFixed(2)}"/>`
+  ).join('');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SPLASH_RASTER}" height="${SPLASH_RASTER}" viewBox="0 0 ${size} ${size}">
     <defs>
-      <filter id="${fId}" x="-60%" y="-60%" width="220%" height="220%">
-        <feTurbulence type="fractalNoise" baseFrequency="${splashRnd(0.011, 0.016).toFixed(4)} ${splashRnd(0.016, 0.022).toFixed(4)}" numOctaves="4" seed="${seed}" result="n"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="${splashRnd(38, 52).toFixed(0)}" xChannelSelector="R" yChannelSelector="G"/>
-        <feGaussianBlur stdDeviation="1.6"/>
+      <filter id="f${s}" x="-80%" y="-80%" width="260%" height="260%">
+        <feTurbulence type="fractalNoise" baseFrequency="${g.freqX.toFixed(4)} ${g.freqY.toFixed(4)}" numOctaves="4" seed="${s}" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="${g.dispScale.toFixed(0)}" xChannelSelector="R" yChannelSelector="G"/>
+        <feGaussianBlur stdDeviation="2.6"/>
       </filter>
-      <filter id="${grainId}" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${seed + 50}" result="grain"/>
+      <filter id="grain${s}" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${s + 40}" result="grain"/>
         <feColorMatrix in="grain" type="saturate" values="0"/>
       </filter>
-      <radialGradient id="${gId}-teal" cx="35%" cy="35%" r="75%">
-        <stop offset="0%" stop-color="${SPLASH_TEAL}" stop-opacity="0.65"/>
-        <stop offset="55%" stop-color="${SPLASH_TEAL}" stop-opacity="0.32"/>
-        <stop offset="100%" stop-color="${SPLASH_TEAL}" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="${gId}-cyan" cx="65%" cy="30%" r="70%">
-        <stop offset="0%" stop-color="${SPLASH_CYAN}" stop-opacity="0.5"/>
-        <stop offset="55%" stop-color="${SPLASH_CYAN}" stop-opacity="0.24"/>
-        <stop offset="100%" stop-color="${SPLASH_CYAN}" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="${gId}-indigo" cx="55%" cy="70%" r="70%">
-        <stop offset="0%" stop-color="${SPLASH_INDIGO}" stop-opacity="0.55"/>
-        <stop offset="55%" stop-color="${SPLASH_INDIGO}" stop-opacity="0.28"/>
-        <stop offset="100%" stop-color="${SPLASH_INDIGO}" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="${gId}-lav" cx="30%" cy="65%" r="65%">
-        <stop offset="0%" stop-color="${SPLASH_LAVENDER}" stop-opacity="0.4"/>
-        <stop offset="60%" stop-color="${SPLASH_LAVENDER}" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="${SPLASH_LAVENDER}" stop-opacity="0"/>
-      </radialGradient>
-      <clipPath id="${clipId}">
-        <ellipse cx="${e1.cx}" cy="${e1.cy}" rx="${e1.rx}" ry="${e1.ry}" filter="url(#${fId})"/>
+      ${grad(`g${s}a`, colors[0], 36, 34, 78, 0.80)}
+      ${grad(`g${s}b`, colors[1], 64, 40, 70, 0.60)}
+      ${grad(`g${s}c`, colors[2], 52, 66, 70, 0.58)}
+      ${grad(`g${s}d`, colors[3], 34, 60, 64, 0.48)}
+      <clipPath id="clip${s}">
+        <ellipse cx="${g.e1.cx.toFixed(1)}" cy="${g.e1.cy.toFixed(1)}" rx="${(g.e1.rx * 1.1).toFixed(1)}" ry="${(g.e1.ry * 1.1).toFixed(1)}" filter="url(#f${s})"/>
       </clipPath>
     </defs>
-    ${satellites}
-    <g filter="url(#${fId})">
-      <ellipse cx="${e1.cx}" cy="${e1.cy}" rx="${e1.rx}" ry="${e1.ry}" fill="url(#${gId}-teal)"/>
-      <ellipse cx="${e2.cx}" cy="${e2.cy}" rx="${e2.rx}" ry="${e2.ry}" fill="url(#${gId}-indigo)"/>
-      <ellipse cx="${e1.cx + maxR * 0.15}" cy="${e1.cy - maxR * 0.2}" rx="${e1.rx * 0.75}" ry="${e1.ry * 0.75}" fill="url(#${gId}-cyan)"/>
-      <ellipse cx="${e2.cx - maxR * 0.2}" cy="${e2.cy + maxR * 0.1}" rx="${e2.rx * 0.7}" ry="${e2.ry * 0.7}" fill="url(#${gId}-lav)"/>
+    ${satelliteEls}
+    <g filter="url(#f${s})">
+      ${ell(g.e1, `g${s}a`)}
+      ${ell(g.e2, `g${s}c`)}
+      ${ell(g.e3, `g${s}b`)}
+      ${ell(g.e4, `g${s}d`)}
     </g>
-    <rect x="0" y="0" width="${size}" height="${size}" filter="url(#${grainId})" opacity="0.05" clip-path="url(#${clipId})"/>
-    <g clip-path="url(#${clipId})">${speckles}</g>
+    <rect x="0" y="0" width="${size}" height="${size}" filter="url(#grain${s})" opacity="0.055" clip-path="url(#clip${s})"/>
+    <g clip-path="url(#clip${s})">${speckleEls}</g>
   </svg>`;
 }
 
+function buildSplashDesign(i) {
+  const g = buildSplashGeometry(11 + i * 17);
+  const entry = { imgs: [], ready: false, _loaded: 0 };
+  SPLASH_COLORWAYS.forEach((colors) => {
+    const img = new Image();
+    img.onload = () => {
+      entry._loaded++;
+      if (entry._loaded === SPLASH_COLORWAYS.length) entry.ready = true;
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(renderSplashSVG(g, colors));
+    entry.imgs.push(img);
+  });
+  splashImages.push(entry);
+}
+
+// Build the first design synchronously so there's always something to
+// draw immediately, then rasterize the rest in one idle slice off the
+// critical path. feTurbulence rasterization is the only expensive bit
+// and it's decoded off-thread once the <img src> is set; blooms whose
+// design isn't ready yet just wait a frame (drawSplashBloom guards).
 function buildSplashLibrary() {
-  for (let i = 0; i < SPLASH_DESIGN_COUNT; i++) {
-    const svg = buildSplashSVG(10 + i * 17);
-    const entry = { img: new Image(), ready: false };
-    entry.img.onload = () => { entry.ready = true; };
-    entry.img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    splashImages.push(entry);
-  }
+  buildSplashDesign(0);
+  const rest = () => {
+    for (let i = 1; i < SPLASH_DESIGN_COUNT; i++) buildSplashDesign(i);
+  };
+  if (window.requestIdleCallback) window.requestIdleCallback(rest, { timeout: 800 });
+  else setTimeout(rest, 120);
 }
 
 // pos: optional {x, y} in WORLD coordinates (document-relative — see
@@ -381,31 +459,52 @@ function makeSplashBloom(now, ageOffsetMs, pos) {
     worldX = pos.x;
     worldY = pos.y;
   } else {
-    // 65% of spawns land within the hero+work "landing" zone — the
-    // part of the page actually seen by default (setupBioTab() lands
-    // on Work) — the rest scatter across the remaining sections.
-    const inLanding = Math.random() < 0.65;
+    // ~45% land in the hero+work "landing" zone (seen by default —
+    // setupBioTab() lands on Work); the rest spread across every other
+    // section so no part of the page feels empty.
+    const inLanding = Math.random() < 0.45;
     worldY = inLanding
       ? Math.random() * splashHeroWorkBottom
       : splashHeroWorkBottom + Math.random() * Math.max(1, splashDocHeight - splashHeroWorkBottom);
 
-    // Bias X away from dead-center, toward the outer thirds, so blooms
-    // read as background rather than sitting under text.
-    worldX = (Math.random() < 0.5 ? Math.random() * 0.34 : 0.66 + Math.random() * 0.34) * splashW;
+    // Near full-width now — the ink is faint enough to sit under text —
+    // with only a slight margin so blooms rarely clip hard at the edge.
+    worldX = splashRnd(0.06, 0.94) * splashW;
   }
 
+  const N = SPLASH_COLORWAYS.length;
+  const isClick = !!pos;
   return {
     worldX, worldY,
-    design: splashImages[Math.floor(Math.random() * splashImages.length)],
+    isClick,
+    // gentle positional drift over the whole life (px), so the wash
+    // feels like it's still settling into the paper, never static.
+    // A click drifts less — it's anchored to where you pressed.
+    driftX: splashRnd(-44, 44) * (isClick ? 0.4 : 1),
+    driftY: splashRnd(-30, 30) * (isClick ? 0.4 : 1),
+    // May be null if the library hasn't finished its idle build yet —
+    // drawSplashBloom assigns one lazily once designs are available.
+    design: splashImages.length
+      ? splashImages[Math.floor(Math.random() * splashImages.length)]
+      : null,
     rotation: splashRnd(0, Math.PI * 2),
     flipX: Math.random() < 0.5 ? -1 : 1,
-    displaySize: 340 + Math.random() * 260, // final on-screen diameter, px
+    // final on-screen diameter, px — clicks resolve a touch smaller so
+    // the initial drop reads as concentrated, not a wide splash.
+    displaySize: isClick ? 460 + Math.random() * 260 : 540 + Math.random() * 420,
+    startScale: isClick ? SPLASH_CLICK_START_SCALE : SPLASH_START_SCALE,
     born: now - ageOffsetMs,
+    // Where along the colourway list the pigment starts, and how far it
+    // drifts (signed) as it expands — this is the "colours mix" effect.
+    // A click starts pinned to the most saturated colourway (0) and
+    // always drifts toward the paler end as it spreads and dilutes.
+    colorPhase: isClick ? 0 : Math.random() * (N - 1),
+    colorDrift: isClick ? splashRnd(1.3, 1.9) : (Math.random() < 0.5 ? -1 : 1) * splashRnd(0.7, 1.5),
     // A click reacts faster than the slow ambient wind-up — feels like
     // a direct response to the press, not a coincidence.
-    growMs: pos ? 800 + Math.random() * 350 : 2200 + Math.random() * 700,
-    holdMs: 3400 + Math.random() * 2400,
-    fadeMs: 2600 + Math.random() * 1000,
+    growMs: isClick ? 1850 + Math.random() * 850 : 5600 + Math.random() * 3000,
+    holdMs: isClick ? 3200 + Math.random() * 2000 : 6000 + Math.random() * 4500,
+    fadeMs: isClick ? 3000 + Math.random() * 1400 : 4200 + Math.random() * 1800,
   };
 }
 
@@ -418,7 +517,11 @@ function seedInitialSplashBlooms(now) {
   // clicks to add, not the page itself.
   for (let i = 0; i < SPLASH_AMBIENT_MAX; i++) {
     const b = makeSplashBloom(now, 0);
-    b.born = now - i * 320;
+    // Modest stagger — the field opens with one wash mid-spread and one
+    // just starting, rather than all in unison. Kept small so a seeded
+    // bloom never lands already deep in its fade if the library takes a
+    // moment to decode.
+    b.born = now - i * splashRnd(900, 2600);
     splashBlooms.push(b);
   }
   splashLastSpawn = now;
@@ -426,46 +529,102 @@ function seedInitialSplashBlooms(now) {
 }
 
 // Returns false once the bloom's full lifecycle (grow+hold+fade) is
-// over. The heavy lifting already happened in buildSplashSVG() — this
-// is just one drawImage() per bloom, scaled/faded per its lifecycle.
+// over. The heavy lifting already happened in renderSplashSVG() — this
+// is two drawImage() calls per bloom (cross-fading colourways), scaled
+// and faded per its lifecycle.
 function drawSplashBloom(b, now, scrollY, isLight) {
   const age = now - b.born;
   const total = b.growMs + b.holdMs + b.fadeMs;
   if (age > total) return false;
-  if (!b.design.ready) return true; // not decoded yet — try again next frame
+  if (!b.design) {
+    if (!splashImages.length) return true; // idle build hasn't produced one yet
+    b.design = splashImages[Math.floor(Math.random() * splashImages.length)];
+  }
+  if (!b.design.ready) return true; // colourways not all decoded yet
 
-  // Scale is never flat: a fast initial spread (0 -> 1, ink hitting the
-  // surface), then it KEEPS creeping outward the rest of its life —
-  // slower and slower, like water continuing to wick into paper
-  // fibers, only truly stopping once it starts to fade.
-  const SPLASH_CREEP_CAP = 1.3;
+  // How far through the "settling" part of life (everything after the
+  // initial spread) — drives the slow creep AND the colour drift.
+  const settleT = age < b.growMs
+    ? 0
+    : Math.min(1, (age - b.growMs) / (b.holdMs + b.fadeMs));
+
+  // Scale. A click first lands as a concentrated DROP: for the punch
+  // window it barely swells (ease-in, building tension), then releases
+  // and spreads to full size, then — like every bloom — keeps wicking
+  // outward slowly for the rest of its life. Water never really stops
+  // creeping into paper until the pigment itself is gone.
+  const CLICK_DROP_SCALE = 0.20; // size the drop reaches before it releases
   let scale;
-  if (age < b.growMs) {
-    const t = age / b.growMs;
-    scale = 1 - Math.pow(1 - t, 3); // fast ease-out spread
+  if (b.isClick && age < SPLASH_CLICK_PUNCH_MS) {
+    const t = age / SPLASH_CLICK_PUNCH_MS;
+    scale = b.startScale + (CLICK_DROP_SCALE - b.startScale) * (t * t);
+  } else if (age < b.growMs) {
+    const base = b.isClick ? CLICK_DROP_SCALE : b.startScale;
+    const t = b.isClick
+      ? (age - SPLASH_CLICK_PUNCH_MS) / (b.growMs - SPLASH_CLICK_PUNCH_MS)
+      : age / b.growMs;
+    scale = base + (1 - base) * (1 - Math.pow(1 - t, 3));
   } else {
-    const creepT = Math.min(1, (age - b.growMs) / b.holdMs);
-    const eased = 1 - Math.pow(1 - creepT, 1.6); // gentle, stretched ease
+    const eased = 1 - Math.pow(1 - settleT, 2.8); // long, stretched ease-out
     scale = 1 + (SPLASH_CREEP_CAP - 1) * eased;
   }
 
   let alpha;
-  if (age < b.growMs) alpha = age / b.growMs;
-  else if (age < b.growMs + b.holdMs) alpha = 1;
-  else alpha = 1 - (age - b.growMs - b.holdMs) / b.fadeMs;
+  if (b.isClick) {
+    // Snaps in fast (it's a direct reaction to the press), holds, fades.
+    const fadeStart = b.growMs + b.holdMs;
+    if (age < 110) alpha = age / 110;
+    else if (age < fadeStart) alpha = 1;
+    else alpha = 1 - (age - fadeStart) / b.fadeMs;
+  } else if (age < b.growMs) {
+    alpha = age / b.growMs;
+  } else if (age < b.growMs + b.holdMs) {
+    alpha = 1;
+  } else {
+    alpha = 1 - (age - b.growMs - b.holdMs) / b.fadeMs;
+  }
+  alpha = Math.max(0, alpha);
+
+  const lifeT = age / total;
+  const dx = b.driftX * lifeT;
+  const dy = b.driftY * lifeT;
 
   const halfDisplay = (b.displaySize * scale) / 2;
-  const cy = b.worldY - scrollY;
-  if (cy + halfDisplay < -60 || cy - halfDisplay > splashH + 60) return true; // alive, off-screen
+  const cy = b.worldY - scrollY + dy;
+  if (cy + halfDisplay < -100 || cy - halfDisplay > splashH + 100) return true; // alive, off-screen
 
-  const peak = isLight ? 0.85 : 0.7;
+  // Colour mix: the phase walks along SPLASH_COLORWAYS as the bloom
+  // opens and settles; the two bracketing colourways cross-fade, so the
+  // pigment appears to shift hue while it spreads. Same geometry +
+  // turbulence seed in every colourway → a true morph, no ghost edge.
+  const N = b.design.imgs.length;
+  const spreadT = age < b.growMs ? (age / b.growMs) * 0.4 : 0.4 + 0.6 * settleT;
+  let phase = b.colorPhase + b.colorDrift * spreadT;
+  phase = Math.max(0, Math.min(N - 1 - 1e-4, phase));
+  const idx = Math.floor(phase);
+  const frac = phase - idx;
+  const imgA = b.design.imgs[idx];
+  const imgB = b.design.imgs[Math.min(N - 1, idx + 1)];
+
+  let peak = isLight ? SPLASH_PEAK_LIGHT : SPLASH_PEAK_DARK;
+  if (b.isClick) {
+    // Saturated at the moment of impact, decaying to the ambient level
+    // as the drop releases and dilutes into the field.
+    const pd = Math.max(0, 1 - age / SPLASH_CLICK_PUNCH_MS);
+    peak *= 1 + SPLASH_CLICK_PUNCH_AMP * pd * pd;
+  }
+  const half = b.displaySize / 2;
+
   splashCtx.save();
-  splashCtx.globalAlpha = Math.max(0, alpha) * peak;
-  splashCtx.translate(b.worldX, cy);
+  splashCtx.translate(b.worldX + dx, cy);
   splashCtx.rotate(b.rotation);
   splashCtx.scale(b.flipX * scale, scale);
-  const half = b.displaySize / 2;
-  splashCtx.drawImage(b.design.img, -half, -half, b.displaySize, b.displaySize);
+  splashCtx.globalAlpha = Math.min(1, alpha * peak * (1 - frac));
+  splashCtx.drawImage(imgA, -half, -half, b.displaySize, b.displaySize);
+  if (frac > 0.001 && imgB !== imgA) {
+    splashCtx.globalAlpha = Math.min(1, alpha * peak * frac);
+    splashCtx.drawImage(imgB, -half, -half, b.displaySize, b.displaySize);
+  }
   splashCtx.restore();
 
   return true;
@@ -479,7 +638,7 @@ function drawSplashField(now) {
   const isLight = dom.html.getAttribute('data-theme') === 'light';
 
   // Ambient auto-spawn only tops back up to SPLASH_AMBIENT_MAX (the
-  // idle 1–2 baseline) — it will never grow the count past that on
+  // idle baseline) — it will never grow the count past that on
   // its own. Clicking is the only thing that pushes past it (see
   // setupSplashClickSpawn(), which checks the higher SPLASH_MAX_BLOOMS
   // ceiling instead) — those extras just fade out normally afterward.
