@@ -3696,17 +3696,6 @@ body.large-text .control-label { font-size: 0.68rem; }
   letter-spacing: 0.06em;
 }
 
-/* Stacked cards alone don't read as swipeable — the fanned edges are
-   subtle and the prev/next buttons are easy to miss on first glance
-   (reported unclear on both mobile and desktop). Spell it out. */
-.deck-hint {
-  text-align: center;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-  margin: 0 0 var(--sp-4);
-}
-
 .deck-controls {
   display: flex;
   align-items: center;
