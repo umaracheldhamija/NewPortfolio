@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Care2Care: a support app for caregivers of gynaecological oncology patients at UPMC Magee-Womens Hospital. A case study by Uma Dhamija.">
+  <meta name="theme-color" content="#F5F4F0">
+  <title>Care2Care · Uma Dhamija</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/css/story.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" fetchpriority="high" href="/images/UPMC-logo.jpg">
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+
+  <!-- Safety net for the card morph: if a browser shows the page before
+       the story has been built (no support for blocking="render"),
+       skip the morph and fade in instead of animating into nothing. -->
+  <script>
+    addEventListener('pagereveal', function (e) {
+      if (e.viewTransition && !document.querySelector('.st-card')) {
+        e.viewTransition.skipTransition();
+        document.documentElement.classList.add('st-fade-in');
+      }
+    });
+  </script>
+  <!-- This case study's content, then the story engine that builds the
+       page from it. blocking="render" holds the first frame until the
+       story exists, so the homepage card can morph into it. -->
+  <script defer blocking="render" src="/case-studies/care2care.js"></script>
+  <script defer blocking="render" src="/js/story.js"></script>
+</head>
+
+<body data-project="care2care">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="cursor-dot" aria-hidden="true"></div>
+
+  <div class="bg-layer" aria-hidden="true">
+    <div class="storm-base"></div>
+    <div class="storm-reveal" id="storm-reveal"></div>
+    <div class="aurora-layer"></div>
+  </div>
+
+  <div class="accessibility-controls" aria-label="Accessibility settings">
+    <button class="control-btn" id="theme-toggle" aria-label="Switch to dark mode">
+      <i class="fas fa-moon" aria-hidden="true"></i>
+      <span class="control-label">Dark</span>
+    </button>
+    <button class="control-btn" id="quiet-toggle" aria-label="Pause animations">
+      <i class="fas fa-pause" aria-hidden="true"></i>
+      <span class="control-label">Motion</span>
+    </button>
+    <button class="control-btn" id="text-size-toggle" aria-label="Increase text size">
+      <i class="fas fa-text-height" aria-hidden="true"></i>
+      <span class="control-label">Text size</span>
+    </button>
+  </div>
+
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-container">
+      <a href="/#hero" class="nav-logo">Uma Dhamija</a>
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        aria-controls="nav-links"
+        aria-expanded="false"
+        aria-label="Open navigation menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links" role="list">
+        <li><a href="/#hero">Home</a></li>
+        <li><a href="/#work" aria-current="true">Work</a></li>
+        <li><a href="/#explorations">Explorations</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- The whole case study is built from case-studies/care2care.js -->
+  <main class="story" id="main-content" data-story="care2care" data-root="/"></main>
+  <noscript>
+    <p style="padding: 8rem 1.5rem; text-align: center;">This case study needs JavaScript. <a href="/#work">Back to work</a></p>
+  </noscript>
+
+  <footer>
+    <div class="footer-content">
+      <p class="footer-name">Uma Dhamija</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="https://github.com/umaracheldhamija" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/umadhamija" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://medium.com/@umaracheldhamija" target="_blank" rel="noopener noreferrer">Medium</a>
+        <button type="button" class="footer-resume-btn" data-action="view-resume" aria-label="View resume">View Resume</button>
+      </nav>
+      <p class="footer-copy">&copy; 2026 Uma Dhamija.</p>
+    </div>
+  </footer>
+
+  <script defer src="/script.js"></script>
+  <script>
+    (() => {
+
+      // ─── Easter egg ─────────────────────────────
+      const styleId = 'project-page-easter-egg-styles';
+      const poemLines = {
+        privacy: [
+          "privacy is not",
+          "the absence of data.",
+          "it's the presence",
+          "of control."
+        ],
+        website: [
+          "how you do one thing",
+          "is how you do everything"
+        ],
+        random: [
+          "ah, you found me",
+          "hidden in the quiet hours",
+          "where the shadows stretch and fold,",
+          "among the limitless, pressed-in pixels,",
+          "and the stories left untold."
+        ]
+      };
+      const secretPalette = ['var(--pastel-1)', 'var(--pastel-2)', 'var(--pastel-3)', 'var(--pastel-4)', 'var(--pastel-5)', 'var(--pastel-6)'];
+      let typedBuffer = '';
+      let cursorX = window.innerWidth / 2;
+      let cursorY = window.innerHeight / 2;
+      let activePoemOverlay = null;
+      let poemEscapeHandler = null;
+
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          @keyframes ripple-out {
+            0% { transform: scale(0); opacity: 0.7; }
+            100% { transform: scale(4); opacity: 0; }
+          }
+          @keyframes fadeInLine {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .easter-poem-overlay {
+            position: fixed; inset: 0; z-index: 10000;
+            background: color-mix(in srgb, var(--shade) 92%, transparent);
+            display: flex; align-items: center; justify-content: center; padding: 2rem;
+          }
+          .easter-poem-content {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 0.2rem; text-align: center;
+          }
+          .easter-poem-line {
+            opacity: 0; color: var(--on-shade); font-size: 1.4rem;
+            line-height: 2.2; font-style: italic;
+            animation: fadeInLine 0.8s ease forwards;
+          }
+          .easter-poem-close {
+            position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+            font-size: 0.75rem; opacity: 0.4; color: var(--on-shade);
+          }
+          .secret-ripple {
+            width: 120px; height: 120px; border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            animation: ripple-out 2s ease-out forwards; transform-origin: center center;
+          }
+          .secret-found-note {
+            position: fixed; left: 50%; bottom: 2rem; transform: translateX(-50%);
+            font-size: 0.85rem; font-style: italic; color: var(--text-secondary);
+            opacity: 0; transition: opacity 0.4s ease; z-index: 9999; pointer-events: none;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      const closePoemOverlay = () => {
+        if (!activePoemOverlay) return;
+        activePoemOverlay.remove();
+        activePoemOverlay = null;
+        if (poemEscapeHandler) {
+          document.removeEventListener('keydown', poemEscapeHandler);
+          poemEscapeHandler = null;
+        }
+      };
+
+      const openPoemOverlay = (poemKey) => {
+        const lines = poemLines[poemKey];
+        if (!lines) return;
+        closePoemOverlay();
+        const overlay = document.createElement('div');
+        overlay.className = 'easter-poem-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        const content = document.createElement('div');
+        content.className = 'easter-poem-content';
+        lines.forEach((line, i) => {
+          const el = document.createElement('p');
+          el.className = 'easter-poem-line';
+          el.style.animationDelay = `${i * 0.6}s`;
+          el.textContent = line;
+          content.appendChild(el);
+        });
+        const hint = document.createElement('p');
+        hint.className = 'easter-poem-close';
+        hint.textContent = 'click anywhere to close';
+        overlay.appendChild(content);
+        overlay.appendChild(hint);
+        overlay.addEventListener('click', closePoemOverlay);
+        poemEscapeHandler = (e) => { if (e.key === 'Escape') closePoemOverlay(); };
+        document.addEventListener('keydown', poemEscapeHandler);
+        document.body.appendChild(overlay);
+        activePoemOverlay = overlay;
+      };
+
+      const attachPoemTrigger = (el, key) => {
+        if (!el) return;
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openPoemOverlay(key); });
+      };
+
+      document.querySelectorAll('[data-poem-trigger]').forEach(el => attachPoemTrigger(el, el.getAttribute('data-poem-trigger')));
+      document.querySelectorAll('.poem-trigger[data-poem]').forEach(el => attachPoemTrigger(el, el.getAttribute('data-poem')));
+
+      document.addEventListener('mousemove', (e) => { cursorX = e.clientX; cursorY = e.clientY; }, { passive: true });
+
+      const playSecretChime = async () => {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        try {
+          const ctx = playSecretChime.ctx || new Ctx();
+          playSecretChime.ctx = ctx;
+          if (ctx.state === 'suspended') await ctx.resume();
+          const notes = [
+            { frequency: 523, duration: 0.15, offset: 0 },
+            { frequency: 659, duration: 0.15, offset: 0.15 },
+            { frequency: 784, duration: 0.2,  offset: 0.3 }
+          ];
+          const now = ctx.currentTime;
+          notes.forEach(({ frequency, duration, offset }) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = frequency;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            const t = now + offset;
+            gain.gain.setValueAtTime(0.0001, t);
+            gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+            osc.start(t);
+            osc.stop(t + duration);
+          });
+        } catch (_) {}
+      };
+
+      const showSecretFoundNote = () => {
+        const note = document.createElement('p');
+        note.className = 'secret-found-note';
+        note.textContent = 'you found it';
+        document.body.appendChild(note);
+        requestAnimationFrame(() => { note.style.opacity = '1'; });
+        setTimeout(() => { note.style.opacity = '0'; }, 2000);
+        setTimeout(() => { note.remove(); }, 2400);
+      };
+
+      const triggerSecretExplosion = () => {
+        for (let i = 0; i < 12; i++) {
+          setTimeout(() => {
+            const ripple = document.createElement('span');
+            ripple.className = 'secret-ripple';
+            ripple.style.left = `${cursorX - 60}px`;
+            ripple.style.top  = `${cursorY - 60}px`;
+            ripple.style.background = secretPalette[Math.floor(Math.random() * secretPalette.length)];
+            document.body.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+          }, i * 80);
+        }
+        playSecretChime();
+        setTimeout(showSecretFoundNote, 2200);
+      };
+
+      document.addEventListener('keydown', (e) => {
+        if (!e.key || e.key.length !== 1) return;
+        typedBuffer = `${typedBuffer}${e.key.toLowerCase()}`.slice(-6);
+        if (typedBuffer === 'secret') { triggerSecretExplosion(); typedBuffer = ''; }
+      });
+    })();
+  </script>
+</body>
+</html>

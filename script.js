@@ -152,8 +152,10 @@ function setupMouseTracking() {
 }
 
 function runBackgroundLoop(now) {
-  // Skip rendering effects on mobile, quiet mode, or system reduced-motion
-  if (!state.quietMode && !state.reducedMotion && window.innerWidth >= 768) {
+  // Skip rendering effects on mobile, quiet mode, or system reduced-motion,
+  // and while a page transition is running (index.html sets the flag) so
+  // the card-to-story morph gets the whole frame budget.
+  if (!state.quietMode && !state.reducedMotion && window.innerWidth >= 768 && !window.__vtRunning) {
     const easing = 0.12;
     state.reveal.x += (state.target.x - state.reveal.x) * easing;
     state.reveal.y += (state.target.y - state.reveal.y) * easing;
@@ -235,7 +237,8 @@ function runMagneticButtons() {
    wet, deckled bleeding edge; layered multi-tone radial pigments; a
    desaturated turbulence pass for paper grain; salt speckles;
    satellite splatter droplets — happens ONCE per design, and once per
-   colourway (teal/cyan → periwinkle → indigo/lavender), building an
+   colourway (honey → apricot → clay, read from the --splash-* tokens
+   in styles.css), building an
    SVG string and rasterizing it into an Image. That build is sliced
    across requestIdleCallback (buildSplashLibrary()) so it never blocks
    load or first interaction. The per-frame draw never touches
@@ -246,16 +249,21 @@ function runMagneticButtons() {
    reduced-motion / mobile guards as everything else there.
    ============================================ */
 
+// Colours live in styles.css (the --splash-* tokens are comma-separated
+// lists), so the palette is defined once. The script is deferred, so the
+// stylesheet has already loaded by the time this runs.
+function readCssColorList(name) {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name).split(',').map((c) => c.trim()).filter(Boolean);
+}
+
 // Each geometry is rasterized once per colourway; a bloom cross-fades
 // along this list as it expands, so the pigment appears to shift hue
-// (teal → cyan → periwinkle → lavender) while it spreads. All three
-// share turbulence geometry, so the cross-fade is pixel-aligned — a
+// (honey → apricot → clay) while it spreads. All three share
+// turbulence geometry, so the cross-fade is pixel-aligned — a
 // colour morph, not a visible double image.
-const SPLASH_COLORWAYS = [
-  ['#1F9E93', '#3FC6E0', '#37B4C6', '#5EC6D6'], // teal / cyan
-  ['#3FC6E0', '#57A9DA', '#6E90CF', '#7E8AC9'], // cyan / periwinkle
-  ['#584FAF', '#7A6AC8', '#9B86DA', '#B49CE8'], // indigo / lavender
-];
+const SPLASH_COLORWAYS = ['--splash-1', '--splash-2', '--splash-3'].map(readCssColorList);
+const SPLASH_SPECKLE = readCssColorList('--white')[0] || 'white';
 const SPLASH_ART_SIZE = 460;  // viewBox units — see renderSplashSVG()
 const SPLASH_RASTER   = 540;  // px the SVG is rasterized at (kept modest — blooms
                               // are heavily blurred, so upscaling is invisible and
@@ -387,7 +395,7 @@ function renderSplashSVG(g, colors) {
     `<ellipse cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" rx="${sp.rx.toFixed(1)}" ry="${sp.ry.toFixed(1)}" fill="${colors[sp.ci]}" fill-opacity="${sp.o.toFixed(2)}" filter="url(#f${s})"/>`
   ).join('');
   const speckleEls = g.speckles.map((sp) =>
-    `<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${sp.r.toFixed(1)}" fill="#FFFFFF" fill-opacity="${sp.o.toFixed(2)}"/>`
+    `<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${sp.r.toFixed(1)}" fill="${SPLASH_SPECKLE}" fill-opacity="${sp.o.toFixed(2)}"/>`
   ).join('');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SPLASH_RASTER}" height="${SPLASH_RASTER}" viewBox="0 0 ${size} ${size}">
@@ -685,6 +693,8 @@ const SPLASH_CLICK_INTERACTIVE_SELECTOR =
 
 function setupSplashClickSpawn() {
   document.addEventListener('click', (e) => {
+    // No click splashes in dark mode.
+    if (state.theme === 'dark') return;
     if (state.reducedMotion || state.quietMode || window.innerWidth < 768) return;
     if (e.target.closest(SPLASH_CLICK_INTERACTIVE_SELECTOR)) return;
 
@@ -955,6 +965,79 @@ function setupLiquidMetal() {
 
 
 /* ============================================
+   10b. "TRY THIS" HINT
+   A hand-drawn arrow points at the dark mode button for 5 seconds,
+   once per visit (sessionStorage), until the visitor has used the
+   button (localStorage). Desktop only: the controls are hidden on
+   phones. On the homepage it waits for the intro screen to finish.
+   Clicking the button dismisses it early.
+   ============================================ */
+
+const TRY_HINT_SHOWN_KEY = 'uma-try-dark-hint-shown';  // this visit
+const TRY_HINT_DONE_KEY = 'uma-tried-dark-mode';       // for good
+
+function setupTryDarkHint() {
+  const toggle = dom.themeToggle;
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    try { localStorage.setItem(TRY_HINT_DONE_KEY, '1'); } catch (_) {}
+  });
+  if (state.theme === 'dark') return;
+  if (!window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)').matches) return;
+  try {
+    if (localStorage.getItem(TRY_HINT_DONE_KEY) || sessionStorage.getItem(TRY_HINT_SHOWN_KEY)) return;
+  } catch (_) { return; }
+
+  const whenIntroGone = (fn) => {
+    const intro = document.getElementById('intro-screen');
+    if (!intro || intro.classList.contains('intro-hidden')) { fn(); return; }
+    const obs = new MutationObserver(() => {
+      if (intro.classList.contains('intro-hidden')) { obs.disconnect(); fn(); }
+    });
+    obs.observe(intro, { attributes: true, attributeFilter: ['class'] });
+  };
+
+  whenIntroGone(() => {
+    try { sessionStorage.setItem(TRY_HINT_SHOWN_KEY, '1'); } catch (_) {}
+
+    const hint = document.createElement('div');
+    hint.className = 'try-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    // The arrow's tip sits at (92, 8) in its 96 x 64 box.
+    hint.innerHTML = `
+      <svg class="try-hint-arrow" viewBox="0 0 96 64" width="96" height="64">
+        <path class="try-hint-line" pathLength="1" d="M6 58 C 22 60, 40 52, 54 38 S 78 12, 90 9"/>
+        <path class="try-hint-head" pathLength="1" d="M78 4 L91 8.5 L83 19"/>
+      </svg>
+      <span class="try-hint-text">try this</span>`;
+    document.body.appendChild(hint);
+
+    const place = () => {
+      const r = toggle.getBoundingClientRect();
+      hint.style.left = `${r.left - 96 - 6}px`;
+      hint.style.top = `${r.top + r.height / 2 - 8}px`;
+    };
+    place();
+    window.addEventListener('resize', place);
+    toggle.classList.add('is-hinted');
+    requestAnimationFrame(() => hint.classList.add('is-in'));
+
+    let gone = false;
+    const leave = () => {
+      if (gone) return;
+      gone = true;
+      toggle.classList.remove('is-hinted');
+      hint.classList.add('is-out');
+      window.removeEventListener('resize', place);
+      setTimeout(() => hint.remove(), 600);
+    };
+    setTimeout(leave, 5000);
+    toggle.addEventListener('click', leave, { once: true });
+  });
+}
+
+
+/* ============================================
    11. PROJECT TILT (Cards + Panels)
    Subtle parallax tilt + ambient gradient tracking.
    Skips if reducedMotion or quietMode enabled.
@@ -1100,6 +1183,95 @@ function setupTiltCards() {
       card.addEventListener('pointercancel', handleLeave, { passive: true });
     }
     card.addEventListener('focusout', handleLeave);
+  });
+}
+
+
+/* ============================================
+   11b. PROJECT CARD HIGHLIGHTS
+   With a mouse, hovering or focusing a card shows its highlights
+   over the image, one bullet at a time, with a dot per bullet.
+   A new bullet rises in every 2 seconds; hovering a dot jumps to
+   that bullet. Phones and touch screens list
+   the bullets in the card instead (CSS only), so nothing runs there.
+   ============================================ */
+
+function setupCardHighlights() {
+  const panels = document.querySelectorAll('.project-card .card-highlights');
+  if (!panels.length) return;
+
+  // Must match the media query that places the panel over the image.
+  const overImage = window.matchMedia('(hover: hover) and (min-width: 769px)');
+  const DWELL = 2000; // ms each bullet stays up
+
+  panels.forEach(panel => {
+    const card = panel.closest('.project-card');
+    const items = [...panel.querySelectorAll('.card-bullets li')];
+    if (!card || !items.length) return;
+
+    const foot = document.createElement('div');
+    foot.className = 'card-highlights-foot';
+    foot.setAttribute('aria-hidden', 'true');
+    foot.innerHTML = '<span class="card-highlights-label">Highlights</span><span class="card-dots"></span>';
+    const dotRow = foot.querySelector('.card-dots');
+    const dots = items.map((_, i) => {
+      const dot = document.createElement('span');
+      dot.className = 'card-dot';
+      dot.addEventListener('mouseenter', () => { if (running) { show(i); schedule(); } });
+      dotRow.appendChild(dot);
+      return dot;
+    });
+    panel.appendChild(foot);
+
+    let index = 0;
+    let running = false;
+    let timer = null;
+
+    items[0].classList.add('is-active');
+
+    function show(next) {
+      if (next !== index) {
+        const out = items[index];
+        out.classList.remove('is-active');
+        out.classList.add('was-active');
+        // Once it has faded, drop it back below, ready to rise in again.
+        setTimeout(() => { if (!out.classList.contains('is-active')) out.classList.remove('was-active'); }, 500);
+      }
+      index = next;
+      items[index].classList.remove('was-active');
+      items[index].classList.add('is-active');
+      dotRow.style.setProperty('--dwell', DWELL + 'ms');
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+    }
+
+    function schedule() {
+      clearTimeout(timer);
+      if (items.length < 2) return;
+      timer = setTimeout(() => {
+        show((index + 1) % items.length);
+        schedule();
+      }, DWELL);
+    }
+
+    function start() {
+      if (running || !overImage.matches) return;
+      running = true;
+      show(0);
+      schedule();
+    }
+
+    function stop() {
+      if (card.matches(':hover') || card.matches(':focus-visible')) return;
+      running = false;
+      clearTimeout(timer);
+      // Clearing the dots now restarts the fill from empty next time.
+      dots.forEach(dot => dot.classList.remove('is-active'));
+    }
+
+    card.addEventListener('mouseenter', start);
+    card.addEventListener('mouseleave', () => setTimeout(stop));
+    card.addEventListener('focus', () => { if (card.matches(':focus-visible')) start(); });
+    card.addEventListener('blur', () => setTimeout(stop));
   });
 }
 
@@ -1669,6 +1841,15 @@ function setupScrollTopButton() {
 
   updateVisibility();
 
+  // On phones the button would sit on top of the contact form's fields;
+  // CSS hides it (below 768px) while the form is on screen.
+  const contactForm = document.querySelector('.contact-form');
+  if (contactForm && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => {
+      dom.scrollTopBtn.classList.toggle('is-suppressed', entry.isIntersecting);
+    }).observe(contactForm);
+  }
+
   dom.scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({
       top: 0,
@@ -1698,8 +1879,8 @@ function setupInteractiveAuroraBlobs() {
 
   if (!profileImage || !blobsContainer) return;
 
-  // Warm aurora colors: deep orange, pink, golden yellow, magenta
-  const colors = ['blob-orange', 'blob-pink', 'blob-yellow', 'blob-magenta'];
+  // Warm aurora colors: orange, coral, honey, clay (see --pop-* tokens)
+  const colors = ['blob-orange', 'blob-coral', 'blob-yellow', 'blob-clay'];
 
   // Create delicate wind chime-like sound with resonance
   function playChime() {
@@ -1842,6 +2023,16 @@ function setupWritingDeck() {
 
   let activeIndex = 0;
   let isAnimating = false;
+  let lastMove = performance.now();
+
+  // "3 / 8" counter, shown on phones where the dots are too small to tap
+  let counter = stack.querySelector('.deck-count');
+  if (!counter) {
+    counter = document.createElement('p');
+    counter.className = 'deck-count';
+    counter.setAttribute('aria-live', 'polite');
+    dotsContainer.after(counter);
+  }
 
   // Build dots
   dotsContainer.innerHTML = '';
@@ -1873,6 +2064,10 @@ function setupWritingDeck() {
       dot.classList.toggle('active', i === activeIndex);
       dot.setAttribute('aria-selected', i === activeIndex ? 'true' : 'false');
     });
+
+    counter.textContent = `${activeIndex + 1} / ${cards.length}`;
+    // Don't announce every automatic turn, only ones the reader makes.
+    counter.setAttribute('aria-live', autoplaying() ? 'off' : 'polite');
   }
 
   function goTo(index) {
@@ -1880,6 +2075,7 @@ function setupWritingDeck() {
     const prevIndex = activeIndex;
     activeIndex = (index + cards.length) % cards.length;
     if (prevIndex === activeIndex) return;
+    lastMove = performance.now();
 
     isAnimating = true;
     const leavingCard = cards[prevIndex];
@@ -1951,7 +2147,247 @@ function setupWritingDeck() {
     }
   }, { passive: true });
 
+  // Autoplay: the next article every 2 seconds. It pauses while the
+  // deck is hovered or focused, while it's off screen or the tab is
+  // hidden, and when the reader presses pause; it never runs with
+  // reduced motion or the site's Motion toggle off. The pause button
+  // is what makes auto-advancing content accessible (WCAG 2.2.2).
+  const DECK_INTERVAL = 2000;
+  let userPaused = false;
+  let hovered = false;
+  let inView = false;
+
+  const pauseBtn = document.createElement('button');
+  pauseBtn.type = 'button';
+  pauseBtn.className = 'deck-btn deck-pause';
+  nextBtn?.after(pauseBtn);
+
+  function motionAllowed() { return !state.reducedMotion && !state.quietMode; }
+  function autoplaying() { return motionAllowed() && !userPaused; }
+  let pauseKey = '';
+  function syncPauseBtn() {
+    const key = `${motionAllowed()}|${userPaused}`;
+    if (key === pauseKey) return;
+    pauseKey = key;
+    pauseBtn.hidden = !motionAllowed();
+    pauseBtn.setAttribute('aria-label', userPaused ? 'Play articles automatically' : 'Pause automatic articles');
+    pauseBtn.innerHTML = `<i class="fas fa-${userPaused ? 'play' : 'pause'}" aria-hidden="true"></i>`;
+  }
+
+  pauseBtn.addEventListener('click', () => {
+    userPaused = !userPaused;
+    lastMove = performance.now();
+    syncPauseBtn();
+    updatePositions();
+  });
+  stack.addEventListener('mouseenter', () => { hovered = true; });
+  stack.addEventListener('mouseleave', () => { hovered = false; lastMove = performance.now(); });
+  stack.addEventListener('focusin', () => { hovered = true; });
+  stack.addEventListener('focusout', (e) => {
+    if (!stack.contains(e.relatedTarget)) { hovered = false; lastMove = performance.now(); }
+  });
+  new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.4 }).observe(stack);
+
+  setInterval(() => {
+    syncPauseBtn();
+    if (!autoplaying() || hovered || !inView || document.hidden) return;
+    if (performance.now() - lastMove >= DECK_INTERVAL) next();
+  }, 250);
+
+  syncPauseBtn();
   updatePositions();
+}
+
+
+/* ============================================
+   20b. WORK CAROUSEL
+   The project row scrolls itself, one card every 4 seconds, and wraps
+   back to the start at the end. Same rules as the writing deck: it
+   pauses while hovered or focused, off screen, in a hidden tab, while
+   a search is typed, and when the reader presses pause; it never runs
+   with reduced motion or the Motion toggle off. Arrows, dots (the
+   cards in view are lit) and a search that filters the cards.
+   ============================================ */
+
+function setupWorkCarousel() {
+  const root = document.getElementById('work-carousel');
+  const grid = document.getElementById('projects-grid');
+  if (!root || !grid) return;
+
+  const cards = [...grid.querySelectorAll('.project-card')];
+  const wrapper = root.querySelector('.projects-grid-wrapper');
+  const prevBtn = root.querySelector('.work-prev');
+  const nextBtn = root.querySelector('.work-next');
+  const pauseBtn = root.querySelector('.work-pause');
+  const dotsContainer = root.querySelector('.work-dots');
+  const counter = root.querySelector('.work-count');
+  const input = document.getElementById('work-search-input');
+  const status = document.getElementById('work-search-status');
+  const empty = root.querySelector('.work-empty');
+  if (!cards.length || !wrapper || !dotsContainer) return;
+
+  const INTERVAL = 4000;
+  let userPaused = false;
+  let hovered = false;
+  let inView = false;
+  let lastMove = performance.now();
+
+  const titleOf = (card) => card.querySelector('h3')?.textContent.trim() || 'project';
+  const shown = () => cards.filter((c) => !c.hidden);
+  const smooth = () => (state.reducedMotion || state.quietMode ? 'auto' : 'smooth');
+  const maxScroll = () => grid.scrollWidth - grid.clientWidth;
+  // Where the row has to scroll for this card to sit at its start.
+  const offsetOf = (card) => card.offsetLeft - (shown()[0]?.offsetLeft ?? 0);
+
+  // Dots: one per project; pressing one scrolls to it.
+  const dots = cards.map((card, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'deck-dot';
+    dot.setAttribute('aria-label', `Go to project ${i + 1}: ${titleOf(card)}`);
+    dot.addEventListener('click', () => goTo(card));
+    dotsContainer.appendChild(dot);
+    return dot;
+  });
+
+  // The card nearest the row's start edge.
+  function currentIndex() {
+    const list = shown();
+    const x = Math.min(grid.scrollLeft, maxScroll());
+    let best = 0, bestD = Infinity;
+    list.forEach((c, i) => {
+      const d = Math.abs(Math.min(offsetOf(c), maxScroll()) - x);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    return best;
+  }
+
+  function goTo(card) {
+    lastMove = performance.now();
+    grid.scrollTo({ left: Math.min(offsetOf(card), maxScroll()), behavior: smooth() });
+  }
+
+  function step(dir) {
+    const list = shown();
+    if (list.length < 2) return;
+    const atEnd = grid.scrollLeft >= maxScroll() - 4;
+    const atStart = grid.scrollLeft <= 4;
+    if (dir > 0 && atEnd) return goTo(list[0]);
+    if (dir < 0 && atStart) return goTo(list[list.length - 1]);
+    goTo(list[Math.max(0, Math.min(list.length - 1, currentIndex() + dir))]);
+  }
+
+  // Light the dots of the cards that are (mostly) in view.
+  function syncDots() {
+    const box = wrapper.getBoundingClientRect();
+    const list = shown();
+    cards.forEach((card, i) => {
+      dots[i].hidden = card.hidden;
+      if (card.hidden) return;
+      const r = card.getBoundingClientRect();
+      const seen = Math.min(r.right, box.right + 8) - Math.max(r.left, box.left - 8);
+      const on = seen > r.width * 0.6;
+      dots[i].classList.toggle('active', on);
+      dots[i].setAttribute('aria-current', on ? 'true' : 'false');
+    });
+    if (counter) {
+      counter.textContent = list.length ? `${currentIndex() + 1} / ${list.length}` : '';
+      counter.setAttribute('aria-live', autoplaying() ? 'off' : 'polite');
+    }
+    const few = list.length < 2;
+    [prevBtn, nextBtn].forEach((b) => { if (b) b.disabled = few; });
+  }
+
+  let syncQueued = false;
+  grid.addEventListener('scroll', () => {
+    lastMove = performance.now();
+    if (syncQueued) return;
+    syncQueued = true;
+    requestAnimationFrame(() => { syncQueued = false; syncDots(); });
+  }, { passive: true });
+  window.addEventListener('resize', debounce(syncDots, 150));
+
+  prevBtn?.addEventListener('click', () => step(-1));
+  nextBtn?.addEventListener('click', () => step(1));
+
+  /* --- Search: every word must appear somewhere on the card (title,
+     subtitle, highlights or tags). --- */
+  const texts = cards.map((c) => c.textContent.toLowerCase().replace(/\s+/g, ' '));
+  let announce = null;
+
+  function filter() {
+    const words = (input?.value || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
+    let count = 0;
+    cards.forEach((card, i) => {
+      card.hidden = !words.every((w) => texts[i].includes(w));
+      if (!card.hidden) count++;
+    });
+    grid.hidden = count === 0;
+    grid.scrollLeft = 0;
+    if (empty) {
+      empty.hidden = count > 0;
+      const q = empty.querySelector('.work-empty-query');
+      if (q) q.textContent = `“${input.value.trim()}”`;
+    }
+    syncDots();
+    clearTimeout(announce);
+    announce = setTimeout(() => {
+      if (!status) return;
+      status.textContent = !words.length ? ''
+        : count === 0 ? 'No projects match.'
+        : `${count} ${count === 1 ? 'project matches' : 'projects match'}.`;
+    }, 400);
+  }
+
+  input?.addEventListener('input', filter);
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && input.value) { e.preventDefault(); input.value = ''; filter(); }
+  });
+  empty?.querySelector('.work-empty-clear')?.addEventListener('click', () => {
+    input.value = '';
+    filter();
+    input.focus();
+  });
+
+  /* --- Autoplay --- */
+  function motionAllowed() { return !state.reducedMotion && !state.quietMode; }
+  function searching() { return !!input?.value.trim(); }
+  function autoplaying() { return motionAllowed() && !userPaused && !searching(); }
+  let pauseKey = '';
+  function syncPauseBtn() {
+    if (!pauseBtn) return;
+    const key = `${motionAllowed()}|${userPaused}`;
+    if (key === pauseKey) return;
+    pauseKey = key;
+    pauseBtn.hidden = !motionAllowed();
+    pauseBtn.setAttribute('aria-label', userPaused ? 'Play projects automatically' : 'Pause automatic scrolling');
+    pauseBtn.innerHTML = `<i class="fas fa-${userPaused ? 'play' : 'pause'}" aria-hidden="true"></i>`;
+  }
+
+  pauseBtn?.addEventListener('click', () => {
+    userPaused = !userPaused;
+    lastMove = performance.now();
+    syncPauseBtn();
+    syncDots();
+  });
+  root.addEventListener('mouseenter', () => { hovered = true; });
+  root.addEventListener('mouseleave', () => { hovered = false; lastMove = performance.now(); });
+  root.addEventListener('focusin', () => { hovered = true; });
+  root.addEventListener('focusout', (e) => {
+    if (!root.contains(e.relatedTarget)) { hovered = false; lastMove = performance.now(); }
+  });
+  // A finger on the row counts as reading it.
+  grid.addEventListener('touchstart', () => { lastMove = performance.now(); }, { passive: true });
+  new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.4 }).observe(grid);
+
+  setInterval(() => {
+    syncPauseBtn();
+    if (!autoplaying() || hovered || !inView || document.hidden) return;
+    if (performance.now() - lastMove >= INTERVAL) step(1);
+  }, 250);
+
+  syncPauseBtn();
+  syncDots();
 }
 
 
@@ -2134,9 +2570,13 @@ function setupBioTab() {
 
   // Instantly skip past the hero so work is the first thing visible.
   // Direct scrollTop assignment bypasses css scroll-behavior: smooth entirely.
+  // Exception: coming back from a case study, where the inline script in
+  // index.html's <head> has already restored the reader's exact spot.
   const navEl = document.querySelector('.site-nav');
   const navH  = navEl ? navEl.offsetHeight : 64;
-  document.documentElement.scrollTop = Math.max(0, work.offsetTop - navH);
+  if (!window.__homeRestored) {
+    document.documentElement.scrollTop = Math.max(0, work.offsetTop - navH);
+  }
 
   // Show/hide the tab based on hero visibility.
   // rootMargin shrinks the observation zone by navH at top, so the hero
@@ -2203,9 +2643,12 @@ function init() {
   setupContactSubmissionFlow();
   setupExplorationGallery();
   setupWritingDeck();      // replaces setupWritingCarousel
+  setupWorkCarousel();
   setupScrollTopButton();
   setupViewportMaintenance();
   setupTiltCards();
+  setupCardHighlights();
+  setupTryDarkHint();
   setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();

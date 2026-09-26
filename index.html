@@ -19,6 +19,91 @@
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <!-- Immediately hide intro for returning visitors this session. Runs before paint -->
   <script>try{if(sessionStorage.getItem('intro-seen')==='true'){document.documentElement.classList.add('intro-skip');}}catch(e){}</script>
+  <!-- Card-to-story transitions (pairs with js/story.js). Hold the first
+       frame until the Work section has been parsed, so a returning
+       visitor's scroll position can be restored before anything shows. -->
+  <link rel="expect" href="#explorations" blocking="render">
+  <script>
+    (function () {
+      // 1. Clicking a story card names its image frame, so the story's
+      //    opening card can grow out of it.
+      // 2. Coming back, that card is named again and the page and
+      //    carousel scroll are restored before the first frame, so the
+      //    image shrinks back into its card.
+      // 3. While a transition runs, window.__vtRunning lets script.js
+      //    pause heavy background effects so the morph stays smooth.
+      var ss = {
+        get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+        set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} },
+        del: function (k) { try { sessionStorage.removeItem(k); } catch (e) {} }
+      };
+      function name(card, on) {
+        var frame = card.querySelector('.project-thumb');
+        if (!frame) return;
+        frame.style.setProperty('view-transition-name', on ? 'card-img-' + card.getAttribute('data-project') : '');
+        frame.style.setProperty('view-transition-class', on ? 'story-card story-img' : '');
+      }
+      function nameOnly(card) {
+        document.querySelectorAll('.project-card[data-story]').forEach(function (c) { name(c, c === card); });
+      }
+
+      document.addEventListener('click', function (e) {
+        var card = e.target.closest && e.target.closest('.project-card');
+        if (!card) return;
+        var grid = document.querySelector('.projects-grid');
+        ss.set('home-return', JSON.stringify({ y: window.scrollY, x: grid ? grid.scrollLeft : 0 }));
+        if (card.hasAttribute('data-story')) {
+          nameOnly(card);
+          // Flatten the 3D hover tilt so the morph starts from a flat image.
+          card.classList.add('is-leaving');
+          card.style.setProperty('--tilt-x', '0deg');
+          card.style.setProperty('--tilt-y', '0deg');
+        }
+      }, true);
+
+      // Back/forward cache restores the page as it was left: un-flatten.
+      window.addEventListener('pageshow', function () {
+        document.querySelectorAll('.project-card.is-leaving').forEach(function (c) { c.classList.remove('is-leaving'); });
+      });
+
+      window.addEventListener('pagereveal', function (e) {
+        if (e.viewTransition) {
+          window.__vtRunning = true;
+          e.viewTransition.finished.finally(function () { window.__vtRunning = false; });
+        }
+        var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        var saved = ss.get('home-return');
+        if (nav && nav.type === 'back_forward' && saved && !window.__homeRestored) {
+          try {
+            var pos = JSON.parse(saved);
+            var grid = document.querySelector('.projects-grid');
+            if (grid) grid.scrollLeft = pos.x;
+            document.documentElement.scrollTop = pos.y;
+            window.__homeRestored = true;
+          } catch (err) { /* fall back to the normal landing */ }
+        }
+        var last = ss.get('last-story');
+        ss.del('last-story');
+        if (e.viewTransition && last) {
+          var card = document.querySelector('.project-card[data-story][data-project="' + last + '"]');
+          if (card) nameOnly(card);
+        }
+      });
+    })();
+  </script>
+  <!-- Prerender a story when its card is hovered or pressed (Chrome/Edge;
+       other browsers ignore this), so the page is already built when the
+       card morphs into it. -->
+  <script type="speculationrules">
+    {
+      "prerender": [
+        { "where": { "selector_matches": ".project-card[data-story]" }, "eagerness": "moderate" }
+      ],
+      "prefetch": [
+        { "where": { "href_matches": "/work/*" }, "eagerness": "moderate" }
+      ]
+    }
+  </script>
 </head>
 
 <body>
@@ -126,7 +211,7 @@
     <div class="hero-content tilt-card" data-tilt-max="6">
 
       <h1 class="hero-name">Uma Dhamija</h1>
-      <p class="hero-role">designing for better services<br>ai ux &bull; neurotech enthusiast &bull; kathak dancer</p>
+      <p class="hero-role">&bull; designing for better services &bull;<br>&bull; ai ux &bull; neurotech enthusiast &bull; kathak dancer &bull;</p>
 
       <!-- Social links original URLs preserved -->
       <div class="social-links" aria-label="Social links">
@@ -136,8 +221,8 @@
         <a href="https://github.com/umaracheldhamija" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)" title="GitHub">
           <i class="fab fa-github" aria-hidden="true"></i>
         </a>
-        <a href="https://umadhamija.github.io/Portfolio/" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="Old Portfolio (opens in new tab)" title="Old Site">
-          <i class="fas fa-briefcase" aria-hidden="true"></i>
+        <a href="https://www.behance.net/umadhamija" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="Behance (opens in new tab)" title="Behance">
+          <i class="fab fa-behance" aria-hidden="true"></i>
         </a>
         <a href="https://medium.com/@umaracheldhamija" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="Medium (opens in new tab)" title="Medium">
           <i class="fab fa-medium" aria-hidden="true"></i>
@@ -172,190 +257,251 @@
       <p class="section-intro" data-poem-trigger="website">Creating this website was also fun ;)</p>
     </div>
 
-    <div class="projects-grid-wrapper">
-      <div class="projects-grid" data-reveal-stagger>
-
-        <!-- 1. OpenMined Capstone -->
-        <a href="openmined/index.html" class="project-card tilt-card" data-project="openmined">
-          <div class="project-thumb">
-            <img
-              src="images/OMlogo.jpg"
-              alt="OpenMined logo"
-              loading="lazy"
-              decoding="async"
-              width="2560"
-              height="1440"
-            >
-          </div>
-          <div class="project-body">
-            <h3>Securely training AI on private data</h3>
-            <p class="card-subtitle">OpenMined · Capstone</p>
-            <ul class="card-bullets">
-              <li>Led discovery for OpenMined's first consumer app, delivered as Kindred, a verified peer support network for people with chronic conditions</li>
-              <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
-              <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
-            </ul>
-            <div class="project-tags">
-              <span class="tag">AI Ethics</span>
-              <span class="tag">User Research</span>
-              <span class="tag">UI + UX Design</span>
-              <span class="tag">A lot of desk research</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- 2. UPMC Magee Hospital Designing w/CARE -->
-        <a href="upmc/index.html" class="project-card tilt-card" data-project="upmc">
-          <div class="project-thumb">
-            <img
-              src="images/UPMC-logo.jpg"
-              alt="UPMC Magee Hospital Gynaecological Oncology Unit"
-              loading="lazy"
-              decoding="async"
-              width="2046"
-              height="949"
-            >
-          </div>
-          <div class="project-body">
-            <h3>Cancer caregivers also need support. We built an app for them.</h3>
-            <p class="card-subtitle">Designing w/CARE · UPMC</p>
-            <ul class="card-bullets">
-              <li>Partnered with CancerBridges, Family CARE Center at UPMC, the University of Pittsburgh and CMU to deliver Care2Care - a final prototype during a 3-month period.</li>
-              <li>Currently supported by Family CARE Center to build out the app.</li>
-            </ul>
-            <div class="project-tags">
-              <span class="tag">Healthcare UX</span>
-              <span class="tag">Service Design</span>
-              <span class="tag">Research</span>
-              <span class="tag">Journey Mapping</span>
-              <span class="tag">Stakeholder Interviews</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- 3. MeditationWise -->
-        <a href="meditationwise/index.html" class="project-card tilt-card" data-project="meditationwise">
-          <div class="project-thumb">
-            <img
-              src="images/MW-logo.png"
-              alt="MeditationWise app interface"
-              loading="lazy"
-              decoding="async"
-              width="1368"
-              height="1068"
-            >
-          </div>
-          <div class="project-body">
-            <h3>An app designed for need and tradition-based meditation</h3>
-            <div class="card-meta-row">
-              <p class="card-subtitle">MeditationWise</p>
-              <span class="card-badge">Startup · Ongoing</span>
-            </div>
-            <ul class="card-bullets">
-              <li>9+ usability sessions over 4 months uncovered the major pitfalls for a meditation practice using an app</li>
-              <li>Redesigned discovery to reduce cognitive load while honoring cultural depth</li>
-            </ul>
-            <div class="project-tags">
-              <span class="tag">Wellness UX</span>
-              <span class="tag">Product Design</span>
-              <span class="tag">User Research</span>
-              <span class="tag">Design Systems</span>
-              <span class="tag">Interaction Design</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- 4. Northwestern Capstone GlowUp Eye Care -->
-        <a href="northwestern/index.html" class="project-card tilt-card" data-project="northwestern">
-          <div class="project-thumb">
-            <img
-              src="images/NWphoto.jpg"
-              alt="GlowUp Eye Care VR project"
-              loading="lazy"
-              decoding="async"
-              width="1024"
-              height="1024"
-            >
-          </div>
-          <div class="project-body">
-            <h3>How do you design to improve eye development for the future generations</h3>
-            <p class="card-subtitle">GlowUp Eye Care · Northwestern</p>
-            <ul class="card-bullets">
-              <li>Pinpointed adherence (not awareness) as the core problem through 4 weeks of research with over 6 interviews with leading ophthalmologists.</li>
-              <li>Designed an XR exercise proposal built around child attention spans</li>
-            </ul>
-            <div class="project-tags">
-              <span class="tag">XR Design</span>
-              <span class="tag">Healthcare</span>
-              <span class="tag">Children's UX</span>
-              <span class="tag">Research</span>
-              <span class="tag">Speculative Design</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- 5. Electric Scooters for Kids -->
-        <a href="scooter/index.html" class="project-card tilt-card" data-project="scooter">
-          <div class="project-thumb">
-            <img
-              src="images/photo.png"
-              alt="Electric scooter prototype for kids"
-              loading="lazy"
-              decoding="async"
-              width="822"
-              height="566"
-            >
-          </div>
-          <div class="project-body">
-            <h3>When the rider is 8 years old, everything about the design changes</h3>
-            <p class="card-subtitle">Electric Scooters for Kids</p>
-            <ul class="card-bullets">
-              <li>Mapped 4 critical ride scenarios across an 8-week course to anchor every design decision</li>
-              <li>3 prototype iterations validated control placement against real handling behavior</li>
-            </ul>
-            <div class="project-tags">
-              <span class="tag">Physical Prototyping</span>
-              <span class="tag">Safety Design</span>
-              <span class="tag">Ergonomics</span>
-              <span class="tag">User Research</span>
-              <span class="tag">Iteration</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- 6. Kathak Kala Kendra -->
-        <a href="kathak/index.html" class="project-card tilt-card" data-project="kathak">
-          <div class="project-thumb">
-            <img
-              src="images/kathakmainphoto.png"
-              alt="Kathak Kala Kendra dance school website"
-              loading="lazy"
-              decoding="async"
-              width="1264"
-              height="842"
-            >
-          </div>
-          <div class="project-body">
-            <h3>A website my teacher of 15 years didn't know he was getting</h3>
-            <p class="card-subtitle">Kathak Kala Kendra</p>
-            <ul class="card-bullets">
-              <li>Built solo in 1 month, designed for Dharamshala's bandwidth and a non-technical client</li>
-              <li>Now connects Guru Dharmendra Jain (30+ years of teaching) with students worldwide</li>
-            </ul>
-            <div class="project-tags">
-              <span class="tag">Web Design</span>
-              <span class="tag">Content Strategy</span>
-              <span class="tag">Solo Project</span>
-              <span class="tag">Low-Resource Design</span>
-              <span class="tag">Handoff</span>
-            </div>
-          </div>
-        </a>
-
+    <!-- Carousel: scrolls itself one project at a time (paused on
+         hover, focus, search, off screen, or with Motion off), with
+         arrows, dots and a search that filters the cards.
+         setupWorkCarousel() in script.js. -->
+    <div class="work-carousel" id="work-carousel">
+      <div class="work-search" role="search" data-reveal>
+        <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+        <label class="sr-only" for="work-search-input">Search projects</label>
+        <input
+          type="search"
+          id="work-search-input"
+          class="work-search-input"
+          placeholder="Search projects, e.g. healthcare"
+          autocomplete="off"
+          spellcheck="false"
+          aria-controls="projects-grid"
+        >
       </div>
-      <div class="work-scroll-hint" aria-hidden="true">
-        <span>Scroll for more</span>
-        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+      <p class="sr-only" id="work-search-status" aria-live="polite"></p>
+
+      <div class="projects-grid-wrapper">
+        <div class="projects-grid" id="projects-grid" data-reveal-stagger>
+
+          <!-- 1. OpenMined Capstone -->
+          <a href="work/kindred/" class="project-card tilt-card" data-project="kindred" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/story/kindred/om-hero-800.jpg"
+                srcset="images/story/kindred/om-hero-800.jpg 800w, images/story/kindred/om-hero-1600.jpg 1600w"
+                sizes="370px"
+                alt="OpenMined logo"
+                loading="lazy"
+                decoding="async"
+                width="1600"
+                height="900"
+              >
+            </div>
+            <div class="project-body">
+              <h3>Securely training AI on private data</h3>
+              <p class="card-subtitle">OpenMined · Capstone</p>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>Led discovery for OpenMined's first consumer app, delivered as Kindred, a verified peer support network for people with chronic conditions</li>
+                  <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
+                  <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">AI Ethics</span>
+                <span class="tag">User Research</span>
+                <span class="tag">System Design</span>
+                <span class="tag">Product + Interface Design</span>
+                <span class="tag">Healthcare UX</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 2. UPMC Magee Hospital Designing w/CARE -->
+          <a href="work/care2care/" class="project-card tilt-card" data-project="care2care" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/UPMC-logo.jpg"
+                alt="UPMC Magee Hospital Gynaecological Oncology Unit"
+                loading="lazy"
+                decoding="async"
+                width="2046"
+                height="949"
+              >
+            </div>
+            <div class="project-body">
+              <h3>Cancer caregivers also need support. We built an app for them.</h3>
+              <div class="card-meta-row">
+                <p class="card-subtitle">Designing w/CARE · UPMC</p>
+                <span class="card-badge">Grant-funded · Ongoing</span>
+              </div>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>Partnered with CancerBridges, Family CARE Center at UPMC, the University of Pittsburgh and CMU to deliver Care2Care - a final prototype during a 3-month period.</li>
+                  <li>Currently supported by Family CARE Center to build out the app.</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">Healthcare UX</span>
+                <span class="tag">Service Design</span>
+                <span class="tag">Research</span>
+                <span class="tag">Journey Mapping</span>
+                <span class="tag">Stakeholder Interviews</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 3. MeditationWise -->
+          <a href="work/meditationwise/" class="project-card tilt-card" data-project="meditationwise" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/MW-logo.png"
+                alt="MeditationWise app interface"
+                loading="lazy"
+                decoding="async"
+                width="1368"
+                height="1068"
+              >
+            </div>
+            <div class="project-body">
+              <h3>An app designed for need and tradition-based meditation</h3>
+              <div class="card-meta-row">
+                <p class="card-subtitle">MeditationWise</p>
+                <span class="card-badge">Startup · Ongoing</span>
+              </div>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>9+ usability sessions over 4 months uncovered the major pitfalls for a meditation practice using an app</li>
+                  <li>Redesigned discovery to reduce cognitive load while honoring cultural depth</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">Wellness UX</span>
+                <span class="tag">Product Design</span>
+                <span class="tag">User Research</span>
+                <span class="tag">Design Systems</span>
+                <span class="tag">Interaction Design</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 4. Northwestern Capstone GlowUp Eye Care -->
+          <a href="work/glowup/" class="project-card tilt-card" data-project="glowup" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/NWphoto.jpg"
+                alt="GlowUp Eye Care VR project"
+                loading="lazy"
+                decoding="async"
+                width="1024"
+                height="1024"
+              >
+            </div>
+            <div class="project-body">
+              <h3>How do you design to improve eye development for the future generations</h3>
+              <p class="card-subtitle">GlowUp Eye Care · Northwestern</p>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>Pinpointed adherence (not awareness) as the core problem through 4 weeks of research with over 6 interviews with leading ophthalmologists.</li>
+                  <li>Designed an XR exercise proposal built around child attention spans</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">XR Design</span>
+                <span class="tag">Healthcare</span>
+                <span class="tag">Children's UX</span>
+                <span class="tag">Research</span>
+                <span class="tag">Speculative Design</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 5. Electric Scooters for Kids -->
+          <a href="work/electric-scooters/" class="project-card tilt-card" data-project="electric-scooters" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/photo.png"
+                alt="Electric scooter prototype for kids"
+                loading="lazy"
+                decoding="async"
+                width="822"
+                height="566"
+              >
+            </div>
+            <div class="project-body">
+              <h3>When the rider is 8 years old, everything about the design changes</h3>
+              <p class="card-subtitle">Electric Scooters for Kids</p>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>Mapped 4 critical ride scenarios across an 8-week course to anchor every design decision</li>
+                  <li>3 prototype iterations validated control placement against real handling behavior</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">Physical Prototyping</span>
+                <span class="tag">Safety Design</span>
+                <span class="tag">Ergonomics</span>
+                <span class="tag">User Research</span>
+                <span class="tag">Iteration</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 6. Kathak Kala Kendra -->
+          <a href="work/kathak-kala-kendra/" class="project-card tilt-card" data-project="kathak-kala-kendra" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/story/kathak-kala-kendra/homepage-800.jpg"
+                srcset="images/story/kathak-kala-kendra/homepage-800.jpg 800w, images/story/kathak-kala-kendra/homepage-1264.jpg 1264w"
+                sizes="370px"
+                alt="Kathak Kala Kendra dance school website"
+                loading="lazy"
+                decoding="async"
+                width="1264"
+                height="842"
+              >
+            </div>
+            <div class="project-body">
+              <h3>A website my teacher of 15 years didn't know he was getting</h3>
+              <p class="card-subtitle">Kathak Kala Kendra</p>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>Built solo in 1 month, designed for Dharamshala's bandwidth and a non-technical client</li>
+                  <li>Now connects Guru Dharmendra Jain (30+ years of teaching) with students worldwide</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">Web Design</span>
+                <span class="tag">Content Strategy</span>
+                <span class="tag">Solo Project</span>
+                <span class="tag">Low-Resource Design</span>
+                <span class="tag">Handoff</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+        <p class="work-empty" hidden>
+          No projects match <span class="work-empty-query"></span>.
+          <button type="button" class="work-empty-clear">Show all projects</button>
+        </p>
+      </div>
+
+      <div class="deck-controls work-controls">
+        <button class="deck-btn work-prev" type="button" aria-label="Previous project" aria-controls="projects-grid">&#8249;</button>
+        <div class="deck-dots work-dots" role="group" aria-label="Jump to a project"></div>
+        <p class="deck-count work-count" aria-live="polite"></p>
+        <button class="deck-btn work-next" type="button" aria-label="Next project" aria-controls="projects-grid">&#8250;</button>
+        <button class="deck-btn deck-pause work-pause" type="button" hidden></button>
       </div>
     </div>
   </section>
@@ -1026,14 +1172,16 @@
 
   <!-- ============================================
        RESUME MODAL
-       Desktop: inline iframe PDF viewer.
+       Desktop: inline iframe PDF viewer. The browser's own PDF
+       toolbar and page sidebar are hidden (#toolbar=0&navpanes=0):
+       they repeated the file name, download button and the page.
        Mobile: redirects to PDF in new tab via JS.
        ============================================ -->
 
   <div class="modal modal-resume" id="resume-modal" aria-labelledby="resume-modal-title" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content resume-modal-content" role="document">
       <div class="resume-modal-top">
-        <h2 id="resume-modal-title">Uma Dhamija Resume</h2>
+        <h2 id="resume-modal-title">Resume</h2>
         <a href="Uma_Dhamija_Resume.pdf" download class="btn btn-secondary" aria-label="Download resume PDF">
           <span>Download</span>
           <i class="fas fa-download" aria-hidden="true"></i>
@@ -1042,7 +1190,7 @@
       </div>
       <div class="resume-viewer" id="resume-viewer">
         <iframe
-          src="Uma_Dhamija_Resume.pdf#zoom=90"
+          src="Uma_Dhamija_Resume.pdf#toolbar=0&amp;navpanes=0&amp;view=FitH"
           title="Uma Dhamija Resume"
           class="resume-iframe"
           loading="lazy"
@@ -1091,7 +1239,7 @@
           "is how you do everything"
         ]
       };
-      const secretPalette = ['#FFB3C6', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB', '#F9E4B7'];
+      const secretPalette = ['var(--pastel-1)', 'var(--pastel-2)', 'var(--pastel-3)', 'var(--pastel-4)', 'var(--pastel-5)', 'var(--pastel-6)'];
       let typedBuffer = '';
       let cursorX = window.innerWidth / 2;
       let cursorY = window.innerHeight / 2;
@@ -1116,7 +1264,7 @@
             position: fixed;
             inset: 0;
             z-index: 10000;
-            background: rgba(0, 0, 0, 0.92);
+            background: color-mix(in srgb, var(--shade) 92%, transparent);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1134,7 +1282,7 @@
 
           .easter-poem-line {
             opacity: 0;
-            color: #F5F4F0;
+            color: var(--on-shade);
             font-size: 1.4rem;
             line-height: 2.2;
             font-style: italic;
@@ -1148,7 +1296,7 @@
             transform: translateX(-50%);
             font-size: 0.75rem;
             opacity: 0.4;
-            color: #F5F4F0;
+            color: var(--on-shade);
           }
 
           .secret-ripple {
@@ -1357,7 +1505,7 @@
             return;
           }
 
-          root.style.setProperty('--bg', '#EDEBE4');
+          root.style.setProperty('--bg', 'var(--bg-late)');
         };
 
         syncLateNightBackground();

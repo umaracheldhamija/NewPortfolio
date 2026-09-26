@@ -1,3 +1,14 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/openmined/:path*", "destination": "/work/kindred/:path*", "permanent": true },
+    { "source": "/upmc/:path*", "destination": "/work/care2care/:path*", "permanent": true },
+    { "source": "/meditationwise/:path*", "destination": "/work/meditationwise/:path*", "permanent": true },
+    { "source": "/northwestern/:path*", "destination": "/work/glowup/:path*", "permanent": true },
+    { "source": "/scooter/:path*", "destination": "/work/electric-scooters/:path*", "permanent": true },
+    { "source": "/kathak", "destination": "/work/kathak-kala-kendra", "permanent": true },
+    { "source": "/kathak/", "destination": "/work/kathak-kala-kendra", "permanent": true },
+    { "source": "/kathak/index", "destination": "/work/kathak-kala-kendra", "permanent": true },
+    { "source": "/kathak/index.html", "destination": "/work/kathak-kala-kendra", "permanent": true }
+  ]
 }

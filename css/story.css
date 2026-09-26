@@ -1,0 +1,2553 @@
+/* ============================================
+   STORY ENGINE STYLES (css/story.css)
+   Pairs with js/story.js. Loaded after styles.css, so every colour,
+   font, radius and shadow comes from the site's design tokens and a
+   case study automatically picks up its project accent.
+
+   Rules this file keeps:
+   - No text smaller than 16px (captions, tags, labels included).
+   - Motion only under html.st-motion (set by JS when the reader
+     hasn't asked for reduced motion or paused the site's motion).
+   - The background line lives in the side gutters; anything it has
+     to cross in the centre is an empty band or an opaque panel.
+
+   1.  Page frame + utilities
+   2.  Opening card + summary
+   3.  Diamond bands + checkpoints
+   4.  Chapters + layouts
+   5.  Figures + placeholders
+   6.  Visual: idea scatter
+   7.  Visual: impact/risk funnel
+   8.  Visual: feature cards
+   9.  Visual: pinned phone
+   10. Visual: gallery
+   11. Interlude (halfway)
+   12. Metrics, reflection, next story
+   13. Background line (spine)
+   14. Desktop navigator
+   15. Mobile progress bar + Chapters menu
+   16. Page transitions
+   17. Reduced motion
+   ============================================ */
+
+
+/* ============================================
+   1. PAGE FRAME + UTILITIES
+   ============================================ */
+
+:root {
+  --st-nav-h: 66px;
+  --st-col: 1120px;
+  --st-gutter: clamp(16px, 5vw, 40px);
+  --st-wrap: min(var(--st-col), 100% - var(--st-gutter) * 2);
+  --st-ease: cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+@media (min-width: 1100px) {
+  /* Wide gutters on desktop hold the line and the navigator. */
+  :root { --st-gutter: clamp(112px, 11vw, 260px); }
+}
+
+.story {
+  position: relative;
+  z-index: 10;
+  padding-top: calc(var(--st-nav-h) + var(--sp-4));
+  overflow-x: clip;
+}
+
+.story > :not(.st-spine) {
+  position: relative;
+  z-index: 1;
+}
+
+.st-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.st-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: var(--sp-4);
+}
+
+.st-eyebrow .st-stage {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.st-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unfilled copy is impossible to miss. */
+.st-todo {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--text);
+  outline: 1px dashed var(--accent-strong);
+  outline-offset: 1px;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+
+/* ============================================
+   2. OPENING CARD + SUMMARY
+   A giant version of the homepage card: the card's image and
+   title morph into this, and the line is pulled out of its base.
+   ============================================ */
+
+.st-opening {
+  width: min(960px, 100% - var(--st-gutter) * 2);
+  margin: 0 auto;
+}
+
+.st-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  margin-bottom: var(--sp-3);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  transition: color var(--t-base), gap var(--t-base);
+}
+
+.st-back:hover { color: var(--accent-deep); gap: var(--sp-3); }
+
+.st-opening-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: var(--sp-6);
+  margin-bottom: var(--sp-3);
+}
+
+.st-opening-bar .st-back { margin-bottom: 0; }
+
+.st-card {
+  position: relative;
+  z-index: 2;
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.st-card-media {
+  aspect-ratio: 16 / 9;
+  max-height: 52svh;
+  width: 100%;
+  overflow: hidden;
+  /* Its own top corners (not just the card's clip), so the rounded
+     shape is part of the morph instead of popping in at the end. */
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  background: var(--surface-raised);
+}
+
+.st-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.st-card-body {
+  padding: clamp(var(--sp-6), 4vw, var(--sp-12));
+}
+
+.st-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2rem + 5vw, 5.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: var(--sp-3);
+  text-wrap: balance;
+}
+
+.st-subtitle {
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 38rem;
+  margin-bottom: var(--sp-6);
+  text-wrap: pretty;
+}
+
+.st-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+}
+
+.st-tags li {
+  font-size: 1rem;
+  line-height: 1.3;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--r-pill);
+  background: var(--accent-subtle);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  color: var(--accent-strong);
+  font-weight: 500;
+}
+
+.st-summary {
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+}
+
+.st-summary-lead {
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text);
+  max-width: 42rem;
+  text-wrap: pretty;
+}
+
+.st-summary-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  margin-top: var(--sp-4);
+  padding: 0 var(--sp-6);
+  border-radius: var(--r-pill);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: transparent;
+  color: var(--accent-strong);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background var(--t-base), border-color var(--t-base);
+}
+
+.st-summary-toggle:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+}
+
+.st-summary-toggle i { transition: transform var(--t-base); }
+.st-summary-toggle[aria-expanded="true"] i { transform: rotate(180deg); }
+
+.st-summary-more {
+  margin-top: var(--sp-6);
+}
+
+.st-motion .st-summary-more:not([hidden]) {
+  animation: st-rise 0.5s var(--st-ease) both;
+}
+
+.st-summary-points {
+  display: grid;
+  gap: var(--sp-4) var(--sp-8);
+}
+
+@media (min-width: 700px) {
+  .st-summary-points { grid-template-columns: 1fr 1fr; }
+}
+
+.st-summary-points dt {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: var(--sp-1);
+}
+
+.st-summary-points dd {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.st-skip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  margin-top: var(--sp-6);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  text-underline-offset: 0.3em;
+}
+
+.st-skip:hover { color: var(--accent-deep); }
+
+@keyframes st-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+
+/* ============================================
+   3. DIAMOND BANDS + CHECKPOINTS
+   Empty space above each point is where the line swings between
+   the centre and the gutters, so nothing sits there.
+   ============================================ */
+
+.st-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: var(--st-gutter);
+  text-align: center;
+}
+
+.st-diamond-intro {
+  padding-top: clamp(var(--sp-16), 10vw, 140px);
+  padding-bottom: clamp(var(--sp-8), 4vw, var(--sp-12));
+}
+
+.st-diamond-intro .st-point { margin-bottom: var(--sp-8); }
+
+@media (min-width: 1100px) {
+  .st-diamond-intro .st-point { margin-bottom: 170px; }
+}
+
+.st-diamond-intro-text .st-eyebrow { justify-content: center; }
+
+.st-diamond-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.st-point {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  transform: rotate(45deg);
+  border: 2px solid var(--accent);
+  background: var(--bg);
+  transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.st-point.is-reached {
+  background: var(--accent);
+  box-shadow: 0 0 0 6px var(--accent-glow);
+}
+
+.st-pinch {
+  position: relative;
+  padding-top: clamp(var(--sp-8), 6vw, var(--sp-12));
+  padding-bottom: clamp(var(--sp-12), 8vw, 120px);
+  scroll-margin-top: calc(var(--st-nav-h) + var(--sp-6));
+}
+
+.st-pinch .st-point {
+  width: 18px;
+  height: 18px;
+}
+
+.st-pinch-label {
+  margin-top: var(--sp-4);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.st-pinch-kicker {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: var(--sp-1);
+}
+
+@media (min-width: 1100px) {
+  /* Room above the point for the strands to converge; the label sits
+     beside the point so the thread can continue straight down. */
+  .st-pinch { padding-top: 170px; padding-bottom: 120px; }
+  .st-pinch-label {
+    position: absolute;
+    left: calc(50% + 28px);
+    top: calc(170px + 22px);
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+  }
+}
+
+
+/* ============================================
+   4. CHAPTERS + LAYOUTS
+   ============================================ */
+
+.st-chapter {
+  padding-block: clamp(var(--sp-12), 8vw, 140px);
+  scroll-margin-top: calc(var(--st-nav-h) + var(--sp-2));
+}
+
+.st-chapter:focus { outline: none; }
+
+.st-chapter-inner {
+  width: var(--st-wrap);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--sp-8);
+}
+
+.st-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.35rem + 2.5vw, 3.25rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: var(--sp-6);
+  text-wrap: balance;
+}
+
+.st-body p {
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  line-height: 1.75;
+  color: var(--text-secondary);
+  max-width: 38rem;
+  text-wrap: pretty;
+}
+
+.st-body p + p { margin-top: var(--sp-4); }
+
+.st-body a,
+.st-quote a,
+.st-figure figcaption a {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.st-body a:hover,
+.st-quote a:hover { color: var(--accent-deep); }
+
+.st-quote {
+  margin-top: var(--sp-8);
+  padding-left: clamp(var(--sp-4), 3vw, var(--sp-8));
+  border-left: 3px solid var(--accent);
+}
+
+.st-quote > p:first-child {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.625rem, 1.15rem + 2vw, 2.75rem);
+  line-height: 1.25;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.st-quote-cite {
+  margin-top: var(--sp-4);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.st-media {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+/* --- Two columns from 900px; everything stacks below
+   (headline, body, then image) --- */
+@media (min-width: 900px) {
+  /* The text column is narrower here, so long insight headlines
+     step down a size instead of stacking six lines deep. */
+  .st-layout-text-left .st-heading,
+  .st-layout-text-right .st-heading,
+  .st-layout-rounds .st-heading {
+    font-size: clamp(2rem, 1.4rem + 1.3vw, 2.75rem);
+  }
+
+  .st-layout-text-left .st-chapter-inner,
+  .st-layout-text-right .st-chapter-inner {
+    column-gap: clamp(var(--sp-8), 5vw, 88px);
+    row-gap: var(--sp-12);
+    align-items: center;
+  }
+
+  .st-layout-text-left .st-chapter-inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "text media" "visual visual";
+  }
+
+  .st-layout-text-right .st-chapter-inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-areas: "media text" "visual visual";
+  }
+
+  .st-layout-text-left .st-text,
+  .st-layout-text-right .st-text { grid-area: text; }
+  .st-layout-text-left .st-media,
+  .st-layout-text-right .st-media { grid-area: media; }
+  .st-layout-text-left .st-visual,
+  .st-layout-text-right .st-visual { grid-area: visual; }
+
+  /* A chapter with a visual and no images: the visual takes the
+     image's side of the split. */
+  .st-visual-only.st-layout-text-left .st-visual,
+  .st-visual-only.st-layout-text-right .st-visual { grid-area: media; }
+}
+
+.st-layout-centered .st-text,
+.st-layout-showcase .st-text {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.st-layout-centered .st-text .st-eyebrow,
+.st-layout-showcase .st-text .st-eyebrow { justify-content: center; }
+
+.st-layout-centered .st-body p,
+.st-layout-showcase .st-body p { margin-inline: auto; }
+
+.st-layout-wide .st-text,
+.st-layout-quote .st-text,
+.st-layout-centered .st-text,
+.st-layout-showcase .st-text { max-width: 46rem; }
+
+.st-layout-wide .st-chapter-inner,
+.st-layout-quote .st-chapter-inner,
+.st-layout-centered .st-chapter-inner,
+.st-layout-showcase .st-chapter-inner { row-gap: clamp(var(--sp-8), 5vw, var(--sp-16)); }
+
+.st-layout-centered .st-media {
+  width: min(880px, 100%);
+  margin-inline: auto;
+}
+
+.st-layout-showcase .st-heading {
+  font-size: clamp(2.25rem, 1.5rem + 3vw, 4rem);
+}
+
+@media (min-width: 700px) {
+  .st-layout-showcase .st-media:not(.st-media--pairs) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .st-layout-showcase .st-media:not(.st-media--pairs) .st-figure:first-child { grid-column: 1 / -1; }
+  .st-layout-showcase .st-media:not(.st-media--pairs) .st-figure:nth-child(2):last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(520px, 100%);
+  }
+}
+
+
+/* ============================================
+   5. FIGURES + PLACEHOLDERS
+   ============================================ */
+
+.st-figure { margin: 0; }
+
+.st-frame {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+  will-change: transform;
+}
+
+.st-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.st-figure figcaption {
+  margin-top: var(--sp-3);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.st-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  border: 2px dashed color-mix(in srgb, var(--accent-strong) 55%, transparent);
+  background:
+    repeating-linear-gradient(135deg, var(--accent-subtle) 0 12px, transparent 12px 24px),
+    var(--surface);
+  color: var(--accent-strong);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+
+/* ============================================
+   6. VISUAL: IDEA SCATTER
+   Cards sit in normal flow (so they can never overlap text), with
+   a small deterministic tilt. On entry they fly out from the
+   centre. Phones show 8, tablets 18, desktop all.
+   ============================================ */
+
+.st-scatter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-4);
+  list-style: none;
+  padding: var(--sp-6) 0;
+}
+
+.st-idea {
+  font-size: 1rem;
+  line-height: 1.3;
+  padding: 0.65rem 1rem;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  transform: translate(var(--jx), var(--jy)) rotate(var(--r));
+}
+
+.st-idea:nth-child(4n + 1) { background: var(--accent-soft); }
+
+.st-motion .st-scatter:not(.is-scattered) .st-idea { opacity: 0; }
+
+.st-motion .st-scatter.is-ready:not(.is-scattered) .st-idea {
+  transform: translate(var(--fx, 0), var(--fy, 0)) scale(0.55);
+}
+
+.st-motion .st-scatter.is-scattered .st-idea {
+  opacity: 1;
+  transform: translate(var(--jx), var(--jy)) rotate(var(--r));
+  transition:
+    transform 1.2s var(--st-ease) calc(var(--d) * 30ms),
+    opacity 0.5s ease calc(var(--d) * 30ms);
+}
+
+@media (max-width: 1099px) { .st-hide-tablet { display: none; } }
+@media (max-width: 599px)  { .st-hide-phone  { display: none; } }
+
+
+/* ============================================
+   7. VISUAL: IMPACT/RISK FUNNEL
+   ============================================ */
+
+.st-funnel {
+  display: grid;
+  gap: var(--sp-8);
+  margin: 0;
+}
+
+.st-matrix-wrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "y matrix" ". x";
+  gap: var(--sp-2) var(--sp-3);
+}
+
+.st-matrix-col { grid-area: matrix; }
+
+.st-axis {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.st-axis--y {
+  grid-area: y;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  justify-self: center;
+  align-self: center;
+}
+
+/* Only the word is turned to read bottom-to-top; the arrow stays
+   upright so it points up, the direction risk increases. */
+.st-axis-word {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.st-axis--x {
+  grid-area: x;
+  justify-self: end;
+}
+
+.st-quads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.st-quads span { padding: var(--sp-1) var(--sp-3); }
+.st-quads span:first-child { text-align: right; }
+.st-quads--top { margin-bottom: var(--sp-1); }
+.st-quads--bottom { margin-top: var(--sp-1); }
+.st-quads--top span:last-child { color: var(--accent-strong); font-weight: 600; }
+
+.st-matrix {
+  position: relative;
+  aspect-ratio: 16 / 11;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(var(--border), var(--border)) center / 1px 100% no-repeat,
+    linear-gradient(var(--border), var(--border)) center / 100% 1px no-repeat,
+    linear-gradient(to top right, transparent 50%, var(--accent-subtle)),
+    var(--paper);
+}
+
+.st-dot {
+  --size: 14px;
+  position: absolute;
+  left: calc(var(--x) * (100% - 36px) + 18px);
+  bottom: calc(var(--y) * (100% - 36px) + 18px);
+  width: var(--size);
+  height: var(--size);
+  translate: -50% 50%;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 55%, transparent);
+  display: grid;
+  place-items: center;
+  transition:
+    width 0.6s var(--st-ease), height 0.6s var(--st-ease),
+    opacity 0.6s ease, background 0.6s ease, scale 0.6s var(--st-ease);
+}
+
+.st-dot-num {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-on-accent);
+  opacity: 0;
+  transition: opacity 0.4s ease 0.2s;
+}
+
+.st-funnel.is-narrowed .st-dot:not(.is-short) {
+  opacity: 0.2;
+  scale: 0.7;
+}
+
+.st-funnel.is-narrowed .st-dot.is-short {
+  --size: 32px;
+  /* Text-safe accent, so the white number inside passes AA */
+  background: var(--accent-strong);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  z-index: 1;
+}
+
+.st-funnel.is-narrowed .st-dot-num { opacity: 1; }
+
+.st-motion .st-funnel .st-dot { opacity: 0; scale: 0; }
+.st-motion .is-in .st-funnel .st-dot,
+.st-motion .st-funnel.is-narrowed .st-dot {
+  opacity: 1;
+  scale: 1;
+  transition-delay: calc(var(--d) * 22ms);
+}
+.st-motion .st-funnel.is-narrowed .st-dot:not(.is-short) { opacity: 0.2; scale: 0.7; transition-delay: 0s; }
+
+.st-funnel-side {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.st-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-4);
+  list-style: none;
+}
+
+.st-step {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: color 0.5s ease;
+}
+
+.st-step strong {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+  color: var(--text-secondary);
+  transition: color 0.5s ease;
+}
+
+.st-step-arrow { color: var(--text-muted); font-size: 1rem; }
+
+.st-funnel:not(.is-narrowed) .st-step[data-step="0"] strong,
+.st-funnel.is-narrowed .st-step[data-step="1"] strong { color: var(--accent-strong); }
+.st-funnel:not(.is-narrowed) .st-step[data-step="0"],
+.st-funnel.is-narrowed .st-step[data-step="1"] { color: var(--text); }
+
+.st-shortlist-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.st-shortlist {
+  display: grid;
+  gap: var(--sp-2) var(--sp-6);
+  list-style: none;
+  transition: opacity 0.6s ease;
+}
+
+@media (min-width: 600px) {
+  .st-shortlist { grid-template-columns: 1fr 1fr; }
+}
+
+.st-funnel:not(.is-narrowed) .st-shortlist { opacity: 0.45; }
+
+.st-shortlist li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.st-dot-key {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  color: var(--text-on-accent);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+@media (max-width: 599px) {
+  /* Too small for numbered dots: the pattern carries the chart and
+     the list below carries the names. */
+  .st-dot { --size: 10px; }
+  .st-funnel.is-narrowed .st-dot.is-short { --size: 16px; }
+  .st-dot-num { display: none; }
+  .st-matrix { aspect-ratio: 1 / 1; }
+  .st-quads span { padding: var(--sp-1) var(--sp-2); }
+}
+
+
+/* ============================================
+   8. VISUAL: FEATURE CARDS
+   Four across on desktop, two on tablets, and on phones one per
+   row with the screen beside the text.
+   ============================================ */
+
+.st-features {
+  display: grid;
+  gap: var(--sp-6);
+  list-style: none;
+}
+
+@media (min-width: 600px) { .st-features { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) {
+  .st-features { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .st-features--n5 { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-4); }
+}
+
+.st-feature {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.st-feature-media {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface-raised);
+  aspect-ratio: 2 / 3;
+}
+
+.st-feature-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.st-feature-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.st-feature p {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 599px) {
+  .st-feature {
+    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-areas: "media title" "media text";
+    align-items: start;
+    column-gap: var(--sp-4);
+  }
+  .st-feature-media { grid-area: media; }
+  .st-feature-title { grid-area: title; }
+  .st-feature p { grid-area: text; }
+}
+
+
+/* ============================================
+   9. VISUAL: PINNED PHONE
+   From 900px the phone stays put while the rounds scroll past and
+   its screen changes. Below that, each round shows its own phone,
+   stacked and clearly labeled.
+   ============================================ */
+
+.st-rounds {
+  list-style: none;
+  display: grid;
+  gap: var(--sp-12);
+}
+
+.st-round-kicker {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.st-round-label {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  line-height: 1.1;
+  color: var(--text);
+  margin-top: var(--sp-1);
+}
+
+.st-round-text {
+  margin-top: var(--sp-3);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 30rem;
+}
+
+.st-phone {
+  height: min(560px, 68svh);
+  aspect-ratio: 9 / 19;
+  padding: 10px;
+  border-radius: 44px;
+  background: var(--shade);
+  border: 1px solid color-mix(in srgb, var(--white) 14%, transparent);
+  box-shadow: var(--shadow-card), 0 30px 60px color-mix(in srgb, var(--shade) 18%, transparent);
+}
+
+.st-phone-screen {
+  position: relative;
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.st-phone-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* fills the screen top to bottom */
+  object-position: top center;
+}
+
+.st-phone-screen .st-placeholder {
+  height: 100%;
+  border-radius: 34px;
+  aspect-ratio: auto !important;
+}
+
+/* One small frame per step on phones and tablets (the pinned stage
+   takes over from 900px). */
+.st-frame-inline { margin-top: var(--sp-6); }
+.st-phone.st-frame-inline { height: auto; width: min(240px, 70%); }
+
+/* What sits inside any frame's screen */
+.st-screen-media { width: 100%; height: 100%; }
+.st-screen-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.st-photo-screen .st-screen-media img { object-fit: contain; object-position: center; }
+.st-screen-media[data-fit="cover"] img { object-fit: cover; object-position: center; }
+.st-screen-media[data-fit="contain"] img { object-fit: contain; object-position: center; }
+
+/* Browser window: for websites */
+.st-browser {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card), 0 30px 60px color-mix(in srgb, var(--shade) 14%, transparent);
+}
+
+.st-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  flex-shrink: 0;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.st-browser-bar > span:not(.st-browser-url) {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text-muted) 35%, transparent);
+}
+
+.st-browser-url {
+  display: flex;
+  align-items: center;
+  flex: 0 1 60%;
+  height: 22px;
+  margin-left: 10px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  background: var(--bg);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-browser-screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--shade);
+}
+
+/* Photo frame: for physical work and illustrations */
+.st-photo {
+  width: 100%;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.st-photo-screen {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.st-browser-screen .st-placeholder,
+.st-photo-screen .st-placeholder {
+  height: 100%;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+}
+
+.st-screen {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
+.st-screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.6s ease, visibility 0s;
+}
+
+/* --- Live prototype inside the phone ---
+   Rendered at 390px (the width it was designed for) and scaled to
+   the frame. Inert until "Try the prototype" is pressed. */
+.st-embed {
+  --embed-scale: 0.68;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.st-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--embed-w, 390px);
+  height: calc(100% / var(--embed-scale));
+  border: 0;
+  transform: scale(var(--embed-scale));
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.st-embed.is-live iframe { pointer-events: auto; }
+
+.st-embed-start {
+  position: absolute;
+  left: 50%;
+  bottom: var(--sp-6);
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  padding: 0 var(--sp-6);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent-strong);
+  color: var(--text-on-accent);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--shadow-card);
+  transition: background var(--t-base), opacity var(--t-base);
+}
+
+.st-embed-start:hover { background: var(--accent-deep); }
+.st-embed.is-live .st-embed-start { opacity: 0; pointer-events: none; }
+
+/* In use: the device frame grows a little and glows in the project
+   colour, so it's clear the prototype is live (story.js setLive). */
+.st-phone,
+.st-browser {
+  transition: transform 0.5s var(--st-ease), box-shadow 0.5s ease;
+  /* Grow mostly upward, clear of the label underneath. */
+  transform-origin: 50% 85%;
+}
+
+.st-phone.is-live,
+.st-browser.is-live {
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 3px color-mix(in srgb, var(--accent) 60%, transparent),
+    0 0 56px 10px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+.st-motion .st-phone.is-live { transform: scale(1.06); }
+.st-motion .st-browser.is-live { transform: scale(1.03); }
+.st-motion .st-phone.is-live,
+.st-motion .st-browser.is-live {
+  animation: st-live-glow 2.4s ease-in-out 0.5s infinite;
+}
+
+@keyframes st-live-glow {
+  50% {
+    box-shadow:
+      var(--shadow-card),
+      0 0 0 3px color-mix(in srgb, var(--accent) 75%, transparent),
+      0 0 72px 16px color-mix(in srgb, var(--accent) 48%, transparent);
+  }
+}
+
+/* --- Prototypes: live prototypes side by side ---
+   The web app takes the wide column, the phone sits beside it; both
+   stack on smaller screens. */
+.st-protos {
+  display: grid;
+  gap: var(--sp-12) clamp(var(--sp-8), 4vw, var(--sp-12));
+  align-items: end;
+  width: min(1100px, 100%);
+  margin-inline: auto;
+}
+
+.st-proto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-6);
+  margin: 0;
+  min-width: 0;
+}
+
+.st-proto--browser { align-items: stretch; }
+.st-proto--phone .st-phone { height: min(520px, 64svh); }
+
+.st-proto-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0 var(--sp-3);
+  text-align: center;
+}
+
+.st-proto-label {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.st-proto-detail {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.st-proto-caption .st-round-link {
+  flex-basis: 100%;
+  justify-content: center;
+  margin-top: 0;
+}
+
+@media (min-width: 900px) {
+  .st-protos {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .st-proto--phone .st-phone { height: auto; width: min(260px, 72%); }
+  /* A desktop web app is too small to use at phone width: show it as
+     a preview, and let "Open in a new tab" do the work. */
+  .st-proto--browser .st-embed-start { display: none; }
+}
+
+.st-round-points {
+  list-style: none;
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  max-width: 30rem;
+}
+
+.st-round-points li {
+  position: relative;
+  padding-left: var(--sp-6);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.st-round-points li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.6em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.st-round-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  margin-top: var(--sp-2);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.st-round-link:hover { color: var(--accent-deep); }
+
+.st-rounds-stage { display: none; }
+
+@media (min-width: 900px) {
+  .st-layout-rounds .st-chapter-inner {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    grid-template-areas: "text stage" "rounds stage";
+    column-gap: clamp(var(--sp-8), 5vw, 88px);
+    row-gap: 0;
+  }
+  .st-layout-rounds .st-text { grid-area: text; padding-bottom: 10svh; }
+  .st-rounds { grid-area: rounds; gap: 0; }
+  .st-round {
+    min-height: 70svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.35;
+    transition: opacity 0.5s ease;
+  }
+  .st-round.is-active { opacity: 1; }
+  .st-frame-inline { display: none; }
+
+  /* Wider frames get the wider column, and a fixed height so the
+     stage can sit centered on screen. */
+  .st-frame-browser .st-chapter-inner,
+  .st-frame-photo .st-chapter-inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .st-frame-browser { --stage-h: calc(min(420px, 52svh) + 34px); }
+  .st-frame-photo { --stage-h: min(500px, 58svh); }
+  .st-frame-browser .st-rounds-stage .st-browser-screen { aspect-ratio: auto; height: min(420px, 52svh); }
+  .st-frame-photo .st-rounds-stage .st-photo-screen { aspect-ratio: auto; height: min(500px, 58svh); }
+  .st-frame-browser .st-rounds-stage,
+  .st-frame-photo .st-rounds-stage {
+    top: calc(var(--st-nav-h) + (100svh - var(--st-nav-h) - var(--stage-h)) / 2 - 24px);
+  }
+
+  .st-rounds-stage {
+    grid-area: stage;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    position: sticky;
+    top: calc(var(--st-nav-h) + (100svh - var(--st-nav-h) - min(560px, 68svh)) / 2 - 24px);
+    align-self: start;
+  }
+
+  .st-stage-label {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+}
+
+
+/* ============================================
+   10. VISUAL: GALLERY
+   ============================================ */
+
+.st-gallery {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 700px) {
+  .st-gallery:not(.st-gallery--pairs) { grid-template-columns: 1fr 1fr; align-items: start; }
+  .st-gallery:not(.st-gallery--pairs) .st-figure:first-child { grid-column: 1 / -1; }
+}
+
+/* Side-by-side pairs (gallery columns: 2, chapter mediaColumns: 2).
+   Each figure's flex-grow is its aspect ratio (set inline), so both
+   images in a row come out the same height. Phones stack them. */
+.st-pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.st-pair + .st-pair { margin-top: var(--sp-6); }
+
+@media (min-width: 700px) {
+  .st-pair { flex-direction: row; align-items: flex-start; }
+}
+
+@media (max-width: 699px) {
+  .st-pair > .st-figure { flex: none !important; }
+}
+
+/* Video frame + its play/pause button */
+.st-frame { position: relative; }
+
+.st-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--surface-raised);
+}
+
+.st-video-toggle {
+  position: absolute;
+  right: var(--sp-3);
+  bottom: var(--sp-3);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--shade) 72%, transparent);
+  color: var(--white);
+  font-size: 0.95rem;
+  transition: background var(--t-base);
+}
+
+.st-video-toggle:hover { background: var(--shade); }
+
+
+/* ============================================
+   11. INTERLUDE (HALFWAY)
+   Full screen, opaque, and the line glows as it arrives.
+   ============================================ */
+
+.st-interlude {
+  position: relative;
+  z-index: 2;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--st-nav-h) + var(--sp-8)) var(--st-gutter) var(--sp-16);
+  text-align: center;
+  background:
+    radial-gradient(60% 50% at 50% 45%, var(--accent-subtle), transparent 70%),
+    var(--bg);
+  scroll-margin-top: 0;
+}
+
+.st-interlude:focus { outline: none; }
+
+.st-interlude-inner {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-4);
+  width: min(720px, 100%);
+}
+
+.st-interlude-art {
+  width: min(520px, 100%);
+  height: auto;
+  overflow: visible;
+  margin-bottom: var(--sp-6);
+}
+
+.st-interlude-art path {
+  fill: none;
+  stroke-linejoin: round;
+}
+
+/* Paths use pathLength="100": a 100-long dash covers all four sides.
+   (Dashes are in path units, so no non-scaling-stroke here; that
+   measured them in screen pixels and left one side undrawn.) */
+.st-art-done {
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: var(--accent-subtle) !important;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 0;
+}
+
+.st-art-next {
+  stroke: color-mix(in srgb, var(--text-muted) 55%, transparent);
+  stroke-width: 1.25;
+  stroke-dasharray: 2 2;
+}
+
+.st-art-point { fill: var(--bg); stroke: var(--text-muted); stroke-width: 2; }
+.st-art-point.is-done { fill: var(--accent); stroke: var(--accent); }
+.st-art-point.is-here { filter: drop-shadow(0 0 8px var(--accent)); }
+
+.st-motion .st-interlude .st-art-done {
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 1.6s var(--st-ease) 0.2s;
+}
+.st-motion .st-interlude.is-in .st-art-done { stroke-dashoffset: 0; }
+
+.st-interlude .st-eyebrow { justify-content: center; margin-bottom: 0; }
+
+.st-interlude-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2rem + 5vw, 6rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--text);
+}
+
+.st-interlude-line {
+  font-size: clamp(1.125rem, 1rem + 0.7vw, 1.5rem);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+
+/* ============================================
+   12. METRICS, REFLECTION, NEXT STORY
+   Opaque panels: the line runs behind them.
+   ============================================ */
+
+.st-panel {
+  position: relative;
+  z-index: 2;
+  width: var(--st-wrap);
+  margin: 0 auto var(--sp-8);
+  padding: clamp(var(--sp-8), 5vw, var(--sp-16));
+  border-radius: var(--r-2xl);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.st-metrics-section { margin-top: clamp(var(--sp-8), 6vw, var(--sp-16)); }
+
+.st-panel-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: var(--sp-8);
+}
+
+.st-reflection p {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.st-reflection p + p { margin-top: var(--sp-4); }
+
+.st-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-8) var(--sp-6);
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .st-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.st-metric-value {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 2rem + 3vw, 4.5rem);
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--accent-strong);
+}
+
+.st-metric-label {
+  margin-top: var(--sp-2);
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.st-metric-detail {
+  margin-top: var(--sp-1);
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.st-metrics--compact {
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+}
+
+.st-metrics--compact .st-metric-value { font-size: clamp(2rem, 1.6rem + 1.5vw, 2.75rem); }
+
+.st-further-intro {
+  margin-top: calc(var(--sp-4) * -1);
+  margin-bottom: var(--sp-6);
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.st-further-list {
+  list-style: none;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 900px) {
+  .st-further-list { grid-template-columns: 1fr 1fr; column-gap: var(--sp-8); }
+}
+
+.st-further-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: var(--sp-3);
+  min-height: 44px;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  transition: color var(--t-base);
+}
+
+.st-further-link:hover { color: var(--accent-strong); }
+
+.st-further-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.st-further-meta {
+  grid-column: 1;
+  margin-top: var(--sp-1);
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.st-further-link i {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--accent-strong);
+  font-size: 0.875rem;
+}
+
+.st-next {
+  position: relative;
+  z-index: 2;
+  width: min(640px, 100% - var(--st-gutter) * 2);
+  margin: clamp(var(--sp-16), 8vw, 120px) auto clamp(var(--sp-16), 10vw, 160px);
+}
+
+.st-next-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: var(--sp-4);
+}
+
+.st-next-card {
+  display: block;
+  width: 100%;
+  height: auto;       /* the homepage carousel fixes card height; not here */
+}
+.st-next-card .project-thumb img { view-transition-name: none; }  /* named on click, see js */
+.st-next-card .project-thumb { height: clamp(180px, 30vw, 260px); }
+.st-next-card .project-body h3 { font-size: 1.25rem; }
+.st-next-card .card-subtitle { font-size: 1rem; margin-top: 0; margin-bottom: 0; }
+
+
+/* ============================================
+   13. BACKGROUND LINE (SPINE)
+   Desktop only. Two strands share the single-thread stretches, so
+   they're faded as a group (no darker overlap).
+   ============================================ */
+
+.st-spine {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+@media (min-width: 1100px) {
+  .st-spine { display: block; }
+}
+
+.st-spine-g { opacity: 0.45; }
+
+.st-strand {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.st-spine.is-pulling .st-strand {
+  transition: stroke-dashoffset 1.3s var(--st-ease);
+}
+
+.st-spine.is-glowing .st-spine-g {
+  animation: st-glow 1.9s ease;
+}
+
+@keyframes st-glow {
+  0%, 100% { opacity: 0.45; filter: none; }
+  35% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 12px var(--accent));
+  }
+}
+
+
+/* ============================================
+   14. DESKTOP NAVIGATOR
+   A miniature of the same line, one dot per chapter. Labels show
+   on hover and keyboard focus; the link text is always there for
+   screen readers.
+   ============================================ */
+
+.st-navigator {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .st-navigator {
+    display: block;
+    position: fixed;
+    left: 24px;
+    top: calc(50% + var(--st-nav-h) / 2);
+    width: 40px;
+    height: min(62vh, 560px);
+    transform: translateY(-50%);
+    z-index: 850;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .st-navigator.is-visible { opacity: 1; pointer-events: auto; }
+}
+
+.st-nav-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.st-nav-art path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+
+/* The outline is a quiet guide; the dots are what you click, so they
+   stay bright. */
+.st-nav-track { stroke: color-mix(in srgb, var(--text-muted) 16%, transparent); stroke-width: 1; }
+.st-nav-progress { stroke: color-mix(in srgb, var(--accent) 38%, transparent); stroke-width: 1.25; clip-path: inset(0 0 100% 0); }
+
+.st-nav-list { list-style: none; }
+
+.st-nav-list li {
+  position: absolute;
+  left: 0;
+  top: var(--y);
+  width: 40px;
+  height: 0;
+}
+
+.st-nav-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.st-nav-dot::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.st-nav-dot:hover::before { border-color: var(--accent-strong); }
+
+.st-nav-dot--pinch::before,
+.st-nav-dot--interlude::before {
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+.st-nav-dot.is-passed::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.st-nav-dot.is-current::before {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.st-nav-label {
+  position: absolute;
+  left: 36px;
+  top: 50%;
+  transform: translate(-6px, -50%);
+  white-space: nowrap;
+  font-size: 1rem;
+  line-height: 1.2;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.st-nav-num { color: var(--accent-strong); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.st-nav-dot:hover .st-nav-label,
+.st-nav-dot:focus-visible .st-nav-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+
+/* ============================================
+   15. MOBILE PROGRESS BAR + CHAPTERS MENU
+   Below 1100px. Safe areas respected for notched phones.
+   ============================================ */
+
+.st-progress,
+.st-chapters-btn { display: none; }
+.st-chapters-btn { font: inherit; font-size: 1rem; }
+
+@media (max-width: 1099px) {
+  .st-progress {
+    display: block;
+    position: fixed;
+    top: var(--st-nav-h);
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 899;
+    background: color-mix(in srgb, var(--text-muted) 18%, transparent);
+  }
+
+  .st-progress-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+
+  .st-progress-mark {
+    position: absolute;
+    top: -3px;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    transform: rotate(45deg);
+    background: var(--bg);
+    border: 2px solid var(--accent-strong);
+  }
+
+  .st-chapters-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--sp-4) + env(safe-area-inset-bottom));
+    z-index: 905;
+    min-height: 48px;
+    max-width: calc(100% - 2 * (var(--sp-4) + 56px));
+    padding: 0 var(--sp-6);
+    border-radius: var(--r-pill);
+    border: 1px solid var(--glass-border-hover);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-card);
+    color: var(--text);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 12px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .st-chapters-btn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+
+  .st-chapters-btn i { color: var(--accent-strong); }
+}
+
+.st-chapters-current {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.st-chapters-current:empty { display: none; }
+
+.st-chapters {
+  width: min(560px, 100% - 32px);
+  max-height: min(80dvh, 720px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow-hover);
+  overscroll-behavior: contain;
+}
+
+.st-chapters::backdrop {
+  background: color-mix(in srgb, var(--shade) 55%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 599px) {
+  /* Bottom sheet on phones */
+  .st-chapters {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.st-motion .st-chapters[open] { animation: st-rise 0.3s var(--st-ease); }
+
+.st-chapters-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-6);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.st-chapters-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 400;
+}
+
+.st-chapters-close {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.25rem;
+}
+
+.st-chapters-close:hover { background: var(--accent-subtle); }
+
+.st-menu {
+  list-style: none;
+  padding: var(--sp-2) var(--sp-3) var(--sp-6);
+}
+
+.st-menu-group {
+  padding: var(--sp-4) var(--sp-3) var(--sp-2);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.st-menu-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 48px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  font-size: 1.0625rem;
+  color: var(--text);
+}
+
+.st-menu-link:hover { background: var(--accent-subtle); }
+
+.st-menu-link[aria-current] {
+  background: var(--accent-subtle);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.st-menu-num {
+  width: 2rem;
+  flex: none;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-strong);
+}
+
+.st-menu-link.is-checkpoint { color: var(--accent-strong); font-weight: 600; }
+
+
+/* ============================================
+   16. PAGE TRANSITIONS
+   The homepage card's image frame and the opening card's image
+   frame share a view-transition name (set in JS), so one grows into
+   the other. Browsers without cross-document transitions, or where
+   the story wasn't built in time, get a soft fade instead.
+   ============================================ */
+
+/* The morph itself (both directions) is styled in styles.css,
+   section 0, since the homepage is the "new" page on the way back. */
+
+@keyframes st-page-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.st-fade-in body { animation: st-page-in 0.45s ease-out both; }
+
+
+/* ============================================
+   17. REDUCED MOTION
+   Everything visible and in place, the line fully drawn (JS), no
+   drift, no scatter flight, no count-up (JS).
+   ============================================ */
+
+.st-motion .st-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.9s var(--ease-out) calc(var(--i, 0) * 140ms),
+    transform 0.9s var(--st-ease) calc(var(--i, 0) * 140ms);
+}
+
+.st-motion .is-in .st-reveal,
+.st-motion .st-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-reveal,
+  .st-idea,
+  .st-dot,
+  .st-frame { transition: none !important; animation: none !important; }
+  .st-frame { transform: none !important; }
+}
+
+
+/* ============================================
+   ZOOM
+   Every story image opens full screen (js: "Zoom" in wire()). If
+   the original is bigger than the screen, clicking it again shows it
+   at full size to pan around.
+   ============================================ */
+
+.st-zoomable { cursor: zoom-in; }
+
+.st-zoomable:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+
+.st-zoom {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: color-mix(in srgb, var(--shade) 92%, transparent);
+  color: var(--on-shade);
+}
+
+.st-zoom::backdrop { background: transparent; }
+
+.st-zoom[open] { animation: st-zoom-in 0.25s ease; }
+
+@keyframes st-zoom-in { from { opacity: 0; } }
+
+.st-zoom-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 72px var(--st-gutter) var(--sp-6);
+  cursor: zoom-out;
+}
+
+.st-zoom-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100svh - 150px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--r-md);
+  background: var(--white);
+  cursor: zoom-out;
+}
+
+.st-zoom.can-grow .st-zoom-img { cursor: zoom-in; }
+
+.st-zoom.is-full .st-zoom-figure {
+  width: max-content;
+  min-width: 100%;
+}
+
+.st-zoom.is-full .st-zoom-img {
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+
+.st-zoom-cap {
+  max-width: 44rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--on-shade);
+}
+
+.st-zoom.is-full .st-zoom-cap { display: none; }
+
+.st-zoom-close {
+  position: fixed;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.125rem;
+  color: var(--on-shade);
+  background: color-mix(in srgb, var(--white) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--white) 30%, transparent);
+  cursor: pointer;
+}
+
+.st-zoom-close:hover { background: color-mix(in srgb, var(--white) 26%, transparent); }
+
+.st-zoom-close:focus-visible {
+  outline: 3px solid var(--on-shade);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-zoom[open] { animation: none; }
+}
+
+
+/* ============================================
+   JOURNEY
+   Stops along a line. With motion, the line draws itself and the
+   stops pop in one by one when it comes into view. Vertical on
+   phones.
+   ============================================ */
+
+.st-journey {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  gap: var(--sp-4);
+  list-style: none;
+  padding-top: 30px;
+}
+
+.st-journey::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: calc(50% / var(--n));
+  right: calc(50% / var(--n));
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left center;
+}
+
+.st-stop {
+  position: relative;
+  text-align: center;
+}
+
+.st-stop-dot {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--accent);
+}
+
+.st-stop-num {
+  display: block;
+  margin-top: var(--sp-3);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-strong);
+}
+
+.st-stop-label {
+  margin-top: var(--sp-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 1.875rem);
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.st-stop-text {
+  margin-top: var(--sp-2);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.st-motion .st-journey::before { transition: transform 1.2s var(--st-ease) 0.2s; }
+.st-motion .st-visual:not(.is-in) .st-journey::before { transform: scaleX(0); }
+.st-motion .st-stop-dot { transition: transform 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) calc(0.35s + var(--k) * 0.3s); }
+.st-motion .st-visual:not(.is-in) .st-stop-dot { transform: scale(0); }
+.st-motion .st-stop > :not(.st-stop-dot) {
+  transition: opacity 0.5s ease calc(0.5s + var(--k) * 0.3s),
+              transform 0.5s var(--st-ease) calc(0.5s + var(--k) * 0.3s);
+}
+.st-motion .st-visual:not(.is-in) .st-stop > :not(.st-stop-dot) { opacity: 0; transform: translateY(10px); }
+
+@media (max-width: 699px) {
+  .st-journey {
+    grid-template-columns: 1fr;
+    gap: var(--sp-6);
+    padding-top: 0;
+    padding-left: 40px;
+  }
+  .st-journey::before {
+    top: 10px;
+    bottom: 10px;
+    left: 9px;
+    right: auto;
+    width: 2px;
+    height: auto;
+    transform-origin: center top;
+  }
+  .st-motion .st-visual:not(.is-in) .st-journey::before { transform: scaleY(0); }
+  .st-stop { text-align: left; }
+  .st-stop-dot { top: 2px; left: -40px; margin-left: 0; }
+  .st-stop-num { margin-top: 0; }
+}
+
+
+/* ============================================
+   REFRAME
+   The old framing gets a hand-drawn strike, then the new one slides
+   in. Without motion, both show in their final state.
+   ============================================ */
+
+.st-reframe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3) var(--sp-6);
+  padding: var(--sp-8) 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.st-reframe-from {
+  position: relative;
+  display: inline-block;
+  color: var(--text-muted);
+}
+
+.st-reframe-strike {
+  position: absolute;
+  left: -4%;
+  top: 52%;
+  width: 108%;
+  height: 0.4em;
+  transform: translateY(-50%);
+  overflow: visible;
+}
+
+/* The SVG is stretched to the phrase, and non-scaling-stroke keeps the
+   line an even 3px. That combination measures dashes in screen pixels,
+   so a pathLength dash left gaps in longer phrases. The strike is
+   drawn by un-clipping it from the left instead (see motion below). */
+.st-reframe-strike path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.st-reframe-arrow {
+  font-size: 0.45em;
+  color: var(--accent-strong);
+}
+
+.st-reframe-to {
+  font-style: italic;
+  color: var(--text);
+}
+
+.st-reframe-caption {
+  max-width: 36rem;
+  margin: calc(var(--sp-4) * -1) auto 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.st-motion .st-reframe-strike { clip-path: inset(0 100% 0 0); transition: clip-path 0.6s var(--st-ease) 0.5s; }
+.st-motion .st-visual.is-in .st-reframe-strike { clip-path: inset(0 0 0 0); }
+.st-motion .st-reframe-from { color: var(--text); transition: color 0.5s ease 0.9s; }
+.st-motion .st-visual.is-in .st-reframe-from { color: var(--text-muted); }
+.st-motion .st-reframe-arrow,
+.st-motion .st-reframe-to {
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.5s ease, transform 0.6s var(--st-ease);
+}
+.st-motion .st-visual.is-in .st-reframe-arrow { opacity: 1; transform: none; transition-delay: 1s; }
+.st-motion .st-visual.is-in .st-reframe-to { opacity: 1; transform: none; transition-delay: 1.2s; }
+
+
+/* ============================================
+   BRIDGE
+   Two sides and the gap between them. With motion, the dashed gap
+   is drawn over by a solid line and its label changes. Stacked on
+   phones.
+   ============================================ */
+
+.st-bridge {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 0.8fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-4);
+  padding: clamp(var(--sp-4), 2.5vw, var(--sp-8));
+  border-radius: var(--r-2xl);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.st-bridge-side {
+  padding: var(--sp-6);
+  border-radius: var(--r-xl);
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+}
+
+.st-bridge-title {
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.st-bridge-side ul { list-style: none; }
+
+.st-bridge-side li {
+  position: relative;
+  padding: 3px 0 3px var(--sp-4);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.st-bridge-side li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.st-bridge-gap {
+  position: relative;
+  align-self: stretch;
+  min-height: 120px;
+}
+
+.st-bridge-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--text-muted) 70%, transparent) 0 8px, transparent 8px 16px);
+}
+
+.st-bridge-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: var(--accent);
+  transform-origin: left center;
+}
+
+.st-bridge-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.st-bridge-label--gap { top: calc(50% - 44px); color: var(--text-muted); opacity: 0; }
+.st-bridge-label--fix { top: calc(50% + 12px); color: var(--accent-strong); }
+
+.st-motion .st-bridge-line::after { transform: scaleX(0); transition: transform 1s var(--st-ease) 1.2s; }
+.st-motion .st-visual.is-in .st-bridge-line::after { transform: scaleX(1); }
+.st-motion .st-bridge-label--gap { opacity: 1; transition: opacity 0.4s ease 1.6s; }
+.st-motion .st-visual.is-in .st-bridge-label--gap { opacity: 0; }
+.st-motion .st-bridge-label--fix { opacity: 0; transition: opacity 0.5s ease 2s; }
+.st-motion .st-visual.is-in .st-bridge-label--fix { opacity: 1; }
+.st-motion .st-bridge-side { transition: opacity 0.6s ease, transform 0.7s var(--st-ease); }
+.st-motion .st-visual:not(.is-in) .st-bridge-side.is-left { opacity: 0; transform: translateX(-24px); }
+.st-motion .st-visual:not(.is-in) .st-bridge-side.is-right { opacity: 0; transform: translateX(24px); }
+.st-motion .st-visual.is-in .st-bridge-side.is-right { transition-delay: 0.25s; }
+
+@media (max-width: 699px) {
+  .st-bridge { grid-template-columns: 1fr; }
+  .st-bridge-gap { min-height: 130px; }
+  .st-bridge-line {
+    left: 50%;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    height: auto;
+    margin: 0 0 0 -1.5px;
+    background: repeating-linear-gradient(180deg, color-mix(in srgb, var(--text-muted) 70%, transparent) 0 8px, transparent 8px 16px);
+  }
+  .st-bridge-line::after { transform-origin: center top; }
+  .st-motion .st-bridge-line::after { transform: scaleY(0); }
+  .st-motion .st-visual.is-in .st-bridge-line::after { transform: scaleY(1); }
+  .st-bridge-label--gap { top: 16px; }
+  .st-bridge-label--fix { top: auto; bottom: 16px; }
+  .st-motion .st-visual:not(.is-in) .st-bridge-side.is-left,
+  .st-motion .st-visual:not(.is-in) .st-bridge-side.is-right { transform: translateY(16px); }
+}
+
+
+/* ============================================
+   EXERCISE ILLUSTRATIONS (GlowUp)
+   Looping SVG animations inside a pinned photo frame; paused with
+   reduced motion or Motion off (js).
+   ============================================ */
+
+.st-motion-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%),
+    var(--surface-raised);
+}
+
+.st-motion-guide {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 45%, transparent);
+  stroke-width: 2;
+  stroke-dasharray: 4 8;
+}
+
+.st-motion-target,
+.st-motion-near,
+.st-motion-far { fill: var(--accent); }
+
+.st-motion-ring,
+.st-motion-ripple {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-width: 3;
+}

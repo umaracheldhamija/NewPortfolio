@@ -47,20 +47,19 @@
      thumbnail visibly shrinks and blends into that logo across the
      navigation (and grows back out again, in reverse).
 
-     Only OpenMined, UPMC, and MeditationWise have a .project-title-logo
+     Story-engine case studies (cards with data-story, e.g. Kindred)
+     pair differently: the card's image frame morphs into the story's
+     opening card (see index.html <head> and js/story.js).
+
+     Only UPMC and MeditationWise have a .project-title-logo
      next to their <h1> (see each project's project-title-row markup).
      GlowUp Eye Care, Electric Scooters for Kids, and Kathak Kala Kendra
      don't, so those three just get the default whole-page crossfade
      above — nothing suitably small to blend into. */
 
-  [data-project="openmined"] .project-thumb img,
-  body[data-project="openmined"] .project-title-logo {
-    view-transition-name: hero-openmined;
-  }
-
-  [data-project="upmc"] .project-thumb img,
-  body[data-project="upmc"] .project-title-logo {
-    view-transition-name: hero-upmc;
+  [data-project="care2care"] .project-thumb img,
+  body[data-project="care2care"] .project-title-logo {
+    view-transition-name: hero-care2care;
   }
 
   [data-project="meditationwise"] .project-thumb img,
@@ -79,18 +78,49 @@
   mix-blend-mode: normal;
 }
 
-::view-transition-old(root),
+/* Page crossfade: the old page holds still and the new one fades in
+   over it. (Fading both at once with normal blending lets the pair
+   dip to half opacity mid-way, which reads as a flicker.) */
+::view-transition-old(root) {
+  animation: none;
+}
+
 ::view-transition-new(root) {
-  animation-duration: 0.35s;
-  animation-timing-function: var(--ease-smooth);
+  animation: vt-page-in 0.4s var(--ease-smooth) both;
+}
+
+@keyframes vt-page-in {
+  from { opacity: 0; }
+}
+
+/* Card ↔ story morph (both directions; the incoming page's CSS styles
+   the transition, and both pages load this file). One image frame
+   grows or shrinks into the other. The two snapshots are the same
+   picture, so plus-lighter blending keeps the crossfade at full
+   strength, and object-fit crops rather than stretches while the
+   frame changes shape. */
+::view-transition-group(*.story-card) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+::view-transition-image-pair(*.story-img) {
+  isolation: isolate;
+}
+
+::view-transition-old(*.story-img),
+::view-transition-new(*.story-img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: plus-lighter;
 }
 
 /* The 3 shared-element crossings run a touch slower than the plain root
    crossfade above — there's more visual distance for the image to
    travel/resize across, so it reads as a blend rather than a snap. */
 @media not (prefers-reduced-motion: reduce) {
-  ::view-transition-group(hero-openmined),
-  ::view-transition-group(hero-upmc),
+  ::view-transition-group(hero-care2care),
   ::view-transition-group(hero-meditationwise) {
     animation-duration: 0.5s;
   }
@@ -99,21 +129,18 @@
      (different logo crops/files), a straight cut reads cleaner than
      a blend — the resize/reposition still carries the "expand" feel
      on its own. */
-  ::view-transition-image-pair(hero-openmined),
-  ::view-transition-image-pair(hero-upmc),
+  ::view-transition-image-pair(hero-care2care),
   ::view-transition-image-pair(hero-meditationwise) {
     isolation: isolate;
   }
 
-  ::view-transition-old(hero-openmined),
-  ::view-transition-old(hero-upmc),
+  ::view-transition-old(hero-care2care),
   ::view-transition-old(hero-meditationwise) {
     animation: none;
     opacity: 0;
   }
 
-  ::view-transition-new(hero-openmined),
-  ::view-transition-new(hero-upmc),
+  ::view-transition-new(hero-care2care),
   ::view-transition-new(hero-meditationwise) {
     animation: none;
     opacity: 1;
@@ -139,9 +166,13 @@
   --sp-16: 4rem;     /* 64px */
   --sp-24: 6rem;     /* 96px */
 
-  /* --- Typography --- */
-  /* Display: Cormorant Garamond — elegance, spirituality */
-  /* Body: Google Sans Flex — technical precision, warmth */
+  /* --- Typography ---
+     Two families, site-wide, loaded by every page with the same
+     Google Fonts URL. Nothing else is loaded.
+     Display (headings): Cormorant Garamond, for elegance.
+     Body (everything else, incl. buttons, forms, captions):
+     Google Sans Flex, a variable font (weight 100 to 700, optical
+     size 6 to 144), for technical precision with warmth. */
   --font-display: 'Cormorant Garamond', 'Georgia', serif;
   --font-body:    'Google Sans Flex', system-ui, -apple-system, sans-serif;
 
@@ -175,106 +206,226 @@
   --r-pill: 9999px;
 
   /* ============================================
-     WARM LIGHT PALETTE (default)
-     Muted ivory backgrounds with softened surfaces.
-     Dark mode remains available only by explicit toggle.
+     COLOUR SYSTEM: vivid warm orange on warm ivory.
+     Every colour on the site is defined in this block (and its dark
+     twin below), once. Components only ever read these tokens; alpha
+     tints are derived with color-mix() rather than re-typed as rgba()
+     literals, so changing a base value re-themes the whole site.
+
+     Each accent comes as a triad:
+       --x          vivid: lines, dots, glows, washes. Never text.
+       --x-strong   same hue, text-safe: text, links, focus rings,
+                    filled buttons (with --text-on-accent)
+       --x-deep     hover/pressed for --x-strong
+     Case study pages swap the site triad for their own project triad
+     (see PROJECT ACCENTS below); everything derived follows.
+
+     Contrast (WCAG AA). Every --x-strong is 4.5:1 or better against
+     --bg, --surface, --surface-raised, --paper AND against a 13%
+     accent-tinted tag pill on each; white on it is 6.2:1 or better.
+       --text            13.4:1 or better
+       --text-secondary   5.9:1 or better
+       --text-muted       4.9:1 or better
      ============================================ */
 
-  /* Backgrounds */
-  --bg:           #F5F4F0;
-  --surface:      #EDECEA;
-  --border:       #D9D8D5;
-  --bg-base:      #ece8e0;
-  --bg-primary:   var(--bg);
-  --bg-secondary: var(--surface);
-  --bg-card:      var(--surface);
-  --bg-elevated:  #e7e4de;
+  /* --- Base palette: warm neutrals --- */
+  --bg:             #F5F4F0;  /* page background (unchanged) */
+  --surface:        #EFEBE4;  /* panels, modals, cards */
+  --surface-raised: #E8E2D8;  /* deepest card tier */
+  --paper:          #FFFCF7;  /* warm white for light glass + buttons */
+  --line:           #DDD5C9;  /* hairlines and borders */
+  --bg-late:        #EDEAE2;  /* 12am to 4am easter egg (index.html) */
 
-  /* Text */
-  --text-primary:   #1A1A1A;
-  /* Darkened from #6B6B6B — fell just under 4.5:1 on the darkest
-     per-project card tier (bg-elevated). */
-  --text-secondary: #626262;
-  /* Darkened from #8a857d — the original failed WCAG AA (4.5:1) for
-     body text against several of the site's own light backgrounds. */
-  --text-muted:     #66625c;
-  --text-on-accent: #ffffff;
+  /* --- Text --- */
+  --text:           #1F1A16;
+  --text-secondary: #5B534B;
+  --text-muted:     #685F56;
 
-  /* Accents */
-  --accent-primary:   #5046e5;
-  --accent-secondary: #744ef0;
-  --accent-subtle:    rgba(80, 70, 229, 0.07);
-  --accent-glow:      rgba(80, 70, 229, 0.11);
-  --accent-glow-lg:   rgba(80, 70, 229, 0.2);
-  --tilt-stroke-1:    rgba(80, 70, 229, 0.55);
-  --tilt-stroke-2:    rgba(251, 182, 206, 0.45);
-  --tilt-stroke-3:    rgba(80, 70, 229, 0.2);
+  /* --- Site accent: vivid orange --- */
+  --accent:         #F86612;
+  --accent-strong:  #A53700;
+  --accent-deep:    #772800;
+  --accent-2:       #E3A04A;  /* honey: gradient partner */
+  --blush:          #EFB29B;  /* rose-peach: gradient partner */
 
-  /* Aurora tints */
-  --aurora-violet: rgba(171, 156, 250, 0.3);
-  --aurora-peach:  rgba(241, 191, 156, 0.28);
-  --aurora-sky:    rgba(161, 197, 236, 0.24);
-  --aurora-rose:   rgba(251, 182, 206, 0.24);
+  /* --- Project accents: one colour per case study, drawn from its
+     own imagery (logo, photo or subject), so each story has its own
+     scheme on the same ivory and espresso grounds. No purple. --- */
+  --kindred:                    #E5487F;  /* rose, from the Kindred logo */
+  --kindred-strong:             #A3164F;
+  --kindred-deep:               #780F3A;
+  --care2care:                  #5E9F63;  /* sage, the leaves by the UPMC sign */
+  --care2care-strong:           #2B6531;
+  --care2care-deep:             #1F4A24;
+  --meditationwise:             #2B92AE;  /* ocean teal, the MeditationWise logo */
+  --meditationwise-strong:      #186076;
+  --meditationwise-deep:        #124A5A;
+  --glowup:                     #EFA814;  /* sunny gold */
+  --glowup-strong:              #7A5600;
+  --glowup-deep:                #553B00;
+  --electric-scooters:          #FA7F1C;  /* safety orange */
+  --electric-scooters-strong:   #984100;
+  --electric-scooters-deep:     #6E2F00;
+  --kathak-kala-kendra:         #E8381F;  /* vermilion */
+  --kathak-kala-kendra-strong:  #AC1400;
+  --kathak-kala-kendra-deep:    #800E00;
 
-  /* Glass & Borders */
-  --glass-bg:           rgba(245, 244, 240, 0.78);
-  --glass-border:       rgba(80, 70, 229, 0.1);
-  --glass-border-hover: rgba(80, 70, 229, 0.2);
-  --border-subtle:      var(--border);
+  /* --- Fixed across both themes --- */
+  --white:          #FFFFFF;  /* logo plates */
+  --shade:          #120D09;  /* warm near-black for scrims + shadows */
+  --on-shade:       #F5F4F0;  /* text on scrims */
+  --shadow-tint:    #403628;  /* warm brown for soft light-mode shadows */
+
+  /* --- Decorative pigments (click blooms, watercolour field, confetti) ---
+     The --splash-* tokens are comma-separated lists read by script.js
+     (readCssColorList) and rasterised into the watercolour field. Each
+     bloom cross-fades 1 → 2 → 3 as it spreads: honey → apricot → clay. */
+  --pop-orange:     #FF8A4C;
+  --pop-coral:      #F4845F;
+  --pop-honey:      #F6BE55;
+  --pop-clay:       #D0654A;
+  --splash-1: #E9A24F, #F2B872, #E6A062, #F5C98F;
+  --splash-2: #F2B872, #EE9A63, #E3824F, #EDA27E;
+  --splash-3: #C8663F, #D9774F, #E0917A, #EBB0A0;
+  --pastel-1:       #FFC7AE;
+  --pastel-2:       #F9DDB0;
+  --pastel-3:       #F6BFAE;
+  --pastel-4:       #FFE3CC;
+  --pastel-5:       #EFCFA8;
+  --pastel-6:       #F7D494;
+
+  /* --- Semantic aliases (existing names components already use) --- */
+  --bg-base:        #ECE7DF;
+  --bg-primary:     var(--bg);
+  --bg-secondary:   var(--surface);
+  --bg-card:        var(--surface);
+  --bg-elevated:    var(--surface-raised);
+  --text-primary:   var(--text);
+  --text-on-accent: var(--white);
+
+  /* Glass */
+  --glass-bg:       color-mix(in srgb, var(--bg) 78%, transparent);
 
   /* Shadows */
-  --shadow-sm:    0 2px 8px rgba(64, 54, 40, 0.08);
-  --shadow-card:  0 8px 28px rgba(64, 54, 40, 0.08);
-  --shadow-hover: 0 20px 52px rgba(64, 54, 40, 0.12), 0 0 0 1px var(--glass-border-hover);
-  --shadow-glass: 0 8px 32px rgba(64, 54, 40, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --shadow-sm:    0 2px 8px color-mix(in srgb, var(--shadow-tint) 8%, transparent);
+  --shadow-card:  0 8px 28px color-mix(in srgb, var(--shadow-tint) 8%, transparent);
+  --shadow-glass: 0 8px 32px color-mix(in srgb, var(--shadow-tint) 8%, transparent), inset 0 1px 0 color-mix(in srgb, var(--white) 85%, transparent);
+}
+
+/* --- Accent-derived tokens ---
+   Declared on every element that can change --accent (the root and
+   case study <body>s), because a custom property that uses var() is
+   resolved where it's declared: without this, a project page would
+   inherit tints mixed from the site orange. */
+:root,
+body[data-project] {
+  --accent-primary:     var(--accent-strong);
+  --accent-secondary:   var(--accent-deep);
+  --accent-soft:        color-mix(in srgb, var(--accent) 14%, var(--bg));
+  --accent-subtle:      color-mix(in srgb, var(--accent) 8%, transparent);
+  --accent-glow:        color-mix(in srgb, var(--accent) 13%, transparent);
+  --accent-glow-lg:     color-mix(in srgb, var(--accent) 22%, transparent);
+  --tilt-stroke-1:      color-mix(in srgb, var(--accent) 55%, transparent);
+  --tilt-stroke-2:      color-mix(in srgb, var(--blush) 50%, transparent);
+  --tilt-stroke-3:      color-mix(in srgb, var(--accent-2) 25%, transparent);
+  --glass-border:       color-mix(in srgb, var(--accent) 14%, transparent);
+  --glass-border-hover: color-mix(in srgb, var(--accent) 28%, transparent);
+  --border:             var(--line);
+  --border-subtle:      var(--border);
+  --shadow-hover: 0 20px 52px color-mix(in srgb, var(--shadow-tint) 12%, transparent), 0 0 0 1px var(--glass-border-hover);
 }
 
 
 /* ============================================
    2. DARK MODE OVERRIDE
+   Same warm family, inverted: espresso surfaces, cream text, and
+   lighter accents that pass AA as text on every dark tier (5:1 or
+   better, tag pills included). Filled accent buttons switch to dark
+   text, since white on a light accent would fail.
    ============================================ */
 
 [data-theme="dark"] {
-  /* Backgrounds */
-  --bg:           #0b0e17;
-  --surface:      #10152a;
-  --border:       rgba(143, 162, 255, 0.16);
-  --bg-base:      #07091121;
-  --bg-primary:   var(--bg);
-  --bg-secondary: #10152a;
-  --bg-card:      #161c38;
-  --bg-elevated:  #1c2445;
+  /* Base palette */
+  --bg:             #14110E;
+  --surface:        #1C1814;
+  --surface-raised: #2D251E;
+  --paper:          #241E18;
+  --bg-card:        #241E18;
+  --bg-base:        color-mix(in srgb, var(--shade) 13%, transparent);
 
   /* Text */
-  --text-primary:   #dde0f5;
-  --text-secondary: #a8afdd;
-  /* Lightened from #747ca3 for the same WCAG AA reason as the light
-     mode value above. */
-  --text-muted:     #9096b5;
-  --text-on-accent: #ffffff;
+  --text:           #F2EAE0;
+  --text-secondary: #CEC1B2;
+  --text-muted:     #AE9F8F;
+  --text-on-accent: var(--shade);
 
-  /* Accents */
-  --accent-primary:   #8fa2ff;
-  --accent-secondary: #c38fff;
-  --accent-subtle:    rgba(143, 162, 255, 0.1);
-  --accent-glow:      rgba(143, 162, 255, 0.18);
-  --accent-glow-lg:   rgba(143, 162, 255, 0.32);
-  --tilt-stroke-1:    rgba(143, 162, 255, 0.55);
-  --tilt-stroke-2:    rgba(195, 143, 255, 0.42);
-  --tilt-stroke-3:    rgba(143, 162, 255, 0.18);
+  /* Site accent */
+  --accent:         #FF843D;
+  --accent-strong:  #FF8547;
+  --accent-deep:    #FFA77A;
+  --accent-2:       #F0B96A;
+  --blush:          #E9A08A;
 
-  /* Glass & Borders */
-  --glass-bg:           rgba(14, 18, 52, 0.58);
-  --glass-border:       rgba(143, 162, 255, 0.13);
-  --glass-border-hover: rgba(143, 162, 255, 0.28);
-  --border-subtle:      rgba(143, 162, 255, 0.07);
+  /* Project accents */
+  --kindred:                    #FF6F9F;
+  --kindred-strong:             #FF8AB2;
+  --kindred-deep:               #FFB3CD;
+  --care2care:                  #7CC080;
+  --care2care-strong:           #8FD092;
+  --care2care-deep:             #B5E2B7;
+  --meditationwise:             #4DB8D6;
+  --meditationwise-strong:      #6CC7E0;
+  --meditationwise-deep:        #9DDAEB;
+  --glowup:                     #FFC93D;
+  --glowup-strong:              #FFC53D;
+  --glowup-deep:                #FFD978;
+  --electric-scooters:          #FF9340;
+  --electric-scooters-strong:   #FF9A52;
+  --electric-scooters-deep:     #FFB47E;
+  --kathak-kala-kendra:         #FF563F;
+  --kathak-kala-kendra-strong:  #FF8676;
+  --kathak-kala-kendra-deep:    #FFAEA3;
+
+  /* Glass */
+  --glass-bg:       color-mix(in srgb, var(--surface) 62%, transparent);
 
   /* Shadows */
-  --shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-card:  0 4px 24px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--glass-border-hover);
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-sm:    0 2px 8px color-mix(in srgb, var(--shade) 30%, transparent);
+  --shadow-card:  0 4px 24px color-mix(in srgb, var(--shade) 35%, transparent);
+  --shadow-glass: 0 8px 32px color-mix(in srgb, var(--shade) 40%, transparent), inset 0 1px 0 color-mix(in srgb, var(--white) 4%, transparent);
 }
+
+/* Accent-derived tokens tuned for a dark ground (see note above) */
+[data-theme="dark"],
+[data-theme="dark"] body[data-project] {
+  --line:               color-mix(in srgb, var(--accent) 16%, transparent);
+  --border-subtle:      color-mix(in srgb, var(--accent) 7%, transparent);
+  --accent-subtle:      color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-glow:        color-mix(in srgb, var(--accent) 18%, transparent);
+  --accent-glow-lg:     color-mix(in srgb, var(--accent) 32%, transparent);
+  --tilt-stroke-3:      color-mix(in srgb, var(--accent) 18%, transparent);
+  --glass-border:       color-mix(in srgb, var(--accent) 14%, transparent);
+  --glass-border-hover: color-mix(in srgb, var(--accent) 30%, transparent);
+  --shadow-hover: 0 16px 48px color-mix(in srgb, var(--shade) 55%, transparent), 0 0 0 1px var(--glass-border-hover);
+}
+
+/* --- PROJECT ACCENTS ---
+   A case study <body data-project="x"> swaps in its own triad. On the
+   homepage, each card only borrows its project colour for its border
+   and hover outline; tags stay site orange. */
+body[data-project="kindred"]            { --accent: var(--kindred);            --accent-strong: var(--kindred-strong);            --accent-deep: var(--kindred-deep); }
+body[data-project="care2care"]          { --accent: var(--care2care);          --accent-strong: var(--care2care-strong);          --accent-deep: var(--care2care-deep); }
+body[data-project="meditationwise"]     { --accent: var(--meditationwise);     --accent-strong: var(--meditationwise-strong);     --accent-deep: var(--meditationwise-deep); }
+body[data-project="glowup"]             { --accent: var(--glowup);             --accent-strong: var(--glowup-strong);             --accent-deep: var(--glowup-deep); }
+body[data-project="electric-scooters"]  { --accent: var(--electric-scooters);  --accent-strong: var(--electric-scooters-strong);  --accent-deep: var(--electric-scooters-deep); }
+body[data-project="kathak-kala-kendra"] { --accent: var(--kathak-kala-kendra); --accent-strong: var(--kathak-kala-kendra-strong); --accent-deep: var(--kathak-kala-kendra-deep); }
+
+[data-project="kindred"]            { --project-accent: var(--kindred); }
+[data-project="care2care"]          { --project-accent: var(--care2care); }
+[data-project="meditationwise"]     { --project-accent: var(--meditationwise); }
+[data-project="glowup"]             { --project-accent: var(--glowup); }
+[data-project="electric-scooters"]  { --project-accent: var(--electric-scooters); }
+[data-project="kathak-kala-kendra"] { --project-accent: var(--kathak-kala-kendra); }
 
 /* Large text accessibility mode — scales all type, not just body */
 body.large-text {
@@ -368,6 +519,19 @@ button, [role="button"] {
   cursor: pointer;
 }
 
+/* Visually hidden, still read by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ============================================
    FOCUS STYLES — WCAG 2.2 AA Requirement
    :focus-visible = keyboard users only.
@@ -425,13 +589,15 @@ a, button, input, textarea, select, [tabindex]:not([tabindex="-1"]) {
   background:
     linear-gradient(
       160deg,
-      rgba(7, 9, 22, 0.94) 0%,
-      rgba(11, 14, 23, 0.85) 50%,
-      rgba(15, 20, 42, 0.9) 100%
+      color-mix(in srgb, var(--bg) 94%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 85%, transparent) 50%,
+      color-mix(in srgb, var(--surface) 90%, transparent) 100%
     ),
     url('images/thunder.jpeg') center / cover no-repeat;
   background-attachment: fixed;
-  filter: blur(28px) brightness(0.1) contrast(0.75);
+  /* sepia + hue-rotate turn the photo's blue-violet storm amber, in
+     keeping with the warm palette */
+  filter: blur(28px) brightness(0.1) contrast(0.75) sepia(1) hue-rotate(-12deg) saturate(1.8);
   opacity: 0.07;
 }
 
@@ -446,7 +612,9 @@ a, button, input, textarea, select, [tabindex]:not([tabindex="-1"]) {
   inset: 0;
   background: url('images/thunder.jpeg') center / cover;
   background-attachment: fixed;
-  filter: brightness(0.48) contrast(1.2) saturate(0.85);
+  /* The source photo's lightning is blue-violet; sepia + a slight
+     hue-rotate re-tints it amber so no purple ever shows. */
+  filter: brightness(0.48) contrast(1.2) sepia(1) hue-rotate(-12deg) saturate(2.2);
   opacity: 0;
   transition: opacity var(--dur-slow) var(--ease-smooth);
   z-index: 1;
@@ -520,7 +688,7 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   animation: blob-expand 2000ms var(--ease-smooth) forwards;
 }
 
-/* Light mode: warm aurora colors (deep oranges, pinks, yellows, magentas) */
+/* Light mode: warm aurora colors (orange, coral, honey, clay) */
 [data-theme="light"] .aurora-blob {
   --blob-base: 1;
   background: radial-gradient(
@@ -541,18 +709,18 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 .aurora-blob.blob-orange {
   background: radial-gradient(
     circle at 30% 30%,
-    #ff6b35 0%,
-    #ff4500 25%,
+    var(--pop-orange) 0%,
+    var(--accent) 25%,
     transparent 70%
   ) !important;
   opacity: 1;
 }
 
-.aurora-blob.blob-pink {
+.aurora-blob.blob-coral {
   background: radial-gradient(
     circle at 30% 30%,
-    #ff1493 0%,
-    #ff69b4 25%,
+    var(--pop-coral) 0%,
+    var(--blush) 25%,
     transparent 70%
   ) !important;
   opacity: 1;
@@ -561,18 +729,18 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 .aurora-blob.blob-yellow {
   background: radial-gradient(
     circle at 30% 30%,
-    #ffed4e 0%,
-    #ffd700 25%,
+    var(--pop-honey) 0%,
+    var(--accent-2) 25%,
     transparent 70%
   ) !important;
   opacity: 0.9;
 }
 
-.aurora-blob.blob-magenta {
+.aurora-blob.blob-clay {
   background: radial-gradient(
     circle at 30% 30%,
-    #ff00ff 0%,
-    #d946ef 25%,
+    var(--pop-clay) 0%,
+    var(--pop-coral) 25%,
     transparent 70%
   ) !important;
   opacity: 1;
@@ -598,17 +766,17 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 
 /* Dark mode dot — glowing accent, additive blend */
 body:not([data-theme="light"]) .cursor-dot {
-  background: var(--accent-primary);
+  background: var(--accent);
   opacity: 0.92;
   mix-blend-mode: plus-lighter;
-  box-shadow: 0 0 6px 2px rgba(143, 162, 255, 0.4);
+  box-shadow: 0 0 6px 2px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 /* Light mode dot — tracks --accent-primary, so it (and the magnet
    trail, which already used --accent-glow) pick up each project's
    theme color automatically via the data-project overrides below. */
 [data-theme="light"] .cursor-dot {
-  background: var(--accent-primary);
+  background: var(--accent);
   opacity: 0.75;
   mix-blend-mode: normal;
   box-shadow: 0 0 0 2px var(--accent-glow);
@@ -701,7 +869,7 @@ body:not([data-theme="light"]) .cursor-dot {
   left: 0;
   width: 0;
   height: 1.5px;
-  background: var(--accent-primary);
+  background: var(--accent);
   border-radius: var(--r-pill);
   transition: width var(--dur-base) var(--ease-out);
 }
@@ -806,7 +974,7 @@ body:not([data-theme="light"]) .cursor-dot {
   border-radius: inherit;
   background: radial-gradient(
     52px circle at var(--btn-mx, 50%) var(--btn-my, 50%),
-    rgba(143, 162, 255, 0.28) 0%,
+    color-mix(in srgb, var(--accent) 28%, transparent) 0%,
     transparent 78%
   );
   opacity: 0;
@@ -828,11 +996,11 @@ body:not([data-theme="light"]) .cursor-dot {
 
 .control-btn.active {
   color: var(--text-primary);
-  background: rgba(143, 162, 255, 0.18);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
   border-color: var(--accent-primary);
 }
 
-[data-theme="light"] .control-btn.active { background: rgba(80, 70, 229, 0.15); }
+[data-theme="light"] .control-btn.active { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 
 .control-btn > i { position: relative; z-index: 1; }
 
@@ -860,7 +1028,7 @@ body:not([data-theme="light"]) .cursor-dot {
   width: 100%;
   padding: var(--sp-12) var(--sp-8);
   /* Dark mode: very subtle glass so lightning can bleed through */
-  background: rgba(8, 10, 22, 0.32);
+  background: color-mix(in srgb, var(--bg) 32%, transparent);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--glass-border);
@@ -896,7 +1064,7 @@ body.intro-active .hero-content {
 
 /* Light mode: warmer, more opaque glass panel */
 [data-theme="light"] .hero-content {
-  background: rgba(255, 252, 248, 0.72);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-color: var(--glass-border);
@@ -911,14 +1079,14 @@ body.intro-active .hero-content {
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid var(--glass-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--shade) 30%, transparent),
               0 0 0 8px var(--accent-subtle);
   transition: transform var(--t-base), box-shadow var(--t-base);
 }
 
 .profile-image:hover {
   transform: scale(1.04) translateY(-2px);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35),
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--shade) 35%, transparent),
               0 0 0 10px var(--accent-subtle);
 }
 
@@ -1003,7 +1171,7 @@ body.intro-active .hero-content {
   border-radius: inherit;
   background: radial-gradient(
     52px circle at var(--btn-mx, 50%) var(--btn-my, 50%),
-    rgba(143, 162, 255, 0.28) 0%,
+    color-mix(in srgb, var(--accent) 28%, transparent) 0%,
     transparent 78%
   );
   opacity: 0;
@@ -1081,8 +1249,8 @@ body.intro-active .hero-content {
   overflow: hidden;
   border: 1px solid var(--glass-border);
   text-decoration: none;
-  background: rgba(12, 16, 34, 0.72);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--shade) 30%, transparent);
   color: var(--text-primary);
   /* Magnetic hover — JS sets --magnet-x/--magnet-y (px) when the cursor
      is nearby; 0px when it isn't, so idle buttons sit exactly in place. */
@@ -1102,8 +1270,8 @@ body.intro-active .hero-content {
   border-radius: inherit;
   background: radial-gradient(
     90px circle at var(--btn-mx, 50%) var(--btn-my, 50%),
-    rgba(143, 162, 255, 0.22) 0%,
-    rgba(143, 162, 255, 0.12) 45%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 12%, transparent) 45%,
     transparent 80%
   );
   opacity: 0;
@@ -1120,28 +1288,28 @@ body.intro-active .hero-content {
 .btn:hover {
   transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 1px));
   border-color: var(--glass-border-hover);
-  background: rgba(20, 26, 52, 0.82);
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+  background: color-mix(in srgb, var(--bg-card) 82%, transparent);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--shade) 34%, transparent);
 }
 
 /* Press: sink back to the magnet position */
 .btn:active {
   transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--shade) 30%, transparent);
 }
 
 .btn-primary {
   background: linear-gradient(
     180deg,
-    rgba(143, 162, 255, 0.2) 0%,
-    rgba(17, 22, 44, 0.82) 100%
+    color-mix(in srgb, var(--accent) 20%, transparent) 0%,
+    color-mix(in srgb, var(--surface) 82%, transparent) 100%
   );
 }
 
-.btn-secondary { background: rgba(11, 15, 30, 0.65); }
+.btn-secondary { background: color-mix(in srgb, var(--bg) 65%, transparent); }
 
-.btn-primary:hover { background: linear-gradient(180deg, rgba(143, 162, 255, 0.3), rgba(17, 22, 44, 0.88)); }
-.btn-secondary:hover { background: rgba(17, 22, 44, 0.8); }
+.btn-primary:hover { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 30%, transparent), color-mix(in srgb, var(--surface) 88%, transparent)); }
+.btn-secondary:hover { background: color-mix(in srgb, var(--surface) 80%, transparent); }
 
 .btn-primary:active,
 .btn-secondary:active { transform: translateY(0); }
@@ -1152,44 +1320,44 @@ body.intro-active .hero-content {
   z-index: 1;
 }
 
-/* Primary: warmer purple glow tint on tracking */
+/* Primary: warmer honey glow tint on tracking */
 .btn-primary::before {
   background: radial-gradient(
     90px circle at var(--btn-mx, 50%) var(--btn-my, 50%),
-    rgba(195, 143, 255, 0.25) 0%,
-    rgba(143, 162, 255, 0.18) 45%,
+    color-mix(in srgb, var(--accent-2) 25%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 18%, transparent) 45%,
     transparent 80%
   );
 }
 
 /* Light mode button treatments */
 [data-theme="light"] .btn {
-  background: rgba(255, 252, 246, 0.92);
-  color: #2a2440;
-  border-color: rgba(80, 70, 229, 0.17);
-  box-shadow: 0 8px 20px rgba(80, 70, 229, 0.12);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 [data-theme="light"] .btn:hover {
-  background: rgba(255, 252, 246, 1);
-  border-color: rgba(80, 70, 229, 0.28);
-  box-shadow: 0 12px 24px rgba(80, 70, 229, 0.16);
+  background: var(--paper);
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 [data-theme="light"] .btn-primary {
   background: linear-gradient(
     180deg,
-    rgba(80, 70, 229, 0.14) 0%,
-    rgba(255, 252, 246, 0.96) 100%
+    color-mix(in srgb, var(--accent) 14%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 96%, transparent) 100%
   );
 }
 
-[data-theme="light"] .btn-secondary { background: rgba(255, 252, 246, 0.9); }
+[data-theme="light"] .btn-secondary { background: color-mix(in srgb, var(--paper) 90%, transparent); }
 [data-theme="light"] .btn-primary:hover {
   background: linear-gradient(
     180deg,
-    rgba(80, 70, 229, 0.2) 0%,
-    rgba(255, 252, 246, 1) 100%
+    color-mix(in srgb, var(--accent) 20%, transparent) 0%,
+    var(--paper) 100%
   );
 }
 
@@ -1217,7 +1385,7 @@ body.intro-active .hero-content {
   content: '';
   width: 1px;
   height: 36px;
-  background: linear-gradient(to bottom, var(--accent-primary), transparent);
+  background: linear-gradient(to bottom, var(--accent), transparent);
   border-radius: var(--r-pill);
 }
 
@@ -1358,7 +1526,10 @@ body.intro-active .hero-content {
 .project-card {
   display: block;
   background: var(--bg-card);
-  border: 1px solid var(--project-card-border, rgba(217, 216, 213, 0.35));
+  /* Border borrows the card's project colour (--project-accent, set
+     by [data-project] in the tokens block); tags inside stay site orange. */
+  --tilt-stroke-1: color-mix(in srgb, var(--project-accent, var(--accent)) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--project-accent, var(--accent)) 22%, transparent);
   border-radius: var(--r-xl);
   overflow: hidden;
   position: relative;
@@ -1372,7 +1543,7 @@ body.intro-active .hero-content {
 
 .project-card:not(.coming-soon):hover {
   box-shadow: var(--shadow-hover);
-  border-color: var(--project-card-border-hover, var(--glass-border-hover));
+  border-color: color-mix(in srgb, var(--project-accent, var(--accent)) 45%, transparent);
 }
 
 .project-card:not(.coming-soon):hover:not(.tilt-card) {
@@ -1456,17 +1627,54 @@ body.intro-active .hero-content {
   z-index: 1;
 }
 
-/* Image container — shorter to give more room for card body */
+/* Clicked story card: settle instantly (no tilt, no easing) so the
+   page transition captures a flat image. See index.html <head>. */
+.project-card.is-leaving,
+.project-card.is-leaving * {
+  transition: none !important;
+}
+
+/* Story cards (data-story) hint at what's inside: on hover or keyboard
+   focus a thread draws out from the centre of the image's base, the
+   same line the case study opens with. Purely decorative; the card is
+   the link either way. */
+.project-card[data-story] .project-thumb::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 2;
+  background: var(--project-accent, var(--accent));
+  transform: translateZ(17px) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.6s cubic-bezier(0.2, 0.75, 0.2, 1);
+  pointer-events: none;
+}
+
+.project-card[data-story]:hover .project-thumb::after,
+.project-card[data-story]:focus-visible .project-thumb::after {
+  transform: translateZ(17px) scaleX(1);
+}
+
+/* Image container — shorter to give more room for card body.
+   --thumb-h is shared with the highlights panel that covers it. */
+.project-card { --thumb-h: 175px; }
+
 .project-thumb {
   width: 100%;
-  height: 175px;
+  height: var(--thumb-h);
   background: linear-gradient(
     135deg,
     var(--accent-subtle) 0%,
-    rgba(195, 143, 255, 0.05) 100%
+    color-mix(in srgb, var(--accent-2) 6%, transparent) 100%
   );
   overflow: hidden;
   position: relative;
+  /* Own top corners, matching the card, so the image frame keeps its
+     shape when it morphs into a story (see section 0). */
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
 }
 
 .project-thumb::after {
@@ -1554,73 +1762,12 @@ body.intro-active .hero-content {
 .tag {
   padding: 0.3rem 0.875rem;
   background: var(--accent-subtle);
-  border: 1px solid var(--project-card-border, var(--border-subtle));
+  border: 1px solid var(--border-subtle);
   border-radius: var(--r-pill);
   font-size: var(--text-xs);
   color: var(--accent-primary);
   font-weight: 500;
   letter-spacing: 0.03em;
-}
-
-/* --- Homepage Work-section cards: border picks up each project's
-   own color (data-project on the card itself, since the homepage
-   isn't scoped to a single project the way case study pages are).
-   Tag pills stay the site-wide purple by request — only the border
-   is per-project. Values match each project's own theme — see
-   PER-PROJECT CASE STUDY THEMES further down if these ever need to
-   change together. --- */
-.project-card[data-project="openmined"] {
-  --project-card-border: rgba(59, 79, 224, 0.12);
-  --project-card-border-hover: rgba(59, 79, 224, 0.24);
-}
-[data-theme="dark"] .project-card[data-project="openmined"] {
-  --project-card-border: rgba(141, 160, 255, 0.14);
-  --project-card-border-hover: rgba(141, 160, 255, 0.3);
-}
-
-.project-card[data-project="kathak"] {
-  --project-card-border: rgba(184, 84, 26, 0.14);
-  --project-card-border-hover: rgba(184, 84, 26, 0.28);
-}
-[data-theme="dark"] .project-card[data-project="kathak"] {
-  --project-card-border: rgba(227, 145, 90, 0.16);
-  --project-card-border-hover: rgba(227, 145, 90, 0.32);
-}
-
-.project-card[data-project="upmc"] {
-  --project-card-border: rgba(201, 123, 46, 0.13);
-  --project-card-border-hover: rgba(201, 123, 46, 0.26);
-}
-[data-theme="dark"] .project-card[data-project="upmc"] {
-  --project-card-border: rgba(227, 165, 103, 0.16);
-  --project-card-border-hover: rgba(227, 165, 103, 0.32);
-}
-
-.project-card[data-project="meditationwise"] {
-  --project-card-border: rgba(21, 129, 140, 0.13);
-  --project-card-border-hover: rgba(21, 129, 140, 0.26);
-}
-[data-theme="dark"] .project-card[data-project="meditationwise"] {
-  --project-card-border: rgba(95, 196, 206, 0.15);
-  --project-card-border-hover: rgba(95, 196, 206, 0.3);
-}
-
-.project-card[data-project="scooter"] {
-  --project-card-border: rgba(232, 89, 12, 0.14);
-  --project-card-border-hover: rgba(232, 89, 12, 0.28);
-}
-[data-theme="dark"] .project-card[data-project="scooter"] {
-  --project-card-border: rgba(255, 138, 76, 0.16);
-  --project-card-border-hover: rgba(255, 138, 76, 0.32);
-}
-
-.project-card[data-project="northwestern"] {
-  --project-card-border: rgba(33, 88, 214, 0.12);
-  --project-card-border-hover: rgba(33, 88, 214, 0.24);
-}
-[data-theme="dark"] .project-card[data-project="northwestern"] {
-  --project-card-border: rgba(124, 168, 255, 0.14);
-  --project-card-border-hover: rgba(124, 168, 255, 0.3);
 }
 
 /* Tool icons row */
@@ -1753,7 +1900,7 @@ body.intro-active .hero-content {
   height: 3.25rem;
   border-radius: 50%;
   border: 1px solid var(--glass-border-hover);
-  background: #ffffff;
+  background: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1916,7 +2063,7 @@ body.intro-active .hero-content {
   top: 50%;
   transform: translateY(-50%);
   z-index: 100;
-  background: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--paper) 85%, transparent);
   border: 1px solid var(--border);
   border-radius: 50%;
   width: 44px;
@@ -1927,23 +2074,23 @@ body.intro-active .hero-content {
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--shade) 12%, transparent);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .carousel-btn:hover {
-  background: rgba(255, 255, 255, 1);
+  background: var(--paper);
 }
 
 [data-theme="dark"] .carousel-btn {
-  background: rgba(22, 28, 56, 0.85);
+  background: color-mix(in srgb, var(--bg-card) 85%, transparent);
   border-color: var(--glass-border);
   color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--shade) 40%, transparent);
 }
 
 [data-theme="dark"] .carousel-btn:hover {
-  background: rgba(28, 36, 69, 1);
+  background: var(--bg-elevated);
   border-color: var(--glass-border-hover);
 }
 
@@ -2205,7 +2352,7 @@ body.intro-active .hero-content {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: color-mix(in srgb, var(--shade) 72%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   z-index: 9000;
@@ -2230,7 +2377,7 @@ body.intro-active .hero-content {
   border: 1px solid var(--border-subtle);
   max-height: 82vh;
   overflow-y: auto;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--shade) 45%, transparent);
   animation: modal-rise 0.38s var(--ease-spring);
 }
 
@@ -2322,9 +2469,9 @@ body.intro-active .hero-content {
 .modal-image .modal-close {
   top: var(--sp-3);
   right: var(--sp-3);
-  background: rgba(10, 14, 28, 0.8);
-  border-color: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  background: color-mix(in srgb, var(--shade) 80%, transparent);
+  border-color: color-mix(in srgb, var(--white) 22%, transparent);
+  color: var(--white);
 }
 
 .exploration-modal-caption {
@@ -2417,7 +2564,7 @@ footer {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--accent-primary);
+  background: var(--accent);
   transition: width var(--t-base);
 }
 
@@ -2450,7 +2597,7 @@ footer {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--accent-primary);
+  background: var(--accent);
   transition: width var(--t-base);
 }
 
@@ -3344,7 +3491,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 }
 
 [data-theme="dark"] .vibe-badge {
-  color: rgba(168, 175, 221, 0.45);
+  color: color-mix(in srgb, var(--text-secondary) 45%, transparent);
 }
 
 
@@ -3420,7 +3567,14 @@ body.large-text .control-label { font-size: 0.68rem; }
   gap: clamp(1.5rem, 2.5vw, 2rem);
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-4) var(--sp-6) var(--sp-6);
+  /* A scroller clips everything outside it, so its padding has to
+     hold the whole hover shadow (0 20px 52px) on every side. Negative
+     margins give that space back to the layout, and scroll-padding
+     makes cards snap to the padded edge (not flush with the clip), so
+     they sit exactly where they did and the shadow shows in full. */
+  padding: 40px 64px 84px;
+  margin: -16px -64px -56px;
+  scroll-padding-inline: 64px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
   grid-template-columns: unset;
@@ -3433,11 +3587,11 @@ body.large-text .control-label { font-size: 0.68rem; }
   border-radius: 2px;
 }
 
-/* Every card: fixed width + same height */
+/* Every card: fixed width; heights match because the row stretches
+   them to the tallest card. */
 .project-card {
   flex: 0 0 370px;
   scroll-snap-align: start;
-  height: 600px;
   display: flex;
   flex-direction: column;
 }
@@ -3468,21 +3622,27 @@ body.large-text .control-label { font-size: 0.68rem; }
   margin-bottom: var(--sp-1);
 }
 
-/* Impact bullets — above tags, no auto-margin */
+/* Highlights: the card's impact bullets. By default (phones, touch
+   screens) they're a plain list between the subtitle and the tags.
+   With a mouse, they sit over the image instead and appear one at a
+   time on hover or keyboard focus, with a dot per bullet
+   (setupCardHighlights() in script.js cycles them). Screen readers
+   get every bullet either way. */
+.card-highlights {
+  margin-bottom: var(--sp-2);
+}
+
 .card-bullets {
-  list-style: none;
-  padding: 0;
-  margin-top: 0;
-  margin-bottom: var(--sp-3);
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--sp-2);
-  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .card-bullets li {
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
   padding-left: var(--sp-4);
   position: relative;
@@ -3494,48 +3654,271 @@ body.large-text .control-label { font-size: 0.68rem; }
   left: 0;
   color: var(--accent-primary);
   font-size: 1.3em;
-  line-height: 1.3;
+  line-height: 1.15;
 }
 
-/* Horizontal-scroll hint — sits under the grid, right-aligned.
-   Purely decorative (aria-hidden); native swipe/scrollbar does the work. */
-.work-scroll-hint {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--sp-2);
-  margin-top: calc(var(--sp-2) * -1);
-  padding-right: var(--sp-6);
+/* Built by script.js; only used over the image. */
+.card-highlights-foot { display: none; }
+
+@media (hover: hover) and (min-width: 769px) {
+  /* The panel is positioned from the body, so it can sit exactly over
+     the image above it; the card itself still clips at its edge. */
+  .project-card .project-body {
+    position: relative;
+    overflow: visible;
+  }
+
+  /* Larger text needs a taller frame for the longest bullet. */
+  body.large-text .project-card { --thumb-h: 200px; }
+
+  .card-highlights {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: var(--thumb-h);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: var(--sp-4) var(--sp-6) var(--sp-3);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--project-accent, var(--accent)) 12%, transparent), transparent 70%),
+      color-mix(in srgb, var(--paper) 94%, transparent);
+    opacity: 0;
+    /* Out quickly; in after a beat, so sweeping the mouse across the
+       row doesn't flash every card. */
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  .project-card:hover .card-highlights,
+  .project-card:focus-visible .card-highlights {
+    opacity: 1;
+    transition: opacity 0.35s ease 0.12s;
+  }
+
+  /* All bullets share one cell; only the current one shows. */
+  .card-bullets {
+    flex: 1;
+    grid-template-areas: 'bullet';
+    align-items: center;
+    min-height: 0;
+  }
+
+  .card-bullets li {
+    grid-area: bullet;
+    font-size: var(--text-base);
+    line-height: 1.5;
+    padding-left: 0;
+    color: var(--text-primary);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.45s var(--ease-out);
+  }
+
+  .card-bullets li::before { content: none; }
+
+  /* Outgoing bullet drifts up as the next one rises in. */
+  .card-bullets li.was-active {
+    transform: translateY(-10px);
+  }
+
+  .card-bullets li.is-active {
+    opacity: 1;
+    transform: none;
+  }
+
+  .card-highlights-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding-top: var(--sp-2);
+  }
+
+  .card-highlights-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* One dot per bullet. The current one stretches into a bar that
+     fills while its bullet is showing. Each dot has a larger hover
+     area than it looks, and hovering one jumps to its bullet. */
+  .card-dots {
+    display: flex;
+    align-items: center;
+    pointer-events: auto;
+  }
+
+  .card-dot {
+    display: grid;
+    place-items: center;
+    height: 20px;
+    padding: 0 4px;
+    cursor: pointer;
+  }
+
+  .card-dot::before {
+    content: '';
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background:
+      linear-gradient(var(--project-accent, var(--accent)), var(--project-accent, var(--accent))) left / 0% 100% no-repeat,
+      color-mix(in srgb, var(--project-accent, var(--accent)) 30%, transparent);
+    transition: width 0.35s var(--ease-out);
+  }
+
+  .card-dot.is-active::before {
+    width: 22px;
+    animation: card-dot-fill var(--dwell, 2s) linear forwards;
+  }
+
+  /* Story cards: the thread under the image draws out here too. */
+  .project-card[data-story] .card-highlights::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--project-accent, var(--accent));
+    transform: scaleX(0);
+    transition: transform 0.6s cubic-bezier(0.2, 0.75, 0.2, 1);
+  }
+
+  .project-card[data-story]:hover .card-highlights::after,
+  .project-card[data-story]:focus-visible .card-highlights::after {
+    transform: scaleX(1);
+  }
+
+  /* Clicked story card: drop the panel at once so the page
+     transition grows the image, not the text. */
+  .project-card.is-leaving .card-highlights { opacity: 0; }
+}
+
+@keyframes card-dot-fill {
+  to { background-size: 100% 100%; }
+}
+
+/* Reduced motion or Motion paused: bullets crossfade in place and the
+   current dot is simply filled. */
+@media (prefers-reduced-motion: reduce) {
+  .card-bullets li,
+  .card-bullets li.was-active { transform: none; transition: opacity 0.3s ease; }
+  .card-dot.is-active::before { animation: none; background-size: 100% 100%; }
+}
+
+body.quiet-mode .card-bullets li,
+body.quiet-mode .card-bullets li.was-active { transform: none; transition: opacity 0.3s ease; }
+body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 100% 100%; }
+
+/* --- Work carousel (setupWorkCarousel() in script.js) ---
+   A search above the row, and the writing deck's controls below it:
+   arrows, a dot per project (lit while its card is in view), pause. */
+.project-card[hidden] { display: none; }
+
+.work-search {
+  position: relative;
+  width: min(360px, 100%);
+  margin: calc(var(--sp-4) * -1) auto var(--sp-6);
+}
+
+.work-search > i {
+  position: absolute;
+  z-index: 1; /* above the input's glass layer */
+  left: var(--sp-4);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
   color: var(--text-muted);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   pointer-events: none;
 }
 
-.work-scroll-hint i {
+.work-search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--sp-4) 0 2.6rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color var(--t-base), box-shadow var(--t-base);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.work-search-input::placeholder { color: var(--text-muted); opacity: 1; }
+
+.work-search-input:hover { border-color: var(--glass-border-hover); }
+
+.work-search-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  outline: none;
+}
+
+/* Clear button (Chrome, Safari): a small ×, in the text colour. */
+.work-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  background: var(--text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 7l10 10M17 7L7 17' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 7l10 10M17 7L7 17' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat;
+  cursor: pointer;
+}
+
+.work-search-input::-webkit-search-cancel-button:hover { background: var(--accent-primary); }
+
+.projects-grid[hidden] { display: none; }
+
+.work-empty {
+  padding: var(--sp-12) var(--sp-4);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.work-empty-clear {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: var(--sp-2);
+  padding: 0 var(--sp-2);
+  border: 0;
+  background: none;
   color: var(--accent-primary);
-  animation: work-scroll-nudge 1.6s ease-in-out infinite;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
 }
 
-@keyframes work-scroll-nudge {
-  0%, 100% { transform: translateX(0); opacity: 0.5; }
-  50%      { transform: translateX(6px); opacity: 1; }
-}
+.work-empty-clear:hover { color: var(--accent-secondary); }
 
-@media (prefers-reduced-motion: reduce) {
-  .work-scroll-hint i { animation: none; opacity: 0.7; }
-}
+.work-controls { margin-top: var(--sp-4); }
+
+.deck-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+
+/* Hidden dots belong to cards a search has filtered out. */
+.work-dots .deck-dot[hidden] { display: none; }
 
 @media (max-width: 768px) {
-  /* Swipe is self-evident on touch — hide the hint */
-  .work-scroll-hint { display: none; }
-
   .projects-grid {
-    padding-right: 60px;
-    /* Ensure grid doesn't expand body width */
-    width: 100%;
-    box-sizing: border-box;
+    /* Full-bleed on phones: cards line up with the page gutter */
+    padding: 24px 16px 40px;
+    margin: -8px -16px -16px;
+    scroll-padding-inline: 16px;
   }
 
   /* Was a flat 280px — cramped the 3 bullet points + tags into a narrow
@@ -3545,7 +3928,6 @@ body.large-text .control-label { font-size: 0.68rem; }
   .project-card {
     flex: 0 0 86vw;
     max-width: 340px;
-    height: 560px;
   }
 }
 
@@ -3772,7 +4154,7 @@ body.large-text .control-label { font-size: 0.68rem; }
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--glass-border);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--shade) 10%, transparent),
               0 0 0 5px var(--accent-subtle);
   flex-shrink: 0;
 }
@@ -3815,18 +4197,18 @@ body.large-text .control-label { font-size: 0.68rem; }
    27. RESUME MODAL — centered panel (matches article modals)
    ============================================ */
 
-/* Full-screen resume modal.
-   16px padding on the overlay keeps a thin backdrop ring visible
-   so clicking outside (that ring) still closes the modal. */
+/* Resume modal: a centered panel sized to the page, with a clear
+   backdrop around it (clicking the backdrop closes the modal). */
 .modal-resume {
-  padding: 16px;
+  padding: clamp(16px, 4vh, 40px) clamp(16px, 4vw, 48px);
   align-items: stretch;
+  justify-content: center;
 }
 
 .resume-modal-content {
   width: 100%;
   height: 100%;
-  max-width: none;
+  max-width: 1000px;
   max-height: none;
   border-radius: var(--r-lg);
   display: flex;
@@ -3839,7 +4221,7 @@ body.large-text .control-label { font-size: 0.68rem; }
   display: flex;
   align-items: center;
   gap: var(--sp-4);
-  padding: var(--sp-6) var(--sp-10);
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-8);
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-secondary);
   flex-shrink: 0;
@@ -3869,6 +4251,16 @@ body.large-text .control-label { font-size: 0.68rem; }
   min-height: 0;
   position: relative;
   overflow: hidden;
+  /* A margin of the panel's own colour around the PDF, so the page
+     doesn't run edge to edge. */
+  margin: var(--sp-6) var(--sp-8) var(--sp-8);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 640px) {
+  .resume-modal-top { padding-left: var(--sp-6); }
+  .resume-viewer { margin: var(--sp-4); }
 }
 
 .resume-iframe {
@@ -4011,7 +4403,7 @@ body.large-text .control-label { font-size: 0.68rem; }
   position: fixed;
   inset: 0;
   z-index: 9000;
-  background: rgba(0, 0, 0, 0.9);
+  background: color-mix(in srgb, var(--shade) 90%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4040,9 +4432,9 @@ body.large-text .control-label { font-size: 0.68rem; }
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
+  background: color-mix(in srgb, var(--white) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--white) 30%, transparent);
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4053,7 +4445,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 }
 
 #img-lightbox-close:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: color-mix(in srgb, var(--white) 28%, transparent);
 }
 
 .artifact-modal-panel .artifact-frame--placeholder::after {
@@ -4275,7 +4667,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 .artifact-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: color-mix(in srgb, var(--shade) 72%, transparent);
   backdrop-filter: blur(6px);
 }
 
@@ -4309,7 +4701,7 @@ body.large-text .control-label { font-size: 0.68rem; }
 
 .artifact-modal-close:hover {
   background: var(--accent-primary);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: transparent;
 }
 
@@ -4472,7 +4864,7 @@ body.large-text .control-label { font-size: 0.68rem; }
   border: 1px solid var(--glass-border);
   border-left: none;
   border-radius: 0 var(--r-lg) var(--r-lg) 0;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 0 20px color-mix(in srgb, var(--shade) 10%, transparent);
 
   cursor: pointer;
   color: inherit;
@@ -4554,7 +4946,7 @@ html.intro-skip #intro-screen { display: none !important; }
   width: 560px;
   height: 560px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(171, 156, 250, 0.14) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -55%);
@@ -4888,104 +5280,32 @@ html.intro-skip #intro-screen { display: none !important; }
 
 
 /* ============================================
-   28. PER-PROJECT CASE STUDY THEMES
+   28. PER-PROJECT CASE STUDY PERSONALITY
 
    Each case study page carries data-project="x" on <body>.
-   Overriding the same tokens the rest of the site already reads
-   (--accent-*, --glass-border*, --tilt-stroke-*) means every
-   button, tag, glow, tilt-card border, and shadow on that page
-   re-themes automatically — no component rules duplicated.
-
-   Light-mode values first (the site default); each project also
-   gets a [data-theme="dark"] pairing so the accent stays legible
-   if a visitor switches themes mid-page.
+   Colour comes from PROJECT ACCENTS in the tokens block (same
+   background and neutrals everywhere, so a case study still feels
+   like the same site). This section is the personality that isn't
+   colour: a texture, a rhythm, a corner radius, a bounce.
    ============================================ */
 
-/* --- OpenMined: privacy-preserving AI — cool indigo-electric,
-   quiet mesh-grid texture nodding to encrypted/networked data --- */
-body[data-project="openmined"] {
-  --accent-primary:   #3B4FE0;
-  /* Darkened slightly from #6C4EF0 — fell just under 4.5:1 on this
-     project's darkest card tier. */
-  --accent-secondary: #6545EF;
-  --accent-subtle:    rgba(59, 79, 224, 0.07);
-  --accent-glow:      rgba(59, 79, 224, 0.13);
-  --accent-glow-lg:   rgba(59, 79, 224, 0.22);
-  --glass-border:       rgba(59, 79, 224, 0.12);
-  --glass-border-hover: rgba(59, 79, 224, 0.24);
-  --tilt-stroke-1: rgba(59, 79, 224, 0.55);
-  --tilt-stroke-2: rgba(108, 78, 240, 0.4);
-  --tilt-stroke-3: rgba(59, 79, 224, 0.2);
-  /* Tinted page background — carries the theme through the whole
-     scroll, not just the hero */
-  --bg:           #F3F3FA;
-  --surface:      #EBEBF5;
-  --bg-card:      #EBEBF5;
-  --bg-elevated:  #E4E4F0;
-}
-
-[data-theme="dark"] body[data-project="openmined"] {
-  --accent-primary:   #8DA0FF;
-  --accent-secondary: #B39BFF;
-  --accent-subtle:    rgba(141, 160, 255, 0.1);
-  --accent-glow:      rgba(141, 160, 255, 0.2);
-  --accent-glow-lg:   rgba(141, 160, 255, 0.34);
-  --glass-border:       rgba(141, 160, 255, 0.14);
-  --glass-border-hover: rgba(141, 160, 255, 0.3);
-  --bg:           #0A0D1C;
-  --surface:      #0F1330;
-  --bg-card:      #151A3E;
-  --bg-elevated:  #1B2150;
-}
-
-body[data-project="openmined"] .project-page-hero {
+/* --- Kindred (OpenMined): quiet mesh-grid texture nodding to
+   encrypted/networked data --- */
+body[data-project="kindred"] .project-page-hero {
   background-image: radial-gradient(var(--accent-subtle) 1px, transparent 1px);
   background-size: 26px 26px;
 }
 
-/* --- Kathak Kala Kendra: warm, cultural, marigold/terracotta --- */
-body[data-project="kathak"] {
-  /* Darkened from #B8541A/#D68A2E — originals fell short of 4.5:1
-     body-text contrast against this project's own light background. */
-  --accent-primary:   #A74C18;
-  --accent-secondary: #8E5A1C;
-  --accent-subtle:    rgba(184, 84, 26, 0.08);
-  --accent-glow:      rgba(184, 84, 26, 0.15);
-  --accent-glow-lg:   rgba(184, 84, 26, 0.24);
-  --glass-border:       rgba(184, 84, 26, 0.14);
-  --glass-border-hover: rgba(184, 84, 26, 0.28);
-  --tilt-stroke-1: rgba(184, 84, 26, 0.55);
-  --tilt-stroke-2: rgba(214, 138, 46, 0.4);
-  --tilt-stroke-3: rgba(184, 84, 26, 0.2);
-  --bg:           #FAF4EE;
-  --surface:      #F4EBE0;
-  --bg-card:      #F4EBE0;
-  --bg-elevated:  #EFE3D4;
-}
-
-[data-theme="dark"] body[data-project="kathak"] {
-  --accent-primary:   #E3915A;
-  --accent-secondary: #F0B15E;
-  --accent-subtle:    rgba(227, 145, 90, 0.12);
-  --accent-glow:      rgba(227, 145, 90, 0.22);
-  --accent-glow-lg:   rgba(227, 145, 90, 0.34);
-  --glass-border:       rgba(227, 145, 90, 0.16);
-  --glass-border-hover: rgba(227, 145, 90, 0.32);
-  --bg:           #150F0A;
-  --surface:      #1D140D;
-  --bg-card:      #251A10;
-  --bg-elevated:  #2E2114;
-}
-
-/* Full-bleed wash — .project-page-hero itself is a centered 880px
-   column (see base rule above), so painting the gradient directly on
-   it left a hard-edged rectangle instead of a soft page-wide tint.
-   This pseudo-element breaks out to full viewport width instead. */
-body[data-project="kathak"] .project-page-hero {
+/* --- Kathak Kala Kendra: soft full-bleed wash under the hero ---
+   .project-page-hero itself is a centered 880px column (see base rule
+   above), so painting the gradient directly on it left a hard-edged
+   rectangle instead of a soft page-wide tint. This pseudo-element
+   breaks out to full viewport width instead. */
+body[data-project="kathak-kala-kendra"] .project-page-hero {
   position: relative;
 }
 
-body[data-project="kathak"] .project-page-hero::before {
+body[data-project="kathak-kala-kendra"] .project-page-hero::before {
   content: '';
   position: absolute;
   top: 0;
@@ -4998,79 +5318,14 @@ body[data-project="kathak"] .project-page-hero::before {
   z-index: -1;
 }
 
-/* --- UPMC / Designing w/CARE: warm amber-orange, softer corners
-   for an empathetic feel --- */
-body[data-project="upmc"] {
-  /* Darkened from #C97B2E/#E0A15C — originals fell as low as 2.47:1
-     against this project's own light background, well under the
-     4.5:1 AA minimum for body text. */
-  --accent-primary:   #8D5620;
-  --accent-secondary: #8C561A;
-  --accent-subtle:    rgba(201, 123, 46, 0.08);
-  --accent-glow:      rgba(201, 123, 46, 0.15);
-  --accent-glow-lg:   rgba(201, 123, 46, 0.24);
-  --glass-border:       rgba(201, 123, 46, 0.13);
-  --glass-border-hover: rgba(201, 123, 46, 0.26);
-  --tilt-stroke-1: rgba(201, 123, 46, 0.55);
-  --tilt-stroke-2: rgba(224, 161, 92, 0.4);
-  --tilt-stroke-3: rgba(201, 123, 46, 0.2);
+/* --- UPMC / Designing w/CARE: softer corners for an empathetic feel --- */
+body[data-project="care2care"] {
   --r-xl: 28px;
   --r-2xl: 36px;
-  --bg:           #FAF3EC;
-  --surface:      #F4E8DA;
-  --bg-card:      #F4E8DA;
-  --bg-elevated:  #EEDCC7;
 }
 
-[data-theme="dark"] body[data-project="upmc"] {
-  --accent-primary:   #E3A567;
-  --accent-secondary: #F0C08A;
-  --accent-subtle:    rgba(227, 165, 103, 0.12);
-  --accent-glow:      rgba(227, 165, 103, 0.22);
-  --accent-glow-lg:   rgba(227, 165, 103, 0.34);
-  --glass-border:       rgba(227, 165, 103, 0.16);
-  --glass-border-hover: rgba(227, 165, 103, 0.32);
-  --bg:           #150E08;
-  --surface:      #1E140A;
-  --bg-card:      #271A0D;
-  --bg-elevated:  #302110;
-}
-
-/* --- MeditationWise: slow, breathing rhythm — calming teal-blue,
-   a gentle pulse behind the hero title --- */
-body[data-project="meditationwise"] {
-  /* Darkened from #15818C/#3FA7AE for 4.5:1 AA against this
-     project's own light background (secondary was as low as 2.47:1). */
-  --accent-primary:   #13737D;
-  --accent-secondary: #2B7176;
-  --accent-subtle:    rgba(21, 129, 140, 0.08);
-  --accent-glow:      rgba(21, 129, 140, 0.15);
-  --accent-glow-lg:   rgba(21, 129, 140, 0.24);
-  --glass-border:       rgba(21, 129, 140, 0.13);
-  --glass-border-hover: rgba(21, 129, 140, 0.26);
-  --tilt-stroke-1: rgba(21, 129, 140, 0.5);
-  --tilt-stroke-2: rgba(63, 167, 174, 0.4);
-  --tilt-stroke-3: rgba(21, 129, 140, 0.2);
-  --bg:           #EFF7F7;
-  --surface:      #E5F1F1;
-  --bg-card:      #E5F1F1;
-  --bg-elevated:  #DCEAEA;
-}
-
-[data-theme="dark"] body[data-project="meditationwise"] {
-  --accent-primary:   #5FC4CE;
-  --accent-secondary: #8AD9DF;
-  --accent-subtle:    rgba(95, 196, 206, 0.12);
-  --accent-glow:      rgba(95, 196, 206, 0.2);
-  --accent-glow-lg:   rgba(95, 196, 206, 0.32);
-  --glass-border:       rgba(95, 196, 206, 0.15);
-  --glass-border-hover: rgba(95, 196, 206, 0.3);
-  --bg:           #081514;
-  --surface:      #0D1E1D;
-  --bg-card:      #122B29;
-  --bg-elevated:  #173534;
-}
-
+/* --- MeditationWise: slow, breathing rhythm, a gentle pulse
+   behind the hero title --- */
 body[data-project="meditationwise"] .project-page-hero {
   position: relative;
 }
@@ -5101,77 +5356,205 @@ body[data-project="meditationwise"] .project-page-hero::before {
   }
 }
 
-/* --- Scooter: playful, bright, bouncier micro-interactions --- */
-body[data-project="scooter"] {
-  /* Darkened from #E8590C/#F2A33D — secondary was as low as 1.76:1
-     against this project's own light background. */
-  --accent-primary:   #AE4309;
-  --accent-secondary: #93570A;
-  --accent-subtle:    rgba(232, 89, 12, 0.08);
-  --accent-glow:      rgba(232, 89, 12, 0.16);
-  --accent-glow-lg:   rgba(232, 89, 12, 0.26);
-  --glass-border:       rgba(232, 89, 12, 0.14);
-  --glass-border-hover: rgba(232, 89, 12, 0.28);
-  --tilt-stroke-1: rgba(232, 89, 12, 0.55);
-  --tilt-stroke-2: rgba(242, 163, 61, 0.42);
-  --tilt-stroke-3: rgba(232, 89, 12, 0.22);
-  --r-pill: 9999px;
-  --bg:           #FBF4EC;
-  --surface:      #F7EADC;
-  --bg-card:      #F7EADC;
-  --bg-elevated:  #F2E0CD;
-}
-
-[data-theme="dark"] body[data-project="scooter"] {
-  --accent-primary:   #FF8A4C;
-  --accent-secondary: #FFC069;
-  --accent-subtle:    rgba(255, 138, 76, 0.12);
-  --accent-glow:      rgba(255, 138, 76, 0.22);
-  --accent-glow-lg:   rgba(255, 138, 76, 0.34);
-  --glass-border:       rgba(255, 138, 76, 0.16);
-  --glass-border-hover: rgba(255, 138, 76, 0.32);
-  --bg:           #170F08;
-  --surface:      #20150A;
-  --bg-card:      #2A1B0D;
-  --bg-elevated:  #352210;
-}
-
-body[data-project="scooter"] .btn:hover,
-body[data-project="scooter"] .tilt-card:hover {
+/* --- Scooter: playful, bouncier micro-interactions --- */
+body[data-project="electric-scooters"] .btn:hover,
+body[data-project="electric-scooters"] .tilt-card:hover {
   transform: translateY(-3px) scale(1.02);
   transition: transform var(--dur-fast) var(--ease-spring);
 }
 
-/* --- GlowUp Eye Care (Northwestern): clean clinical-modern, clear blue --- */
-body[data-project="northwestern"] {
-  --accent-primary:   #2158D6;
-  /* Darkened from #4C8CF0 — was as low as 2.73:1 against this
-     project's own light background. */
-  --accent-secondary: #1362DE;
-  --accent-subtle:    rgba(33, 88, 214, 0.07);
-  --accent-glow:      rgba(33, 88, 214, 0.13);
-  --accent-glow-lg:   rgba(33, 88, 214, 0.22);
-  --glass-border:       rgba(33, 88, 214, 0.12);
-  --glass-border-hover: rgba(33, 88, 214, 0.24);
-  --tilt-stroke-1: rgba(33, 88, 214, 0.5);
-  --tilt-stroke-2: rgba(76, 140, 240, 0.38);
-  --tilt-stroke-3: rgba(33, 88, 214, 0.2);
-  --bg:           #F1F5FC;
-  --surface:      #E8EFFA;
-  --bg-card:      #E8EFFA;
-  --bg-elevated:  #DFEAF7;
+
+/* Writing deck pause/play (autoplay control, see setupWritingDeck) */
+.deck-pause[hidden] { display: none; }
+.deck-pause i { font-size: 0.85rem; }
+
+/* "3 / 8" counter for the writing deck; only shown on phones (below) */
+.deck-count {
+  display: none;
+  min-width: 4ch;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--text-muted);
 }
 
-[data-theme="dark"] body[data-project="northwestern"] {
-  --accent-primary:   #7CA8FF;
-  --accent-secondary: #9DC2FF;
-  --accent-subtle:    rgba(124, 168, 255, 0.1);
-  --accent-glow:      rgba(124, 168, 255, 0.2);
-  --accent-glow-lg:   rgba(124, 168, 255, 0.32);
-  --glass-border:       rgba(124, 168, 255, 0.14);
-  --glass-border-hover: rgba(124, 168, 255, 0.3);
-  --bg:           #0A0E1A;
-  --surface:      #0F1428;
-  --bg-card:      #141B38;
-  --bg-elevated:  #1A2247;
+/* ============================================
+   30. MOBILE READABILITY + TOUCH
+   Phones in portrait (767px and below) and in landscape (touch screens
+   under 500px tall). Site-wide: no text under 16px, every tap target
+   at least 44px, and nothing fixed sitting on top of content.
+   ============================================ */
+
+@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-height: 500px) {
+  /* The two small type steps become 16px, which lifts tags, dates,
+     captions, labels, form labels and the footer in one place. */
+  :root {
+    --text-xs: 1rem;
+    --text-sm: 1rem;
+  }
+
+  body.large-text {
+    --text-xs: 1.0625rem;
+    --text-sm: 1.125rem;
+  }
+
+  /* Sizes set outside the type scale */
+  .hero-role,
+  .card-badge,
+  .card-label,
+  .education-school {
+    font-size: 1rem;
+  }
+
+  /* Tap targets */
+  .nav-logo,
+  .nav-links a,
+  .back-link,
+  .contact-email,
+  .footer-links a,
+  .footer-resume-btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .nav-links a {
+    min-width: 44px;
+    justify-content: center;
+  }
+
+  /* Explorations carousel dots: same 8px dot, 44px to tap */
+  .carousel-dots { gap: 0; flex-wrap: wrap; }
+  .carousel-dot {
+    box-sizing: content-box;
+    padding: 18px;
+    background-clip: content-box;
+  }
+  .carousel-dot.active { background-clip: content-box; }
+
+  /* Work cards: at 16px, long tag lists wrapped to four rows and
+     stretched every card to match. Show the first three, and let tags
+     follow the text so any spare room sits at the bottom. */
+  .project-tags { margin-top: var(--sp-2); }
+  .project-tags .tag:nth-child(n + 4) { display: none; }
+
+  /* The open menu was see-through (a blurred panel inside the blurred
+     nav can't blur), so page text showed through it. */
+  .nav-links { background: var(--bg); }
+
+  /* The floating accessibility panel is already hidden on portrait
+     phones; landscape phones get the same. */
+  .accessibility-controls { display: none !important; }
+
+  /* The side "About" tab covered the left edge of cards on phones;
+     Home in the menu does the same job. */
+  .bio-tab { display: none; }
+
+  /* Deck: dots are too small to tap, so show "3 / 8" instead (the
+     arrows and swipe still move between articles), and keep the fanned
+     cards inside the screen. */
+  .deck-dots { display: none; }
+  .deck-count { display: block; }
+
+  .deck-card[data-deck-pos="1"] { transform: translate(10px, 12px) rotate(3deg); }
+  .deck-card[data-deck-pos="2"] { transform: translate(-10px, 22px) rotate(-3deg); }
+
+  /* Scroll-to-top steps aside while the contact form is on screen,
+     so it never covers a field (script.js setupScrollTopButton). */
+  .scroll-top-btn.is-suppressed {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+  }
+}
+
+
+/* ============================================
+   "TRY THIS" HINT
+   Points at the dark mode button for a new visitor's first 5
+   seconds (setupTryDarkHint() in script.js). Desktop only.
+   ============================================ */
+
+.try-hint {
+  position: fixed;
+  z-index: 902;
+  width: 96px;
+  height: 64px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.try-hint.is-in { opacity: 1; }
+.try-hint.is-out { opacity: 0; transition-duration: 0.5s; }
+
+.try-hint-arrow {
+  display: block;
+  overflow: visible;
+  color: var(--accent-strong);
+  animation: try-hint-nudge 1.1s ease-in-out 0.9s infinite;
+}
+
+.try-hint-line,
+.try-hint-head {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+.try-hint.is-in .try-hint-line { animation: try-hint-draw 0.7s var(--ease-out) 0.15s forwards; }
+.try-hint.is-in .try-hint-head { animation: try-hint-draw 0.25s var(--ease-out) 0.8s forwards; }
+
+.try-hint-text {
+  position: absolute;
+  top: 54px;
+  left: -58px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.6rem;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--accent-strong);
+  transform: rotate(-8deg);
+  opacity: 0;
+  transition: opacity 0.4s ease 0.35s;
+}
+
+.try-hint.is-in .try-hint-text { opacity: 1; }
+
+@keyframes try-hint-draw { to { stroke-dashoffset: 0; } }
+
+/* A small push towards the button, on repeat. */
+@keyframes try-hint-nudge {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(5px, -4px); }
+}
+
+/* The button itself glows softly while the hint is up. */
+#theme-toggle.is-hinted {
+  border-color: var(--accent);
+  animation: try-hint-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes try-hint-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  50%      { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+
+/* Reduced motion: the arrow simply appears and holds still. */
+@media (prefers-reduced-motion: reduce) {
+  .try-hint-arrow,
+  #theme-toggle.is-hinted { animation: none; }
+  .try-hint-line,
+  .try-hint-head { stroke-dashoffset: 0; }
+  .try-hint.is-in .try-hint-line,
+  .try-hint.is-in .try-hint-head { animation: none; }
+}
+
+@media (max-width: 768px), (hover: none) {
+  .try-hint { display: none; }
 }
