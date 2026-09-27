@@ -85,7 +85,14 @@
         var last = ss.get('last-story');
         ss.del('last-story');
         if (e.viewTransition && last) {
-          var card = document.querySelector('.project-card[data-story][data-project="' + last + '"]');
+          // The row loops, so a project can appear twice: morph into
+          // the one nearest the middle of the screen.
+          var card = null, best = Infinity;
+          document.querySelectorAll('.project-card[data-story][data-project="' + last + '"]').forEach(function (c) {
+            var r = c.getBoundingClientRect();
+            var d = Math.abs(r.left + r.width / 2 - window.innerWidth / 2);
+            if (d < best) { best = d; card = c; }
+          });
           if (card) nameOnly(card);
         }
       });
@@ -211,7 +218,7 @@
     <div class="hero-content tilt-card" data-tilt-max="6">
 
       <h1 class="hero-name">Uma Dhamija</h1>
-      <p class="hero-role">&bull; designing for better services &bull;<br>&bull; ai ux &bull; neurotech enthusiast &bull; kathak dancer &bull;</p>
+      <p class="hero-role">designing for better services<br>user experience designer &middot; neurotech enthusiast &middot; kathak dancer</p>
 
       <!-- Social links original URLs preserved -->
       <div class="social-links" aria-label="Social links">
@@ -257,66 +264,15 @@
       <p class="section-intro" data-poem-trigger="website">Creating this website was also fun ;)</p>
     </div>
 
-    <!-- Carousel: scrolls itself one project at a time (paused on
-         hover, focus, search, off screen, or with Motion off), with
-         arrows, dots and a search that filters the cards.
+    <!-- Carousel: glides slowly through the projects on a loop
+         (paused on hover, focus, off screen, or with Motion off), and
+         can still be scrolled by hand or with the arrows.
          setupWorkCarousel() in script.js. -->
     <div class="work-carousel" id="work-carousel">
-      <div class="work-search" role="search" data-reveal>
-        <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-        <label class="sr-only" for="work-search-input">Search projects</label>
-        <input
-          type="search"
-          id="work-search-input"
-          class="work-search-input"
-          placeholder="Search projects, e.g. healthcare"
-          autocomplete="off"
-          spellcheck="false"
-          aria-controls="projects-grid"
-        >
-      </div>
-      <p class="sr-only" id="work-search-status" aria-live="polite"></p>
-
       <div class="projects-grid-wrapper">
         <div class="projects-grid" id="projects-grid" data-reveal-stagger>
 
-          <!-- 1. OpenMined Capstone -->
-          <a href="work/kindred/" class="project-card tilt-card" data-project="kindred" data-story>
-            <div class="project-thumb">
-              <img
-                src="images/story/kindred/om-hero-800.jpg"
-                srcset="images/story/kindred/om-hero-800.jpg 800w, images/story/kindred/om-hero-1600.jpg 1600w"
-                sizes="370px"
-                alt="OpenMined logo"
-                loading="lazy"
-                decoding="async"
-                width="1600"
-                height="900"
-              >
-            </div>
-            <div class="project-body">
-              <h3>Securely training AI on private data</h3>
-              <p class="card-subtitle">OpenMined · Capstone</p>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>Led discovery for OpenMined's first consumer app, delivered as Kindred, a verified peer support network for people with chronic conditions</li>
-                  <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
-                  <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
-                </ul>
-              </div>
-              <div class="project-tags">
-                <span class="tag">AI Ethics</span>
-                <span class="tag">User Research</span>
-                <span class="tag">System Design</span>
-                <span class="tag">Product + Interface Design</span>
-                <span class="tag">Healthcare UX</span>
-              </div>
-            </div>
-          </a>
-
-          <!-- 2. UPMC Magee Hospital Designing w/CARE -->
+          <!-- 1. UPMC Magee Hospital Designing w/CARE -->
           <a href="work/care2care/" class="project-card tilt-card" data-project="care2care" data-story>
             <div class="project-thumb">
               <img
@@ -348,6 +304,42 @@
                 <span class="tag">Research</span>
                 <span class="tag">Journey Mapping</span>
                 <span class="tag">Stakeholder Interviews</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 2. OpenMined Capstone (second, so it sits in the middle on load) -->
+          <a href="work/kindred/" class="project-card tilt-card" data-project="kindred" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/story/kindred/om-hero-800.jpg"
+                srcset="images/story/kindred/om-hero-800.jpg 800w, images/story/kindred/om-hero-1600.jpg 1600w"
+                sizes="370px"
+                alt="OpenMined logo"
+                loading="lazy"
+                decoding="async"
+                width="1600"
+                height="900"
+              >
+            </div>
+            <div class="project-body">
+              <h3>Securely training AI on private data</h3>
+              <p class="card-subtitle">OpenMined · Capstone</p>
+              <!-- Highlights: over the image, one at a time, on hover or
+                   focus; listed in the card on phones and touch screens -->
+              <div class="card-highlights">
+                <ul class="card-bullets">
+                  <li>Led discovery for OpenMined's first consumer app, delivered as Kindred, a verified peer support network for people with chronic conditions</li>
+                  <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
+                  <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
+                </ul>
+              </div>
+              <div class="project-tags">
+                <span class="tag">AI Ethics</span>
+                <span class="tag">User Research</span>
+                <span class="tag">System Design</span>
+                <span class="tag">Product + Interface Design</span>
+                <span class="tag">Healthcare UX</span>
               </div>
             </div>
           </a>
@@ -490,18 +482,11 @@
           </a>
 
         </div>
-        <p class="work-empty" hidden>
-          No projects match <span class="work-empty-query"></span>.
-          <button type="button" class="work-empty-clear">Show all projects</button>
-        </p>
       </div>
 
       <div class="deck-controls work-controls">
         <button class="deck-btn work-prev" type="button" aria-label="Previous project" aria-controls="projects-grid">&#8249;</button>
-        <div class="deck-dots work-dots" role="group" aria-label="Jump to a project"></div>
-        <p class="deck-count work-count" aria-live="polite"></p>
         <button class="deck-btn work-next" type="button" aria-label="Next project" aria-controls="projects-grid">&#8250;</button>
-        <button class="deck-btn deck-pause work-pause" type="button" hidden></button>
       </div>
     </div>
   </section>

@@ -656,6 +656,10 @@ function drawSplashField(now) {
     splashNextSpawnDelay = SPLASH_SPAWN_MIN + Math.random() * (SPLASH_SPAWN_MAX - SPLASH_SPAWN_MIN);
   }
 
+  // Click splashes are light mode only: switching to dark clears any
+  // still on screen at once (setupSplashClickSpawn() starts no new ones).
+  if (!isLight) splashBlooms = splashBlooms.filter((b) => !b.isClick);
+
   splashBlooms = splashBlooms.filter((b) => drawSplashBloom(b, now, scrollY, isLight));
 }
 
@@ -960,79 +964,6 @@ function setupLiquidMetal() {
       el.style.setProperty('--btn-mx', '50%');
       el.style.setProperty('--btn-my', '50%');
     }, { passive: true });
-  });
-}
-
-
-/* ============================================
-   10b. "TRY THIS" HINT
-   A hand-drawn arrow points at the dark mode button for 5 seconds,
-   once per visit (sessionStorage), until the visitor has used the
-   button (localStorage). Desktop only: the controls are hidden on
-   phones. On the homepage it waits for the intro screen to finish.
-   Clicking the button dismisses it early.
-   ============================================ */
-
-const TRY_HINT_SHOWN_KEY = 'uma-try-dark-hint-shown';  // this visit
-const TRY_HINT_DONE_KEY = 'uma-tried-dark-mode';       // for good
-
-function setupTryDarkHint() {
-  const toggle = dom.themeToggle;
-  if (!toggle) return;
-  toggle.addEventListener('click', () => {
-    try { localStorage.setItem(TRY_HINT_DONE_KEY, '1'); } catch (_) {}
-  });
-  if (state.theme === 'dark') return;
-  if (!window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)').matches) return;
-  try {
-    if (localStorage.getItem(TRY_HINT_DONE_KEY) || sessionStorage.getItem(TRY_HINT_SHOWN_KEY)) return;
-  } catch (_) { return; }
-
-  const whenIntroGone = (fn) => {
-    const intro = document.getElementById('intro-screen');
-    if (!intro || intro.classList.contains('intro-hidden')) { fn(); return; }
-    const obs = new MutationObserver(() => {
-      if (intro.classList.contains('intro-hidden')) { obs.disconnect(); fn(); }
-    });
-    obs.observe(intro, { attributes: true, attributeFilter: ['class'] });
-  };
-
-  whenIntroGone(() => {
-    try { sessionStorage.setItem(TRY_HINT_SHOWN_KEY, '1'); } catch (_) {}
-
-    const hint = document.createElement('div');
-    hint.className = 'try-hint';
-    hint.setAttribute('aria-hidden', 'true');
-    // The arrow's tip sits at (92, 8) in its 96 x 64 box.
-    hint.innerHTML = `
-      <svg class="try-hint-arrow" viewBox="0 0 96 64" width="96" height="64">
-        <path class="try-hint-line" pathLength="1" d="M6 58 C 22 60, 40 52, 54 38 S 78 12, 90 9"/>
-        <path class="try-hint-head" pathLength="1" d="M78 4 L91 8.5 L83 19"/>
-      </svg>
-      <span class="try-hint-text">try this</span>`;
-    document.body.appendChild(hint);
-
-    const place = () => {
-      const r = toggle.getBoundingClientRect();
-      hint.style.left = `${r.left - 96 - 6}px`;
-      hint.style.top = `${r.top + r.height / 2 - 8}px`;
-    };
-    place();
-    window.addEventListener('resize', place);
-    toggle.classList.add('is-hinted');
-    requestAnimationFrame(() => hint.classList.add('is-in'));
-
-    let gone = false;
-    const leave = () => {
-      if (gone) return;
-      gone = true;
-      toggle.classList.remove('is-hinted');
-      hint.classList.add('is-out');
-      window.removeEventListener('resize', place);
-      setTimeout(() => hint.remove(), 600);
-    };
-    setTimeout(leave, 5000);
-    toggle.addEventListener('click', leave, { once: true });
   });
 }
 
@@ -2148,38 +2079,15 @@ function setupWritingDeck() {
   }, { passive: true });
 
   // Autoplay: the next article every 2 seconds. It pauses while the
-  // deck is hovered or focused, while it's off screen or the tab is
-  // hidden, and when the reader presses pause; it never runs with
-  // reduced motion or the site's Motion toggle off. The pause button
-  // is what makes auto-advancing content accessible (WCAG 2.2.2).
+  // deck is hovered or focused, and while it's off screen or the tab
+  // is hidden; it never runs with reduced motion or the site's Motion
+  // toggle off. That toggle is the pause control (WCAG 2.2.2).
   const DECK_INTERVAL = 2000;
-  let userPaused = false;
   let hovered = false;
   let inView = false;
 
-  const pauseBtn = document.createElement('button');
-  pauseBtn.type = 'button';
-  pauseBtn.className = 'deck-btn deck-pause';
-  nextBtn?.after(pauseBtn);
+  function autoplaying() { return !state.reducedMotion && !state.quietMode; }
 
-  function motionAllowed() { return !state.reducedMotion && !state.quietMode; }
-  function autoplaying() { return motionAllowed() && !userPaused; }
-  let pauseKey = '';
-  function syncPauseBtn() {
-    const key = `${motionAllowed()}|${userPaused}`;
-    if (key === pauseKey) return;
-    pauseKey = key;
-    pauseBtn.hidden = !motionAllowed();
-    pauseBtn.setAttribute('aria-label', userPaused ? 'Play articles automatically' : 'Pause automatic articles');
-    pauseBtn.innerHTML = `<i class="fas fa-${userPaused ? 'play' : 'pause'}" aria-hidden="true"></i>`;
-  }
-
-  pauseBtn.addEventListener('click', () => {
-    userPaused = !userPaused;
-    lastMove = performance.now();
-    syncPauseBtn();
-    updatePositions();
-  });
   stack.addEventListener('mouseenter', () => { hovered = true; });
   stack.addEventListener('mouseleave', () => { hovered = false; lastMove = performance.now(); });
   stack.addEventListener('focusin', () => { hovered = true; });
@@ -2189,25 +2097,28 @@ function setupWritingDeck() {
   new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.4 }).observe(stack);
 
   setInterval(() => {
-    syncPauseBtn();
     if (!autoplaying() || hovered || !inView || document.hidden) return;
     if (performance.now() - lastMove >= DECK_INTERVAL) next();
   }, 250);
 
-  syncPauseBtn();
   updatePositions();
 }
 
 
 /* ============================================
    20b. WORK CAROUSEL
-   The project row scrolls itself, one card every 4 seconds, and wraps
-   back to the start at the end. Same rules as the writing deck: it
-   pauses while hovered or focused, off screen, in a hidden tab, while
-   a search is typed, and when the reader presses pause; it never runs
-   with reduced motion or the Motion toggle off. Arrows, dots (the
-   cards in view are lit) and a search that filters the cards.
+   From page load, the project row glides slowly to the left on a
+   loop: a copy of the cards follows the originals, and once the
+   first copy reaches the start the row jumps back by one set, which
+   looks identical. It pauses while hovered or focused, off screen,
+   in a hidden tab, and for a few seconds after the reader scrolls or
+   presses an arrow. It never runs with reduced motion or the Motion
+   toggle off (the site's pause control; phones start with it off),
+   and then the row is a plain snapping scroller.
    ============================================ */
+
+const WORK_GLIDE_SPEED = 30;    // px per second
+const WORK_RESUME_AFTER = 3000; // ms after the reader's last move
 
 function setupWorkCarousel() {
   const root = document.getElementById('work-carousel');
@@ -2215,179 +2126,128 @@ function setupWorkCarousel() {
   if (!root || !grid) return;
 
   const cards = [...grid.querySelectorAll('.project-card')];
-  const wrapper = root.querySelector('.projects-grid-wrapper');
   const prevBtn = root.querySelector('.work-prev');
   const nextBtn = root.querySelector('.work-next');
-  const pauseBtn = root.querySelector('.work-pause');
-  const dotsContainer = root.querySelector('.work-dots');
-  const counter = root.querySelector('.work-count');
-  const input = document.getElementById('work-search-input');
-  const status = document.getElementById('work-search-status');
-  const empty = root.querySelector('.work-empty');
-  if (!cards.length || !wrapper || !dotsContainer) return;
+  if (!cards.length) return;
 
-  const INTERVAL = 4000;
-  let userPaused = false;
+  let clones = [];
   let hovered = false;
   let inView = false;
-  let lastMove = performance.now();
+  let pos = grid.scrollLeft;    // where the glide has the row (sub-pixel)
+  let lastSet = -1;             // what the glide last wrote to scrollLeft
+  let lastUserScroll = 0;
+  let resumeAt = performance.now() + 1500; // let the page settle first
+  let lastFrame = 0;
 
-  const titleOf = (card) => card.querySelector('h3')?.textContent.trim() || 'project';
-  const shown = () => cards.filter((c) => !c.hidden);
-  const smooth = () => (state.reducedMotion || state.quietMode ? 'auto' : 'smooth');
-  const maxScroll = () => grid.scrollWidth - grid.clientWidth;
-  // Where the row has to scroll for this card to sit at its start.
-  const offsetOf = (card) => card.offsetLeft - (shown()[0]?.offsetLeft ?? 0);
+  const motionAllowed = () => !state.reducedMotion && !state.quietMode;
+  const smooth = () => (motionAllowed() ? 'smooth' : 'auto');
+  const looping = () => clones.length > 0;
+  // One full set of cards: how far the row travels before it repeats.
+  const setWidth = () => (looping() ? clones[0].offsetLeft - cards[0].offsetLeft : 0);
+  const stops = () => [...cards, ...clones].map((c) => c.offsetLeft - cards[0].offsetLeft);
+  const holdOff = () => { resumeAt = performance.now() + WORK_RESUME_AFTER; };
 
-  // Dots: one per project; pressing one scrolls to it.
-  const dots = cards.map((card, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'deck-dot';
-    dot.setAttribute('aria-label', `Go to project ${i + 1}: ${titleOf(card)}`);
-    dot.addEventListener('click', () => goTo(card));
-    dotsContainer.appendChild(dot);
-    return dot;
-  });
-
-  // The card nearest the row's start edge.
-  function currentIndex() {
-    const list = shown();
-    const x = Math.min(grid.scrollLeft, maxScroll());
-    let best = 0, bestD = Infinity;
-    list.forEach((c, i) => {
-      const d = Math.abs(Math.min(offsetOf(c), maxScroll()) - x);
-      if (d < bestD) { bestD = d; best = i; }
+  // Copies are for the eye only: screen readers and the Tab key get
+  // each project once. They can still be clicked.
+  function buildLoop() {
+    if (looping()) return;
+    clones = cards.map((card) => {
+      const copy = card.cloneNode(true);
+      copy.classList.add('is-clone');
+      copy.setAttribute('aria-hidden', 'true');
+      copy.setAttribute('tabindex', '-1');
+      grid.appendChild(copy);
+      return copy;
     });
-    return best;
+    grid.classList.add('is-looping');
   }
 
-  function goTo(card) {
-    lastMove = performance.now();
-    grid.scrollTo({ left: Math.min(offsetOf(card), maxScroll()), behavior: smooth() });
+  // Past the first set, jump back by one set: the view is identical.
+  function wrap() {
+    const w = setWidth();
+    if (w && grid.scrollLeft >= w) {
+      grid.scrollLeft -= w;
+      pos = grid.scrollLeft;
+      lastSet = grid.scrollLeft;
+    }
   }
 
   function step(dir) {
-    const list = shown();
-    if (list.length < 2) return;
-    const atEnd = grid.scrollLeft >= maxScroll() - 4;
-    const atStart = grid.scrollLeft <= 4;
-    if (dir > 0 && atEnd) return goTo(list[0]);
-    if (dir < 0 && atStart) return goTo(list[list.length - 1]);
-    goTo(list[Math.max(0, Math.min(list.length - 1, currentIndex() + dir))]);
-  }
-
-  // Light the dots of the cards that are (mostly) in view.
-  function syncDots() {
-    const box = wrapper.getBoundingClientRect();
-    const list = shown();
-    cards.forEach((card, i) => {
-      dots[i].hidden = card.hidden;
-      if (card.hidden) return;
-      const r = card.getBoundingClientRect();
-      const seen = Math.min(r.right, box.right + 8) - Math.max(r.left, box.left - 8);
-      const on = seen > r.width * 0.6;
-      dots[i].classList.toggle('active', on);
-      dots[i].setAttribute('aria-current', on ? 'true' : 'false');
-    });
-    if (counter) {
-      counter.textContent = list.length ? `${currentIndex() + 1} / ${list.length}` : '';
-      counter.setAttribute('aria-live', autoplaying() ? 'off' : 'polite');
+    holdOff();
+    const x = grid.scrollLeft;
+    const max = grid.scrollWidth - grid.clientWidth;
+    let list = stops();
+    if (looping()) {
+      // Going back from the very start: hop forward a set first.
+      if (dir < 0 && x < 4) { grid.scrollLeft = x + setWidth(); list = stops(); }
+      const cur = grid.scrollLeft;
+      const target = dir > 0 ? list.find((o) => o > cur + 4) : [...list].reverse().find((o) => o < cur - 4);
+      if (target != null) grid.scrollTo({ left: Math.min(target, max), behavior: smooth() });
+      return;
     }
-    const few = list.length < 2;
-    [prevBtn, nextBtn].forEach((b) => { if (b) b.disabled = few; });
+    // No loop (Motion off): wrap from one end to the other.
+    if (dir > 0 && x >= max - 4) return grid.scrollTo({ left: 0, behavior: smooth() });
+    if (dir < 0 && x <= 4) return grid.scrollTo({ left: max, behavior: smooth() });
+    const target = dir > 0 ? list.find((o) => o > x + 4) : [...list].reverse().find((o) => o < x - 4);
+    grid.scrollTo({ left: Math.min(target ?? 0, max), behavior: smooth() });
   }
 
-  let syncQueued = false;
-  grid.addEventListener('scroll', () => {
-    lastMove = performance.now();
-    if (syncQueued) return;
-    syncQueued = true;
-    requestAnimationFrame(() => { syncQueued = false; syncDots(); });
-  }, { passive: true });
-  window.addEventListener('resize', debounce(syncDots, 150));
+  // Build now, so a returning reader's saved spot (restored before the
+  // first frame, see index.html <head>) can land among the copies.
+  if (motionAllowed()) buildLoop();
+  // If that restore already ran, the copies weren't there yet: redo it.
+  if (window.__homeRestored && looping()) {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('home-return'));
+      if (saved) grid.scrollLeft = saved.x;
+    } catch (_) {}
+  }
 
   prevBtn?.addEventListener('click', () => step(-1));
   nextBtn?.addEventListener('click', () => step(1));
 
-  /* --- Search: every word must appear somewhere on the card (title,
-     subtitle, highlights or tags). --- */
-  const texts = cards.map((c) => c.textContent.toLowerCase().replace(/\s+/g, ' '));
-  let announce = null;
-
-  function filter() {
-    const words = (input?.value || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
-    let count = 0;
-    cards.forEach((card, i) => {
-      card.hidden = !words.every((w) => texts[i].includes(w));
-      if (!card.hidden) count++;
-    });
-    grid.hidden = count === 0;
-    grid.scrollLeft = 0;
-    if (empty) {
-      empty.hidden = count > 0;
-      const q = empty.querySelector('.work-empty-query');
-      if (q) q.textContent = `“${input.value.trim()}”`;
+  // Anything that moves the row other than the glide counts as the
+  // reader taking over for a moment.
+  grid.addEventListener('scroll', () => {
+    if (Math.abs(grid.scrollLeft - lastSet) > 2) {
+      lastUserScroll = performance.now();
+      holdOff();
     }
-    syncDots();
-    clearTimeout(announce);
-    announce = setTimeout(() => {
-      if (!status) return;
-      status.textContent = !words.length ? ''
-        : count === 0 ? 'No projects match.'
-        : `${count} ${count === 1 ? 'project matches' : 'projects match'}.`;
-    }, 400);
-  }
+  }, { passive: true });
+  grid.addEventListener('touchstart', holdOff, { passive: true });
+  grid.addEventListener('wheel', holdOff, { passive: true });
 
-  input?.addEventListener('input', filter);
-  input?.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && input.value) { e.preventDefault(); input.value = ''; filter(); }
-  });
-  empty?.querySelector('.work-empty-clear')?.addEventListener('click', () => {
-    input.value = '';
-    filter();
-    input.focus();
-  });
-
-  /* --- Autoplay --- */
-  function motionAllowed() { return !state.reducedMotion && !state.quietMode; }
-  function searching() { return !!input?.value.trim(); }
-  function autoplaying() { return motionAllowed() && !userPaused && !searching(); }
-  let pauseKey = '';
-  function syncPauseBtn() {
-    if (!pauseBtn) return;
-    const key = `${motionAllowed()}|${userPaused}`;
-    if (key === pauseKey) return;
-    pauseKey = key;
-    pauseBtn.hidden = !motionAllowed();
-    pauseBtn.setAttribute('aria-label', userPaused ? 'Play projects automatically' : 'Pause automatic scrolling');
-    pauseBtn.innerHTML = `<i class="fas fa-${userPaused ? 'play' : 'pause'}" aria-hidden="true"></i>`;
-  }
-
-  pauseBtn?.addEventListener('click', () => {
-    userPaused = !userPaused;
-    lastMove = performance.now();
-    syncPauseBtn();
-    syncDots();
-  });
   root.addEventListener('mouseenter', () => { hovered = true; });
-  root.addEventListener('mouseleave', () => { hovered = false; lastMove = performance.now(); });
+  root.addEventListener('mouseleave', () => { hovered = false; });
   root.addEventListener('focusin', () => { hovered = true; });
   root.addEventListener('focusout', (e) => {
-    if (!root.contains(e.relatedTarget)) { hovered = false; lastMove = performance.now(); }
+    if (!root.contains(e.relatedTarget)) hovered = false;
   });
-  // A finger on the row counts as reading it.
-  grid.addEventListener('touchstart', () => { lastMove = performance.now(); }, { passive: true });
-  new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.4 }).observe(grid);
+  new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.3 }).observe(grid);
 
-  setInterval(() => {
-    syncPauseBtn();
-    if (!autoplaying() || hovered || !inView || document.hidden) return;
-    if (performance.now() - lastMove >= INTERVAL) step(1);
-  }, 250);
+  function frame(now) {
+    const dt = lastFrame ? Math.min(now - lastFrame, 100) : 0;
+    lastFrame = now;
+    if (motionAllowed()) buildLoop();
 
-  syncPauseBtn();
-  syncDots();
+    const idle = now - lastUserScroll > 400;
+    const gliding = looping() && motionAllowed() && !hovered && inView && !document.hidden
+      && !window.__vtRunning && now >= resumeAt;
+
+    if (gliding) {
+      // Pick up from wherever the reader left the row.
+      if (Math.abs(grid.scrollLeft - lastSet) > 2) pos = grid.scrollLeft;
+      pos += (WORK_GLIDE_SPEED * dt) / 1000;
+      const w = setWidth();
+      if (w && pos >= w) pos -= w;
+      grid.scrollLeft = pos;
+      lastSet = grid.scrollLeft;
+    } else if (looping() && idle) {
+      wrap();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
 
@@ -2648,7 +2508,6 @@ function init() {
   setupViewportMaintenance();
   setupTiltCards();
   setupCardHighlights();
-  setupTryDarkHint();
   setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();

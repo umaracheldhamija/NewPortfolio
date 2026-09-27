@@ -177,7 +177,6 @@
       nav: 'Care2Care',
       heading: 'Care2Care meets caregivers at onboarding, in daily life and in hard times.',
       body: ['Each stage of a caregiver\'s journey gets its own kind of support.'],
-      // Screens: swap each placeholder for the exported screen.
       visual: {
         type: 'pinned',
         frame: 'phone',
@@ -186,17 +185,17 @@
           {
             label: 'Onboarding',
             text: 'A short survey matches each caregiver to resources based on their specific needs and capacity.',
-            media: { placeholder: 'IMAGE: onboarding screen export' },
+            media: { src: 'images/care-onb.png', alt: "Care2Care welcome screen with the app's logo, the line 'You show up for them. We'll show up for you.' and a Get Started button", width: 393, height: 844 },
           },
           {
             label: 'Daily life',
             text: 'Quick check-ins keep recommendations current and can flag high stress for a person to reach out. A resource hub collects peer-reviewed support, from financial aid to emotional counseling and symptom management.',
-            media: { placeholder: 'IMAGE: check-in or resource hub screen export' },
+            media: { src: 'images/care-dash.png', alt: "Support Hub screen: resources picked for the caregiver and reviewed by people who've been there, with search and filters for local, online and hybrid support", width: 393, height: 852 },
           },
           {
             label: 'Hard times',
             text: 'Caregivers can talk to a real liaison from a network of volunteers that includes the CARE Center and CancerBridges.',
-            media: { placeholder: 'IMAGE: liaison screen export' },
+            media: { src: 'images/care-hard.png', alt: "Home screen with a 'How's it going today?' check-in, where the caregiver has picked Heavy, and their liaison, Kimm Stevens of Magee Hospital, shown below", width: 393, height: 852 },
           },
         ],
       },

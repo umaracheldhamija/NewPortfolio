@@ -381,7 +381,6 @@
       ],
       links: { 'attribution-based control': 'https://openmined.org/attribution-based-control/' },
       layout: 'showcase',
-      mediaColumns: 2,   // the two presentation photos side by side
       media: [
         {
           src: 'images/story/kindred/team-presenting-1600.jpg',
@@ -390,14 +389,7 @@
           caption: 'Presenting Kindred to OpenMined and the CMU Human-Computer Interaction Institute.',
           width: 1600,
           height: 1343,
-        },
-        {
-          src: 'images/story/kindred/team-final-presentation-1372.jpg',
-          srcset: 'images/story/kindred/team-final-presentation-800.jpg 800w, images/story/kindred/team-final-presentation-1372.jpg 1372w',
-          alt: 'The Kindred team standing in front of the final presentation slide, Private Health, Public Wisdom',
-          caption: 'The Kindred team at the final presentation.',
-          width: 1372,
-          height: 1722,
+          maxWidth: 760,
         },
       ],
     },

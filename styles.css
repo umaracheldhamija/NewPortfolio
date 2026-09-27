@@ -249,20 +249,20 @@
   --blush:          #EFB29B;  /* rose-peach: gradient partner */
 
   /* --- Project accents: one colour per case study, drawn from its
-     own imagery (logo, photo or subject), so each story has its own
-     scheme on the same ivory and espresso grounds. No purple. --- */
-  --kindred:                    #E5487F;  /* rose, from the Kindred logo */
-  --kindred-strong:             #A3164F;
-  --kindred-deep:               #780F3A;
-  --care2care:                  #5E9F63;  /* sage, the leaves by the UPMC sign */
-  --care2care-strong:           #2B6531;
-  --care2care-deep:             #1F4A24;
+     own imagery or product, so each story has its own scheme on the
+     same ivory and espresso grounds. No purple. --- */
+  --kindred:                    #2451D6;  /* Kindred blue; -strong is the app's #00288C */
+  --kindred-strong:             #00288C;
+  --kindred-deep:               #001C66;
+  --care2care:                  #F59A74;  /* warm peach, from the Care2Care app */
+  --care2care-strong:           #9C3F1C;
+  --care2care-deep:             #742D18;
   --meditationwise:             #2B92AE;  /* ocean teal, the MeditationWise logo */
   --meditationwise-strong:      #186076;
   --meditationwise-deep:        #124A5A;
-  --glowup:                     #EFA814;  /* sunny gold */
-  --glowup-strong:              #7A5600;
-  --glowup-deep:                #553B00;
+  --glowup:                     #2BAE8E;  /* teal green */
+  --glowup-strong:              #0E6852;
+  --glowup-deep:                #0A4C3C;
   --electric-scooters:          #FA7F1C;  /* safety orange */
   --electric-scooters-strong:   #984100;
   --electric-scooters-deep:     #6E2F00;
@@ -367,18 +367,18 @@ body[data-project] {
   --blush:          #E9A08A;
 
   /* Project accents */
-  --kindred:                    #FF6F9F;
-  --kindred-strong:             #FF8AB2;
-  --kindred-deep:               #FFB3CD;
-  --care2care:                  #7CC080;
-  --care2care-strong:           #8FD092;
-  --care2care-deep:             #B5E2B7;
+  --kindred:                    #5B84FF;
+  --kindred-strong:             #8FA8FF;
+  --kindred-deep:               #B8C8FF;
+  --care2care:                  #FFAA85;
+  --care2care-strong:           #FFA07A;
+  --care2care-deep:             #FFC2A8;
   --meditationwise:             #4DB8D6;
   --meditationwise-strong:      #6CC7E0;
   --meditationwise-deep:        #9DDAEB;
-  --glowup:                     #FFC93D;
-  --glowup-strong:              #FFC53D;
-  --glowup-deep:                #FFD978;
+  --glowup:                     #45CFAE;
+  --glowup-strong:              #5AD4B6;
+  --glowup-deep:                #93E4D0;
   --electric-scooters:          #FF9340;
   --electric-scooters-strong:   #FF9A52;
   --electric-scooters-deep:     #FFB47E;
@@ -517,19 +517,6 @@ a {
 button, [role="button"] {
   font-family: inherit;
   cursor: pointer;
-}
-
-/* Visually hidden, still read by screen readers */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 /* ============================================
@@ -3575,17 +3562,13 @@ body.large-text .control-label { font-size: 0.68rem; }
   padding: 40px 64px 84px;
   margin: -16px -64px -56px;
   scroll-padding-inline: 64px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  /* No visible scrollbar: the arrows below are the visible control,
+     and the row still scrolls by trackpad, touch and Tab. */
+  scrollbar-width: none;
   grid-template-columns: unset;
 }
 
-.projects-grid::-webkit-scrollbar { height: 3px; }
-.projects-grid::-webkit-scrollbar-track { background: transparent; }
-.projects-grid::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 2px;
-}
+.projects-grid::-webkit-scrollbar { display: none; }
 
 /* Every card: fixed width; heights match because the row stretches
    them to the tallest card. */
@@ -3819,99 +3802,13 @@ body.quiet-mode .card-bullets li.was-active { transform: none; transition: opaci
 body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 100% 100%; }
 
 /* --- Work carousel (setupWorkCarousel() in script.js) ---
-   A search above the row, and the writing deck's controls below it:
-   arrows, a dot per project (lit while its card is in view), pause. */
-.project-card[hidden] { display: none; }
-
-.work-search {
-  position: relative;
-  width: min(360px, 100%);
-  margin: calc(var(--sp-4) * -1) auto var(--sp-6);
-}
-
-.work-search > i {
-  position: absolute;
-  z-index: 1; /* above the input's glass layer */
-  left: var(--sp-4);
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
-.work-search-input {
-  width: 100%;
-  min-height: 44px;
-  padding: 0 var(--sp-4) 0 2.6rem;
-  background: var(--glass-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--r-pill);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 1rem;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: border-color var(--t-base), box-shadow var(--t-base);
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.work-search-input::placeholder { color: var(--text-muted); opacity: 1; }
-
-.work-search-input:hover { border-color: var(--glass-border-hover); }
-
-.work-search-input:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-  outline: none;
-}
-
-/* Clear button (Chrome, Safari): a small ×, in the text colour. */
-.work-search-input::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  background: var(--text-muted);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 7l10 10M17 7L7 17' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 7l10 10M17 7L7 17' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat;
-  cursor: pointer;
-}
-
-.work-search-input::-webkit-search-cancel-button:hover { background: var(--accent-primary); }
-
-.projects-grid[hidden] { display: none; }
-
-.work-empty {
-  padding: var(--sp-12) var(--sp-4);
-  text-align: center;
-  color: var(--text-secondary);
-}
-
-.work-empty-clear {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-left: var(--sp-2);
-  padding: 0 var(--sp-2);
-  border: 0;
-  background: none;
-  color: var(--accent-primary);
-  font: inherit;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-}
-
-.work-empty-clear:hover { color: var(--accent-secondary); }
+   The row glides on a loop; copies of the cards (.is-clone) follow
+   the originals so the end joins back to the start. Snapping would
+   fight the glide, so it's off while the loop is running. The
+   writing deck's arrows sit below. */
+.projects-grid.is-looping { scroll-snap-type: none; }
 
 .work-controls { margin-top: var(--sp-4); }
-
-.deck-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
-
-/* Hidden dots belong to cards a search has filtered out. */
-.work-dots .deck-dot[hidden] { display: none; }
 
 @media (max-width: 768px) {
   .projects-grid {
@@ -5364,10 +5261,6 @@ body[data-project="electric-scooters"] .tilt-card:hover {
 }
 
 
-/* Writing deck pause/play (autoplay control, see setupWritingDeck) */
-.deck-pause[hidden] { display: none; }
-.deck-pause i { font-size: 0.85rem; }
-
 /* "3 / 8" counter for the writing deck; only shown on phones (below) */
 .deck-count {
   display: none;
@@ -5466,95 +5359,4 @@ body[data-project="electric-scooters"] .tilt-card:hover {
     pointer-events: none;
     transform: translateY(12px);
   }
-}
-
-
-/* ============================================
-   "TRY THIS" HINT
-   Points at the dark mode button for a new visitor's first 5
-   seconds (setupTryDarkHint() in script.js). Desktop only.
-   ============================================ */
-
-.try-hint {
-  position: fixed;
-  z-index: 902;
-  width: 96px;
-  height: 64px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.try-hint.is-in { opacity: 1; }
-.try-hint.is-out { opacity: 0; transition-duration: 0.5s; }
-
-.try-hint-arrow {
-  display: block;
-  overflow: visible;
-  color: var(--accent-strong);
-  animation: try-hint-nudge 1.1s ease-in-out 0.9s infinite;
-}
-
-.try-hint-line,
-.try-hint-head {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1 1;
-  stroke-dashoffset: 1;
-}
-
-.try-hint.is-in .try-hint-line { animation: try-hint-draw 0.7s var(--ease-out) 0.15s forwards; }
-.try-hint.is-in .try-hint-head { animation: try-hint-draw 0.25s var(--ease-out) 0.8s forwards; }
-
-.try-hint-text {
-  position: absolute;
-  top: 54px;
-  left: -58px;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1.6rem;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--accent-strong);
-  transform: rotate(-8deg);
-  opacity: 0;
-  transition: opacity 0.4s ease 0.35s;
-}
-
-.try-hint.is-in .try-hint-text { opacity: 1; }
-
-@keyframes try-hint-draw { to { stroke-dashoffset: 0; } }
-
-/* A small push towards the button, on repeat. */
-@keyframes try-hint-nudge {
-  0%, 100% { transform: translate(0, 0); }
-  50%      { transform: translate(5px, -4px); }
-}
-
-/* The button itself glows softly while the hint is up. */
-#theme-toggle.is-hinted {
-  border-color: var(--accent);
-  animation: try-hint-glow 1.6s ease-in-out infinite;
-}
-
-@keyframes try-hint-glow {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
-  50%      { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); }
-}
-
-/* Reduced motion: the arrow simply appears and holds still. */
-@media (prefers-reduced-motion: reduce) {
-  .try-hint-arrow,
-  #theme-toggle.is-hinted { animation: none; }
-  .try-hint-line,
-  .try-hint-head { stroke-dashoffset: 0; }
-  .try-hint.is-in .try-hint-line,
-  .try-hint.is-in .try-hint-head { animation: none; }
-}
-
-@media (max-width: 768px), (hover: none) {
-  .try-hint { display: none; }
 }
