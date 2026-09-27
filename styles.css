@@ -4056,8 +4056,58 @@ body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 
   flex-shrink: 0;
 }
 
+/* The photo is a button that opens it full size (#headshot-modal). */
+.about-headshot-btn {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: zoom-in;
+}
+
+.about-headshot-btn:focus-visible { border-radius: 50%; }
+
+.about-headshot-btn .about-headshot {
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+
+.about-headshot-btn:hover .about-headshot {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--shade) 14%, transparent),
+              0 0 0 6px var(--accent-glow);
+}
+
+.modal-headshot .exploration-modal-image { border-radius: var(--r-xl); }
+
 .about-bio {
   margin: 0;
+}
+
+/* Quotes share one grid cell and cross-fade (setupContactQuotes). */
+.about-quotes {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.about-quote {
+  grid-area: 1 / 1;
+  align-self: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
+.about-quote.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease 0.2s, visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-quote,
+  .about-quote.is-active { transition: none; }
 }
 
 .about-bio p {

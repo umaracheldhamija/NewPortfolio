@@ -2252,6 +2252,59 @@ function setupWorkCarousel() {
 
 
 /* ============================================
+   20c. CONTACT QUOTES
+   The quotes beside the photo take turns every 7 seconds, in an order
+   shuffled on each visit. They pause while hovered, off screen or in a
+   hidden tab. With reduced motion or the Motion toggle off they hold
+   still on one quote picked at random (that toggle is the pause
+   control, WCAG 2.2.2).
+   ============================================ */
+
+const QUOTE_INTERVAL = 7000;
+
+function setupContactQuotes() {
+  const wrap = document.querySelector('.about-quotes');
+  if (!wrap) return;
+  const quotes = [...wrap.querySelectorAll('.about-quote')];
+  if (quotes.length < 2) return;
+
+  // Fisher-Yates shuffle
+  const order = quotes.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+
+  let turn = 0;
+  let hovered = false;
+  let inView = false;
+  let lastTurn = performance.now();
+
+  // Only the quote on show is exposed to screen readers.
+  function show(k) {
+    quotes.forEach((q, i) => {
+      q.classList.toggle('is-active', i === k);
+      if (i === k) q.removeAttribute('aria-hidden');
+      else q.setAttribute('aria-hidden', 'true');
+    });
+  }
+  show(order[0]);
+
+  wrap.addEventListener('mouseenter', () => { hovered = true; });
+  wrap.addEventListener('mouseleave', () => { hovered = false; lastTurn = performance.now(); });
+  new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.5 }).observe(wrap);
+
+  setInterval(() => {
+    if (state.reducedMotion || state.quietMode || hovered || !inView || document.hidden) return;
+    if (performance.now() - lastTurn < QUOTE_INTERVAL) return;
+    turn = (turn + 1) % order.length;
+    show(order[turn]);
+    lastTurn = performance.now();
+  }, 250);
+}
+
+
+/* ============================================
    21. RESUME MODAL
    Desktop: opens inline PDF in modal.
    Mobile (touch or narrow): opens PDF in new tab.
@@ -2504,6 +2557,7 @@ function init() {
   setupExplorationGallery();
   setupWritingDeck();      // replaces setupWritingCarousel
   setupWorkCarousel();
+  setupContactQuotes();
   setupScrollTopButton();
   setupViewportMaintenance();
   setupTiltCards();

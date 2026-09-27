@@ -879,19 +879,43 @@
     <div class="contact-layout" data-reveal>
       <div class="contact-info">
         <div class="about-header">
-          <img
-            src="images/Headshot.jpeg"
-            alt="Uma Dhamija"
-            class="about-headshot"
-            loading="lazy"
-            decoding="async"
-            width="200"
-            height="200"
-          >
-          <blockquote class="about-bio">
-            <p>"Design creates culture. Culture shapes values. Values determine the future."</p>
-            <cite>Robert L. Peters</cite>
-          </blockquote>
+          <!-- Opens the photo full size in #headshot-modal -->
+          <button type="button" class="about-headshot-btn" data-modal="headshot-modal" aria-label="View larger photo of Uma Dhamija">
+            <img
+              src="images/Headshot.jpeg"
+              alt=""
+              class="about-headshot"
+              loading="lazy"
+              decoding="async"
+              width="200"
+              height="200"
+            >
+          </button>
+          <!-- Quotes take turns, in a shuffled order (setupContactQuotes).
+               All share one grid cell, so the tallest sets the height and
+               nothing below jumps as they change. -->
+          <div class="about-quotes">
+            <blockquote class="about-bio about-quote is-active">
+              <p>"Design creates culture. Culture shapes values. Values determine the future."</p>
+              <cite>Robert L. Peters</cite>
+            </blockquote>
+            <blockquote class="about-bio about-quote" aria-hidden="true">
+              <p>"If it is both necessary &amp; useful, don&rsquo;t hesitate to make it beautiful."</p>
+              <cite>Joshua Porter</cite>
+            </blockquote>
+            <blockquote class="about-bio about-quote" aria-hidden="true">
+              <p>"Simplicity is the ultimate sophistication."</p>
+              <cite>Leonardo da Vinci</cite>
+            </blockquote>
+            <blockquote class="about-bio about-quote" aria-hidden="true">
+              <p>"Instructions must die"</p>
+              <cite>Steve Krug</cite>
+            </blockquote>
+            <blockquote class="about-bio about-quote" aria-hidden="true">
+              <p>"Any darn fool can make something complex; it takes a genius to make something simple."</p>
+              <cite>Albert Einstein</cite>
+            </blockquote>
+          </div>
         </div>
         <a href="mailto:umaracheldhamija@gmail.com" class="contact-email">
           <i class="fas fa-envelope" aria-hidden="true"></i>
@@ -974,6 +998,14 @@
       <h2 id="exploration-image-title">Exploration</h2>
       <img id="exploration-modal-image" class="exploration-modal-image" src="" alt="" loading="lazy" decoding="async" width="1200" height="1200">
       <p id="exploration-modal-caption" class="exploration-modal-caption"></p>
+    </div>
+  </div>
+
+  <div class="modal modal-image modal-headshot" id="headshot-modal" aria-labelledby="headshot-modal-title" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content exploration-modal-content" role="document">
+      <button class="modal-close" aria-label="Close photo">&times;</button>
+      <h2 id="headshot-modal-title">Uma Dhamija</h2>
+      <img class="exploration-modal-image" src="images/Headshot.jpeg" alt="Uma Dhamija" loading="lazy" decoding="async" width="2000" height="1894">
     </div>
   </div>
 
