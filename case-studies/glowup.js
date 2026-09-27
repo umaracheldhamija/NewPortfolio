@@ -141,6 +141,7 @@
       media: [
         {
           video: 'images/gazeFlow.mp4',
+          webm: 'images/story/glowup/gazeflow-720.webm',
           poster: 'images/story/glowup/gazeflow-poster.jpg',
           alt: 'GazeFlow seen through a VR headset: teal tiles float in a dark, starry space and light up pale yellow as the viewer looks at them, with a virtual hand in view',
           caption: 'GazeFlow, an XR eye-tracking prototype made in collaboration with Rabiat Sadiq. View the project on GitHub.',

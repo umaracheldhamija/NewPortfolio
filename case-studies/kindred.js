@@ -63,6 +63,7 @@
       media: [
         {
           video: 'images/story/kindred/timelapse-720.mp4',   // from images/Timelapse.MOV
+          webm: 'images/story/kindred/timelapse-720.webm',  // fallback for browsers without H.264
           poster: 'images/story/kindred/timelapse-poster.jpg',
           alt: 'Timelapse of the team sorting research sticky notes into groups on a whiteboard',
           caption: 'A timelapse of us sorting what we learned on the whiteboard.',

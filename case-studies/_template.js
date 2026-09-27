@@ -110,7 +110,7 @@
         // Video: silent, loops, loads near the screen, plays while
         // visible (never by itself with reduced motion), has a pause
         // button. Export as H.264 .mp4, 720p, ~2 Mbps.
-        { video: 'images/story/your-slug/clip-720.mp4', poster: 'images/story/your-slug/clip-poster.jpg',
+        { video: 'images/story/your-slug/clip-720.mp4', webm: 'images/story/your-slug/clip-720.webm', poster: 'images/story/your-slug/clip-poster.jpg',
           alt: 'What happens in the clip', caption: '...', width: 1280, height: 720 },
       ],
       mediaColumns: 2,           // optional: show media as side-by-side pairs, heights matched

@@ -138,7 +138,7 @@
     // motion). The button pauses it, which WCAG requires for anything
     // that moves for more than five seconds.
     const inner = m.video
-      ? `<video class="st-video" muted loop playsinline preload="none" poster="${srcAttr(m.poster || '')}" data-src="${srcAttr(m.video)}" aria-label="${esc(m.alt)}"></video>
+      ? `<video class="st-video" muted loop playsinline preload="none" poster="${srcAttr(m.poster || '')}" data-src="${srcAttr(m.video)}"${m.webm ? ` data-webm="${srcAttr(m.webm)}"` : ''} aria-label="${esc(m.alt)}"></video>
          <button class="st-video-toggle" type="button" aria-label="Play video"><i class="fas fa-play" aria-hidden="true"></i></button>`
       : imgTag(m, { sizes });
     return `<figure class="st-figure st-reveal${drift ? ' st-drift' : ''}${m.video ? ' st-figure--video' : ''} ${cls}" style="--i:${i}${max}${grow}"><div class="st-frame"${ratio}>${inner}</div>${cap}</figure>`;
@@ -873,7 +873,29 @@
         btn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
         btn.innerHTML = `<i class="fas fa-${playing ? 'pause' : 'play'}" aria-hidden="true"></i>`;
       };
-      const load = () => { if (!v.src) { v.src = v.dataset.src; } };
+      // MP4 (H.264) first, which Safari, Chrome and Edge all play;
+      // WebM (VP9) second for browsers built without H.264. If neither
+      // plays, the poster stays up and the play button goes away, so a
+      // visitor never sees a broken player.
+      let loaded = false;
+      const load = () => {
+        if (loaded) return;
+        loaded = true;
+        const add = (src, type) => {
+          const s = document.createElement('source');
+          s.src = src;
+          s.type = type;
+          v.appendChild(s);
+          return s;
+        };
+        add(v.dataset.src, 'video/mp4');
+        const last = v.dataset.webm ? add(v.dataset.webm, 'video/webm') : v.lastElementChild;
+        last.addEventListener('error', () => {
+          v.closest('.st-figure')?.classList.add('st-video-failed');
+          btn.hidden = true;
+        });
+        v.load();
+      };
       const sync = () => {
         if (visible && !userPaused && !reduced()) { load(); v.play().catch(() => {}); } else v.pause();
       };

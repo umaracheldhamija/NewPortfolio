@@ -3456,33 +3456,6 @@ body.large-text .control-label { font-size: 0.68rem; }
 
 
 /* ============================================
-   23. VIBE-CODED BADGE
-   ============================================ */
-
-.vibe-badge {
-  position: fixed;
-  bottom: var(--sp-6);
-  left: var(--sp-6);
-  z-index: 902;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.6s var(--ease-smooth);
-  line-height: 1.2;
-}
-
-.vibe-badge.scrolled-away {
-  opacity: 0;
-}
-
-[data-theme="dark"] .vibe-badge {
-  color: color-mix(in srgb, var(--text-secondary) 45%, transparent);
-}
-
-
-/* ============================================
    23b. PROJECT BADGE — fixed bottom-left logo + name
    Replaces the old cursor-trailing companion. Static, decorative
    (aria-hidden — the project name is already the page's own H1),
@@ -5070,7 +5043,6 @@ html.intro-skip #intro-screen { display: none !important; }
   .project-badge,
   .aurora-blobs,
   .splash-canvas,
-  .vibe-badge,
   .scroll-indicator {
     display: none !important;
   }

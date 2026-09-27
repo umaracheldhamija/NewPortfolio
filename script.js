@@ -1914,29 +1914,6 @@ function setupInteractiveAuroraBlobs() {
 
 
 /* ============================================
-   19. VIBE-CODED BADGE — fades on scroll
-   ============================================ */
-
-function setupVibeBadge() {
-  const badge = document.getElementById('vibe-badge');
-  if (!badge) return;
-
-  let lastScrollY = -1;
-
-  function updateBadge() {
-    const scrolled = window.scrollY > 60;
-    if (scrolled !== (lastScrollY > 60)) {
-      badge.classList.toggle('scrolled-away', scrolled);
-    }
-    lastScrollY = window.scrollY;
-  }
-
-  window.addEventListener('scroll', debounce(updateBadge, 80), { passive: true });
-  updateBadge();
-}
-
-
-/* ============================================
    20. WRITING — STACKED CARD DECK
    ============================================ */
 
@@ -2565,7 +2542,6 @@ function init() {
   setupBioTab();
   setupLiquidMetal();
   setupInteractiveAuroraBlobs();
-  setupVibeBadge();
   setupResumeModal();
   setupSplashField();
   updateQuietIcon();
