@@ -101,6 +101,7 @@
           srcset: 'images/story/your-slug/photo-800.jpg 800w, images/story/your-slug/photo-1600.jpg 1600w',
           alt: '...',
           caption: '...',        // optional
+          links: { 'phrase in the caption': 'https://...' },  // optional
           width: 1600,
           height: 900,
           maxWidth: 480,         // optional: cap small source images near their real size

@@ -132,7 +132,7 @@
       return `<figure class="st-figure st-reveal ${cls}" style="--i:${i}${grow}${max}">${placeholderTag(m)}</figure>`;
     }
     const ratio = m.width && m.height ? ` style="aspect-ratio:${m.width} / ${m.height}"` : '';
-    const cap = m.caption ? `<figcaption>${linkify(m.caption)}</figcaption>` : '';
+    const cap = m.caption ? `<figcaption>${linkify(m.caption, m.links)}</figcaption>` : '';
     // Video: silent, looping, loads only when it comes near the screen
     // and plays only while visible (and never on its own with reduced
     // motion). The button pauses it, which WCAG requires for anything

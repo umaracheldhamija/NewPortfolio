@@ -6,8 +6,7 @@
    A solo thesis, so headings say "I" rather than "we".
    Copy and numbers come from the previous GlowUp page and the
    homepage card. The reflection is a draft built from that page's
-   outcomes: edit freely. One image placeholder marks where a concept
-   visual would help most.
+   outcomes: edit freely.
    Resized image variants live in images/story/glowup/.
    ============================================ */
 
@@ -140,7 +139,16 @@
       ],
       layout: 'centered',
       media: [
-        { placeholder: 'IMAGE: an XR exercise concept or session flow', ratio: '16 / 9', maxWidth: 880 },
+        {
+          video: 'images/gazeFlow.mp4',
+          poster: 'images/story/glowup/gazeflow-poster.jpg',
+          alt: 'GazeFlow seen through a VR headset: teal tiles float in a dark, starry space and light up pale yellow as the viewer looks at them, with a virtual hand in view',
+          caption: 'GazeFlow, an XR eye-tracking prototype made in collaboration with Rabiat Sadiq. View the project on GitHub.',
+          links: { 'View the project on GitHub': 'https://github.com/RabiatS/GazeFlow' },
+          width: 1280,
+          height: 720,
+          maxWidth: 880,
+        },
       ],
     },
   ],
