@@ -2458,14 +2458,33 @@ function setupBioTab() {
     history.scrollRestoration = 'manual';
   }
 
-  // Instantly skip past the hero so work is the first thing visible.
-  // Direct scrollTop assignment bypasses css scroll-behavior: smooth entirely.
+  // Skip past the hero so the Selected Work title is the first thing
+  // visible, just below the nav. html has scroll-behavior: smooth, so
+  // this glides (hidden behind the intro on desktop, seen on phones).
   // Exception: coming back from a case study, where the inline script in
   // index.html's <head> has already restored the reader's exact spot.
   const navEl = document.querySelector('.site-nav');
   const navH  = navEl ? navEl.offsetHeight : 64;
   if (!window.__homeRestored) {
-    document.documentElement.scrollTop = Math.max(0, work.offsetTop - navH);
+    const workTarget = () => Math.max(0, work.offsetTop - navH);
+    let aimedAt = workTarget();
+    document.documentElement.scrollTop = aimedAt;
+
+    // The hero's height depends on its text, so it changes once the web
+    // fonts arrive (44px shorter on an iPhone 13), which left the title
+    // hidden under the nav. Re-aim after fonts and load, unless the
+    // visitor has already started scrolling on their own.
+    let userMoved = false;
+    const stop = () => { userMoved = true; };
+    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((type) =>
+      window.addEventListener(type, stop, { once: true, passive: true }));
+    const reaim = () => {
+      if (userMoved || workTarget() === aimedAt) return;
+      aimedAt = workTarget();
+      document.documentElement.scrollTop = aimedAt;
+    };
+    if (document.fonts) document.fonts.ready.then(reaim);
+    window.addEventListener('load', reaim, { once: true });
   }
 
   // Show/hide the tab based on hero visibility.

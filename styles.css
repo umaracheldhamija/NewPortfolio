@@ -1106,6 +1106,14 @@ body.intro-active .hero-content {
   margin: 0 auto var(--sp-6);
 }
 
+/* Each role keeps its words (and the dot after it) on one row, so on
+   phones the line only breaks between roles. Below 360px "user
+   experience designer" is wider than the row, so there it may break
+   rather than spill off screen. */
+@media (min-width: 360px) {
+  .hero-role .role { white-space: nowrap; }
+}
+
 /* Bio — readable, not too dense */
 .hero-bio {
   font-size: var(--text-base);
