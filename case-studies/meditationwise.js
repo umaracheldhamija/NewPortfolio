@@ -127,7 +127,7 @@
           },
           {
             label: 'Meditate',
-            text: 'Browse by need, level or tradition. Each technique opens with a description of where it comes from, and can be guided, steps only or timer only.',
+            text: 'Browse by need, level or tradition. Each technique explains its origins and is available in guided, step-by-step, or timer-only formats.',
             media: { src: 'images/story/meditationwise/screen-session-690.jpg', alt: 'A Raja Yoga Meditation session, found by need, with guided, steps only and timer only options, a player and a technique description', width: 690, height: 1480 },
           },
           {
@@ -246,7 +246,7 @@
     homeCard: 'glowup',
     href: '/work/glowup/',
     story: true,
-    title: 'How do you design to improve eye development for the future generations',
+    title: 'How might we make eye-therapy exercises work for children?',
     subtitle: 'GlowUp Eye Care · Northwestern',
     image: { src: 'images/NWphoto.jpg', alt: 'A child in a VR headset pointing upward' },
   },

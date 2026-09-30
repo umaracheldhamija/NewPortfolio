@@ -38,7 +38,6 @@
       { label: 'Process', text: 'Goals with my teacher in mind, a low-fidelity prototype tested with his students, content curation, then design, build and handoff.' },
       { label: 'Outcome', text: "A live site he can manage himself. He didn't know he was getting it until it was live." },
     ],
-    showMetrics: true,
   },
 
   diamonds: [
@@ -51,7 +50,7 @@
       diamond: 'build',
       stage: 'diverge',
       nav: 'The idea',
-      heading: 'My teacher of 15 years had no website. So I made him one.',
+      heading: 'My teacher for 15 years had no website, so I built one for him.',
       body: [
         'I noticed that my dance teacher, Guru Dharmendra Jain, had no website to show his work or connect with potential students. His studio is in Dharamshala, India, and he has been teaching Kathak for over 30 years.',
         'I wanted to surprise him with a platform that highlights his expertise, helps people learn about Kathak, and makes it easy to get in touch about classes, workshops and performances.',
@@ -100,7 +99,7 @@
       heading: 'His students shaped the site before he ever saw it.',
       body: [
         'I started from what he would most want to show, and what was feasible given his technical knowledge and internet access.',
-        'Then I made a low-fidelity prototype and wireframe and showed them to some of his students for feedback.',
+        'I then made a low-fidelity prototype and shared it with a few of his students for feedback.',
       ],
       layout: 'wide',
       visual: {
@@ -114,7 +113,15 @@
         ],
       },
       media: [
-        { placeholder: 'IMAGE: the low-fidelity prototype or wireframe', ratio: '16 / 9', maxWidth: 720 },
+        // The live site, for reference alongside the process.
+        {
+          embed: 'https://kathak-kala-kendra.vercel.app',
+          url: 'kathak-kala-kendra.vercel.app',
+          title: 'The live Kathak Kala Kendra website',
+          start: 'Explore the site',
+          caption: 'For reference, the finished site as it is live today.',
+          maxWidth: 880,
+        },
       ],
     },
 
@@ -246,15 +253,6 @@
     { id: 'cp-site', kind: 'pinch', chapter: 'site', label: 'Live' },
   ],
 
-  metrics: {
-    heading: 'By the numbers',
-    items: [
-      { value: 1, label: 'month, start to live' },
-      { value: 15, label: 'years as his student' },
-      { value: 30, suffix: '+', label: 'years he has taught Kathak' },
-    ],
-  },
-
   reflection: {
     heading: 'Reflection',
     lines: [
@@ -270,6 +268,6 @@
     story: true,
     title: 'Securely training AI on private data',
     subtitle: 'OpenMined · Capstone',
-    image: { src: 'images/story/kindred/om-hero-800.jpg', alt: 'OpenMined logo' },
+    image: { src: 'images/story/kindred/om-hero-wordmark-800.jpg', alt: 'OpenMined logo and name' },
   },
 };

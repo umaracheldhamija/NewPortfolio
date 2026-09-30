@@ -4,8 +4,8 @@
    Rendered by js/story.js into work/electric-scooters/index.html.
 
    Copy and numbers come from the previous Electric Scooters page and
-   the homepage card. The previous page didn't state a role, so that
-   is a placeholder. The reflection is a draft built from that page:
+   the homepage card. The previous page didn't state a role, so the
+   summary has no Role line until Uma confirms hers. The reflection is a draft built from that page:
    edit freely.
    Resized image variants live in images/story/electric-scooters/.
    ============================================ */
@@ -27,7 +27,6 @@
     lead: 'Designed a kid-sized electric scooter from first principles, and tested it through 3 prototype iterations against how children actually ride.',
     points: [
       { label: 'Problem', text: 'Electric scooters are designed around adult proportions and assumptions. For a child, balance, reach, braking and fit all change.' },
-      { label: 'Role', text: '[PLACEHOLDER: your role on the team]' },
       { label: 'Process', text: '8 weeks with my team of four: interviews with kids and parents, 4 critical ride scenarios, sketching and paper screens, then 3 physical prototype iterations with structured critique.' },
       { label: 'Outcome', text: 'A testable prototype, and the rationale behind its geometry and controls, documented for future engineering.' },
     ],
@@ -66,7 +65,7 @@
       heading: 'We asked kids and parents what feels easy, what feels hard and what feels unsafe.',
       body: [
         'We planned the study for schools, parks and playgrounds.',
-        'We asked kids what they like about riding, and asked parents how safe they feel letting their child ride an electric scooter, and whether they let them ride unsupervised.',
+        'We asked children what they enjoyed about riding and asked parents whether they felt safe letting their child ride an electric scooter, including whether they allowed unsupervised rides.',
       ],
       layout: 'text-left',
       media: [
@@ -160,7 +159,7 @@
       nav: 'Prototyping',
       heading: 'Controls a child can understand quickly and reach comfortably.',
       body: [
-        'Over 3 prototype iterations, we tested every version against real handling behavior rather than aesthetics alone.',
+        'Across three prototype iterations, we tested each version against real handling behavior rather than appearance alone.',
       ],
       visual: {
         type: 'pinned',
@@ -258,7 +257,7 @@
     homeCard: 'kathak-kala-kendra',
     href: '/work/kathak-kala-kendra/',
     story: true,
-    title: "A website my teacher of 15 years didn't know he was getting",
+    title: 'A surprise website for my Kathak teacher.',
     subtitle: 'Kathak Kala Kendra',
     image: { src: 'images/story/kathak-kala-kendra/homepage-800.jpg', alt: 'Guru Dharmendra Jain with tabla beside a Kathak dancer' },
   },

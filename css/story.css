@@ -168,6 +168,14 @@
   object-fit: cover;
 }
 
+/* Until real images are approved, the opening image can be a
+   placeholder (meta.hero.placeholder) that fills the same frame. */
+.st-card-media .st-placeholder {
+  height: 100%;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+}
+
 .st-card-body {
   padding: clamp(var(--sp-6), 4vw, var(--sp-12));
 }

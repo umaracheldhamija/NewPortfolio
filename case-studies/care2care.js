@@ -15,7 +15,7 @@
     slug: 'care2care',
     homeCard: 'care2care',
     title: 'Care2Care',
-    subtitle: 'A support app for caregivers of gynaecological oncology patients at UPMC Magee-Womens Hospital.',
+    subtitle: 'A support app for caregivers of gynecologic oncology patients at UPMC Magee-Womens Hospital.',
     tags: ['Client: UPMC Magee-Womens', '8 months', 'Team of 3', 'Role: UX Research and Design', 'Ongoing'],
     // Same image as the homepage card, so the card can morph into it.
     hero: { src: 'images/UPMC-logo.jpg', alt: 'The UPMC Magee-Womens sign on a wooden wall', width: 2046, height: 949 },
@@ -25,10 +25,10 @@
   summary: {
     lead: 'Designed a support app for cancer caregivers in 3 months, then won the funding to build it with UPMC.',
     points: [
-      { label: 'Problem', text: 'Caregivers of gynaecological oncology patients are overlooked by existing healthcare tools while they navigate emotionally heavy, information-dense care journeys.' },
+      { label: 'Problem', text: 'Caregivers of gynecologic oncology patients are overlooked by existing healthcare tools while they navigate emotionally heavy, information-dense care journeys.' },
       { label: 'Role', text: 'UX Research and Design' },
-      { label: 'Process', text: 'With my team of three, and in partnership with CancerBridges, the Family CARE Center at UPMC, the University of Pittsburgh and CMU: journey mapping, shadowing and stakeholder interviews, then concepts tested with caregivers.' },
-      { label: 'Outcome', text: 'Care2Care, a final prototype in 3 months, now funded by the Lucie Young Kelly Faculty Leadership Award and in development with the Family CARE Center.' },
+      { label: 'Process', text: 'With my team of three, I partnered with CancerBridges, the Family CARE Center at UPMC, the University of Pittsburgh, and CMU to map journeys, shadow the care team, conduct stakeholder interviews, and test concepts with caregivers.' },
+      { label: 'Outcome', text: 'We built a final Care2Care prototype in three months. The project received the Lucie Young Kelly Faculty Leadership Award and is in development with the Family CARE Center.' },
     ],
     showMetrics: true,
   },
@@ -90,7 +90,7 @@
         {
           src: 'images/story/care2care/ecosystem-1600.jpg',
           srcset: 'images/story/care2care/ecosystem-800.jpg 800w, images/story/care2care/ecosystem-1600.jpg 1600w',
-          alt: 'Hand-drawn map on orange paper showing a gap between providers at the Family Care Center and caregivers at home, with clinical and non-clinical onboarding paths',
+          alt: 'Hand-drawn map on orange paper showing a gap between providers at the Family CARE Center and caregivers at home, with clinical and non-clinical onboarding paths',
           caption: 'An early map of the gap between providers and caregivers.',
           width: 1600,
           height: 1200,
@@ -315,7 +315,7 @@
     homeCard: 'meditationwise',
     href: '/work/meditationwise/',
     story: true,
-    title: 'An app designed for need and tradition-based meditation',
+    title: 'An app for finding meditation practices by need and tradition.',
     subtitle: 'MeditationWise',
     image: { src: 'images/MW-logo.png', alt: 'MeditationWise logo' },
   },

@@ -3,7 +3,7 @@
    Schema: see case-studies/_template.js
    Rendered by js/story.js into work/kindred/index.html.
 
-   Numbers come from the previous OpenMined page. Placeholders are
+   Research numbers match Uma's resume (confirmed Sept 2026). Placeholders are
    marked [PLACEHOLDER: ...] and render as visible boxes.
    Resized image variants live in images/story/kindred/.
    ============================================ */
@@ -15,12 +15,12 @@
     homeCard: 'kindred',
     title: 'Kindred',
     subtitle: 'A privacy-first AI health companion for people living with chronic conditions.',
-    tags: ['Client: OpenMined', '6 months', 'Team of 4', 'Role: UX Designer'],
+    tags: ['Client: OpenMined', '8 months', 'Team of 4', 'Role: UX Designer'],
     // Same image as the homepage card, so the card can morph into it.
     hero: {
-      src: 'images/story/kindred/om-hero-1600.jpg',
-      srcset: 'images/story/kindred/om-hero-800.jpg 800w, images/story/kindred/om-hero-1600.jpg 1600w',
-      alt: 'OpenMined logo',
+      src: 'images/story/kindred/om-hero-wordmark-1600.jpg',
+      srcset: 'images/story/kindred/om-hero-wordmark-800.jpg 800w, images/story/kindred/om-hero-wordmark-1600.jpg 1600w',
+      alt: 'OpenMined logo and name',
       width: 1600,
       height: 900,
     },
@@ -28,7 +28,7 @@
   },
 
   summary: {
-    lead: 'Turned an open-ended brief into a clinician-validated health app, ready for development, in 6 months.',
+    lead: 'Turned an open-ended brief into a clinician-validated product concept, ready for development, in 8 months.',
     points: [
       { label: 'Problem', text: 'OpenMined had powerful privacy technology and no consumer use case.' },
       { label: 'Role', text: 'UX Designer' },
@@ -103,7 +103,7 @@
       stage: 'diverge',
       nav: '36 ideas',
       heading: 'Once we understood it, we saw possibilities everywhere.',
-      body: ['Through 18 SME interviews and generative workshops (Crazy 8s, How Might We, and more), we generated 36 use case ideas: from a mental health tool built on private health records, to an elderly health kit, to a shopping recommendation platform.'],
+      body: ['Through SME interviews and generative workshops (Crazy 8s, How Might We, and more), we generated 36 use case ideas: from a mental health tool built on private health records, to an elderly health kit, to a shopping recommendation platform.'],
       layout: 'wide',
       visual: {
         type: 'idea-scatter',
@@ -142,8 +142,8 @@
       nav: 'Choosing one',
       heading: 'Then came the hard part: choosing one.',
       body: [
-        'I plotted every idea on an impact vs. risk matrix.',
-        'Then I ran speed dating sessions with 44 people to test how they felt about the top 8.',
+        'I plotted the ideas on an impact-versus-risk matrix.',
+        'Then I ran 50 speed-dating intercepts to test how people felt about the top 8.',
       ],
       layout: 'text-right',
       visual: {
@@ -206,7 +206,7 @@
       nav: 'The Informed Patient',
       heading: 'People already ask the internet about their health. They deserve answers that are private and accurate.',
       body: [
-        'That idea became The Informed Patient. It scored highest on our weighted decision matrix, which tested each of the top 8 against criteria like burning need, technical fit and legal regulations.',
+        'That idea became The Informed Patient. It scored highest on our weighted decision matrix, which tested each of the top 8 against criteria such as urgency of need, technical fit, and legal constraints.',
         'Most people already go online with health questions, so this was the use case where health privacy and AI accuracy mattered most.',
       ],
       layout: 'text-left',
@@ -232,7 +232,7 @@
       heading: 'We designed for sharing. Patients wanted understanding.',
       body: [
         "We assumed OpenMined's technology was best suited to a network of patients with the same condition sharing experiences, with the system showing them how many people their data had helped.",
-        "Co-design sessions with 21 people, and interviews with clinicians, showed otherwise. Patients didn't want to feel watched. They wanted insight from others' data and their own, with the help of AI, personalized to their condition.",
+        "Co-design sessions with 11 people, and interviews with clinicians, showed otherwise. Patients didn't want to feel watched. They wanted insight from others' data and their own, with the help of AI, personalized to their condition.",
         'Over two rounds of testing, 36 feature ideas became 17 worth testing, then the 5 feature sets that mattered most to patients and clinicians. I also made sure clinicians were comfortable with the direction.',
       ],
       layout: 'centered',
@@ -279,7 +279,7 @@
             label: 'Low fidelity',
             // Draft: edit freely.
             points: [
-              'We sketched 36 possible features and brought them to co-design sessions with 21 people.',
+              'We sketched 36 possible features and brought them to co-design sessions with 11 people.',
               'Together, we narrowed them to the 17 worth testing.',
             ],
             media: { src: 'images/om-low-fidelity.png', alt: 'Low-fidelity home screen in greyscale: a greeting, an Ask anything search, a learning module, and a timeline preview', width: 810, height: 1698 },
@@ -375,9 +375,9 @@
       diamond: 'solution',
       stage: 'converge',
       nav: 'Kindred',
-      heading: 'From an open-ended brief to a product ready to build, in six months.',
+      heading: 'From an open-ended brief to a product ready to build, in eight months.',
       body: [
-        "Kindred unifies scattered health records into one private timeline, where a medically trained AI and patients with similar diagnoses help make sense of them. It runs on OpenMined's attribution-based control, so insights are shared without the underlying data ever moving.",
+        "Kindred unifies scattered health records into one private timeline, where AI and patients with similar diagnoses help make sense of them. A medically trained AI is part of the concept, not yet a validated capability. It runs on OpenMined's attribution-based control, so insights are shared without the underlying data ever moving.",
         "We handed over the product, a go-to-market strategy, a build sequence and our discovery framework, which OpenMined can rerun on future ideas. OpenMined's CEO, Andrew Trask, responded enthusiastically, and Madhava, the principal engineer leading BioVault, validated our technical direction.",
       ],
       links: { 'attribution-based control': 'https://openmined.org/attribution-based-control/' },
@@ -415,9 +415,9 @@
     items: [
       { value: 123, label: 'research articles and papers' },
       { value: 82, label: 'survey responses' },
-      { value: 30, label: 'interviews with experts and users' },
+      { value: 65, label: 'patient, clinician and SME interviews' },
       { value: 36, label: 'use case ideas' },
-      { value: 44, label: 'speed dating participants' },
+      { value: 50, label: 'speed-dating intercepts' },
       { value: 8, suffix: '/10', label: 'recommendation score from patients', detail: '8.5/10 from clinicians' },
     ],
   },
@@ -438,7 +438,7 @@
     href: '/work/care2care/',
     story: true,
     title: 'Cancer caregivers also need support. We built an app for them.',
-    subtitle: 'Designing w/CARE · UPMC',
-    image: { src: 'images/UPMC-logo.jpg', alt: 'UPMC Magee Hospital Gynaecological Oncology Unit' },
+    subtitle: 'Care2Care · UPMC',
+    image: { src: 'images/UPMC-logo.jpg', alt: 'UPMC Magee Hospital Gynecologic Oncology Unit' },
   },
 };

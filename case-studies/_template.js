@@ -44,6 +44,7 @@
     tags: ['Client: Name', '3 months', 'Team of 3', 'Role: ...'],
     // Use the SAME image as the homepage card for a seamless morph.
     hero: { src: 'images/card-image.jpg', alt: 'What the image shows', width: 1600, height: 900 },
+    // Or, until images are approved: hero: { placeholder: 'IMAGE: ...', width: 1600, height: 900 }
     skipTo: { label: 'Skip to the final product', chapter: 'final' },  // optional
   },
 
@@ -112,6 +113,10 @@
         // button. Export as H.264 .mp4, 720p, ~2 Mbps.
         { video: 'images/story/your-slug/clip-720.mp4', webm: 'images/story/your-slug/clip-720.webm', poster: 'images/story/your-slug/clip-poster.jpg',
           alt: 'What happens in the clip', caption: '...', width: 1280, height: 720 },
+        // Live website in a browser frame, rendered at 1280px and scaled
+        // to fit. Inert until its button is pressed, like other embeds.
+        { embed: 'https://site.com', url: 'site.com', title: 'What screen readers hear',
+          start: 'Explore the site', caption: '...', maxWidth: 880 },
       ],
       mediaColumns: 2,           // optional: show media as side-by-side pairs, heights matched
     },
@@ -144,6 +149,7 @@
     items: [
       { value: 12, suffix: '+', label: 'interviews' },
       { value: 8.5, suffix: '/10', label: 'average score', detail: 'optional second line' },
+      { prefix: '$', value: 114, suffix: 'K+', label: 'raised' },
     ],
   },
 

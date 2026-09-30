@@ -28,7 +28,7 @@
     points: [
       { label: 'Problem', text: 'Children with early oculomotor difficulty are given eye exercises that are repetitive, hard to track and easy to abandon.' },
       { label: 'Role', text: 'Research and Experience Design, as an individual thesis.' },
-      { label: 'Process', text: '4 weeks of research, including 6+ interviews with leading ophthalmologists, then a speculative XR exercise system built around child attention spans.' },
+      { label: 'Process', text: 'A six-week project: 4 weeks of research, including 6+ interviews with leading ophthalmologists, then a speculative XR exercise system built around child attention spans.' },
       { label: 'Outcome', text: 'A design strategy for child-friendly, therapy-adjacent interaction, with playful, trackable routines and support for caregivers at home.' },
     ],
     showMetrics: true,
@@ -48,7 +48,7 @@
       diamond: 'problem',
       stage: 'diverge',
       nav: 'The context',
-      heading: "Children's eyes are working harder than ever, and early strain often goes unnoticed.",
+      heading: 'Children with early oculomotor challenges can struggle to stay engaged with repetitive eye exercises.',
       body: [
         'Children now spend long hours on close-focus digital tasks, while early signs of visual strain and oculomotor difficulty often go unnoticed.',
         'I set out to explore how design could make therapeutic eye exercises more engaging and easier to sustain, for children with early oculomotor challenges and the caregivers who support them.',
@@ -172,8 +172,7 @@
     heading: 'By the numbers',
     items: [
       { value: 6, suffix: '+', label: 'interviews with ophthalmologists' },
-      { value: 4, label: 'weeks of research' },
-      { value: 6, label: 'weeks from brief to design' },
+      { value: 6, label: 'weeks in total', detail: 'including 4 weeks of research' },
     ],
   },
 
@@ -182,7 +181,7 @@
     // Draft built from the previous page's outcomes: edit freely.
     lines: [
       'This project built my fluency in designing for healthcare, for families and for the wide variation in how children develop.',
-      'It also convinced me that engagement design is critical to therapy, not a layer on top of it. Consistency is what makes the exercises work, and play is what makes children consistent.',
+      'It also convinced me that engagement design is critical to therapy, not a layer on top of it. I designed play to make repeated practice more engaging.',
     ],
   },
 

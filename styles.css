@@ -1094,11 +1094,20 @@ body.intro-active .hero-content {
   margin-bottom: var(--sp-3);
 }
 
-/* Role / subtitle — two lines */
+/* Tagline, then the roles on a line of their own */
+.hero-tagline {
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.6;
+  max-width: 46rem;
+  margin: 0 auto var(--sp-2);
+}
+
 .hero-role {
   font-size: clamp(0.82rem, 1.2vw, 0.95rem);
   letter-spacing: 0.06em;
-  text-transform: lowercase;
   color: var(--text-secondary);
   font-weight: 500;
   line-height: 1.9;
@@ -1106,7 +1115,7 @@ body.intro-active .hero-content {
   margin: 0 auto var(--sp-6);
 }
 
-/* Each role keeps its words (and the dot after it) on one row, so on
+/* Each role keeps its words (and the dot before it) on one row, so on
    phones the line only breaks between roles. Below 360px "user
    experience designer" is wider than the row, so there it may break
    rather than spill off screen. */
@@ -2045,6 +2054,22 @@ body.intro-active .hero-content {
   display: block;
 }
 
+/* Photography: two photos share one card, stacked */
+.carousel-card-media--pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--line);
+}
+
+.carousel-card-media--pair img {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+/* Keep the man in frame when the portrait is cropped to a half */
+.carousel-card-media--pair .photo-portrait { object-position: 65% 35%; }
+
 .card-label {
   display: block;
   margin-top: 0.5rem;
@@ -2472,6 +2497,45 @@ body.intro-active .hero-content {
 .exploration-modal-caption {
   display: none;
 }
+
+/* Switcher under a photo from a card that holds several */
+.exploration-modal-thumbs {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.exploration-modal-thumbs[hidden] { display: none; }
+
+.exploration-modal-content:has(.exploration-modal-thumbs:not([hidden])) .exploration-modal-image {
+  max-height: calc(88vh - 88px);
+  margin-inline: auto;
+}
+
+.exploration-thumb {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--t-base), border-color var(--t-base);
+}
+
+.exploration-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.exploration-thumb:hover,
+.exploration-thumb[aria-pressed="true"] { opacity: 1; }
+.exploration-thumb[aria-pressed="true"] { border-color: var(--on-shade); }
 
 .contact-success-modal-content {
   text-align: center;
@@ -5322,6 +5386,7 @@ body[data-project="electric-scooters"] .tilt-card:hover {
   }
 
   /* Sizes set outside the type scale */
+  .hero-tagline,
   .hero-role,
   .card-badge,
   .card-label,

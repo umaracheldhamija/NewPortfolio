@@ -131,6 +131,10 @@
     if (m.placeholder) {
       return `<figure class="st-figure st-reveal ${cls}" style="--i:${i}${grow}${max}">${placeholderTag(m)}</figure>`;
     }
+    if (m.embed) {
+      const embedCap = m.caption ? `<figcaption>${linkify(m.caption, m.links)}</figcaption>` : '';
+      return `<figure class="st-figure st-figure--embed st-reveal ${cls}" style="--i:${i}${max}">${frameHTML('browser', embedHTML(m, 'browser'), { url: m.url })}${embedCap}</figure>`;
+    }
     const ratio = m.width && m.height ? ` style="aspect-ratio:${m.width} / ${m.height}"` : '';
     const cap = m.caption ? `<figcaption>${linkify(m.caption, m.links)}</figcaption>` : '';
     // Video: silent, looping, loads only when it comes near the screen
@@ -179,7 +183,7 @@
           ${next}
         </div>
         <div class="st-card">
-          <div class="st-card-media"${m.hero.width && m.hero.height ? ` style="aspect-ratio:${m.hero.width} / ${m.hero.height}"` : ''}>${imgTag(m.hero, { eager: true, cls: 'st-hero-img', sizes: '(min-width: 1100px) 960px, 100vw' })}</div>
+          <div class="st-card-media"${m.hero.width && m.hero.height ? ` style="aspect-ratio:${m.hero.width} / ${m.hero.height}"` : ''}>${m.hero.placeholder ? placeholderTag(m.hero) : imgTag(m.hero, { eager: true, cls: 'st-hero-img', sizes: '(min-width: 1100px) 960px, 100vw' })}</div>
           <div class="st-card-body">
             <h1 class="st-title">${esc(m.title)}</h1>
             <p class="st-subtitle">${esc(m.subtitle)}</p>
@@ -547,11 +551,11 @@
   /* --- Closing: metrics, reflection, next story --- */
   function metricsList(items, cls = '') {
     return `<ul class="st-metrics ${cls}" role="list">${items.map((m) => {
-      const final = `${m.value}${m.suffix || ''}`;
+      const final = `${m.prefix || ''}${m.value}${m.suffix || ''}`;
       const dec = String(m.value).includes('.') ? String(m.value).split('.')[1].length : 0;
       return `
         <li class="st-metric">
-          <p class="st-metric-value"><span class="st-count" data-value="${m.value}" data-dec="${dec}" aria-hidden="true">${esc(m.value)}</span><span aria-hidden="true">${esc(m.suffix || '')}</span><span class="st-sr">${esc(final)}</span></p>
+          <p class="st-metric-value">${m.prefix ? `<span aria-hidden="true">${esc(m.prefix)}</span>` : ''}<span class="st-count" data-value="${m.value}" data-dec="${dec}" aria-hidden="true">${esc(m.value)}</span><span aria-hidden="true">${esc(m.suffix || '')}</span><span class="st-sr">${esc(final)}</span></p>
           <p class="st-metric-label">${esc(m.label)}</p>
           ${m.detail ? `<p class="st-metric-detail">${esc(m.detail)}</p>` : ''}
         </li>`;
@@ -998,16 +1002,9 @@
       requestLayout();
     });
 
-    /* --- Back to work: behave like the browser back button when the
-       reader came from the homepage, so scroll position and the
-       image-into-card transition are both restored. --- */
-    $('[data-st-back]', main)?.addEventListener('click', (e) => {
-      try {
-        const ref = new URL(document.referrer);
-        const fromHome = ref.origin === location.origin && /^\/(index\.html)?$/.test(ref.pathname);
-        if (fromHome && history.length > 1) { e.preventDefault(); history.back(); }
-      } catch (_) { /* no referrer: follow the link */ }
-    });
+    /* "Back to work" is a plain link to /#work, so it behaves the same
+       on every browser and device, whatever the referrer or history.
+       The browser's own back button still restores the exact scroll. */
 
     // Tell the homepage which card to shrink back into.
     const remember = () => { try { sessionStorage.setItem('last-story', c.meta.homeCard || ''); } catch (_) {} };

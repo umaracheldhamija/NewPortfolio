@@ -75,6 +75,7 @@ const dom = {
   explorationTriggers: [...document.querySelectorAll('.exploration-trigger')],
   explorationModalImage: document.getElementById('exploration-modal-image'),
   explorationModalCaption: document.getElementById('exploration-modal-caption'),
+  explorationModalThumbs: document.getElementById('exploration-modal-thumbs'),
   projectImages:    [...document.querySelectorAll('.project-page .case-img, .project-page .kindred-hero-banner img, .project-page .case-hero-banner img, .project-page .case-hero-banner--breakout img, .project-page .project-image, .project-page .process-grid img')],
   sections:         [...document.querySelectorAll('section[id]')],
 };
@@ -1335,6 +1336,12 @@ function setupContactSubmissionFlow() {
     nextInput.value = nextUrl.toString();
   }
 
+  // "Back to home" closes the dialog too; its #hero anchor still scrolls.
+  document.querySelector('.success-cta')?.addEventListener('click', (event) => {
+    const modal = event.currentTarget.closest('.modal');
+    if (modal) closeModal(modal);
+  });
+
   const currentUrl = new URL(window.location.href);
   if (currentUrl.searchParams.get('contact') !== 'sent') return;
 
@@ -1482,6 +1489,10 @@ function closeModal(modal) {
     dom.explorationModalImage.removeAttribute('src');
     dom.explorationModalImage.alt = '';
     if (dom.explorationModalCaption) dom.explorationModalCaption.textContent = '';
+    if (dom.explorationModalThumbs) {
+      dom.explorationModalThumbs.innerHTML = '';
+      dom.explorationModalThumbs.hidden = true;
+    }
   }
 
   if (modal.id === 'project-image-modal') {
@@ -1659,7 +1670,44 @@ function setupExplorationGallery() {
     return;
   }
 
-  const openExplorationImage = (trigger) => {
+  // A card with several photos (Photography) opens on the one that was
+  // clicked, with a row of thumbnails to switch between them.
+  const openPhotoSet = (trigger, photos, event) => {
+    const thumbs = dom.explorationModalThumbs;
+    const picked = event?.target?.closest?.('[data-photo]');
+    const show = (index) => {
+      dom.explorationModalImage.src = photos[index].getAttribute('src');
+      dom.explorationModalImage.alt = photos[index].alt;
+      if (dom.explorationModalCaption) dom.explorationModalCaption.textContent = photos[index].alt;
+      [...thumbs.children].forEach((b, i) => b.setAttribute('aria-pressed', i === index ? 'true' : 'false'));
+    };
+
+    thumbs.innerHTML = '';
+    photos.forEach((photo, index) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'exploration-thumb';
+      btn.setAttribute('aria-label', `Show ${photo.alt.toLowerCase()}`);
+      const img = document.createElement('img');
+      img.src = photo.getAttribute('src');
+      img.alt = '';
+      btn.appendChild(img);
+      btn.addEventListener('click', () => show(index));
+      thumbs.appendChild(btn);
+    });
+    thumbs.hidden = false;
+
+    show(Math.max(photos.indexOf(picked), 0));
+    openModal('exploration-image-modal', trigger);
+  };
+
+  const openExplorationImage = (trigger, event) => {
+    const photos = [...trigger.querySelectorAll('[data-photo]')];
+    if (photos.length > 1 && dom.explorationModalThumbs) {
+      openPhotoSet(trigger, photos, event);
+      return;
+    }
+
     const imageSrc = trigger.getAttribute('data-image-src');
     const imageAlt = trigger.getAttribute('data-image-alt') ?? 'Exploration image';
     if (!imageSrc) return;
