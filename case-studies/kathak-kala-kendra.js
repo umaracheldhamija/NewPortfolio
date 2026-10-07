@@ -251,7 +251,7 @@
     href: '/work/kindred/',
     story: true,
     title: 'Securely training AI on private data',
-    subtitle: 'OpenMined · Capstone',
+    subtitle: 'OpenMined · CMU Capstone',
     image: { src: 'images/story/kindred/om-logo-800.jpg', alt: 'OpenMined logo and name' },
   },
 };
