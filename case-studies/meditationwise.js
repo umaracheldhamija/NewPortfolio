@@ -27,25 +27,19 @@
     points: [
       { label: 'Problem', text: 'Fragmented navigation and discovery flows overwhelmed new users before they could form a practice.' },
       { label: 'Role', text: 'Lead Designer, covering navigation, session flows and a scalable design system.' },
-      { label: 'Process', text: 'A double diamond with my team of three: interviews and task analysis, personas and journeys, then 9+ usability sessions over 4 months.' },
+      { label: 'Process', text: 'With my team of three: interviews and task analysis, personas and journeys, then 9+ usability sessions over 4 months.' },
       { label: 'Outcome', text: 'A redesigned onboarding and browse experience that reduces cognitive load while keeping the cultural depth that sets MeditationWise apart.' },
     ],
     showMetrics: true,
   },
 
-  diamonds: [
-    { id: 'problem', label: 'Diamond 1', title: 'Finding what got in the way', stages: ['Discover', 'Define'] },
-    { id: 'solution', label: 'Diamond 2', title: 'Designing a calmer way in', stages: ['Develop', 'Deliver'] },
-  ],
 
   chapters: [
 
-    /* ---------- Diamond 1: Finding what got in the way ---------- */
+    /* ---------- Finding what got in the way ---------- */
 
     {
       id: 'brief',
-      diamond: 'problem',
-      stage: 'diverge',
       nav: 'The brief',
       heading: 'We were not building a content feed. We were building a practice.',
       body: [
@@ -59,8 +53,6 @@
 
     {
       id: 'research',
-      diamond: 'problem',
-      stage: 'diverge',
       nav: 'Research',
       heading: 'We found people were overwhelmed before they ever started a practice.',
       body: [
@@ -93,8 +85,6 @@
 
     {
       id: 'tension',
-      diamond: 'problem',
-      stage: 'converge',
       nav: 'The tension',
       heading: 'The depth that made the app special was also what made it hard to start.',
       body: [
@@ -104,12 +94,10 @@
       media: [],
     },
 
-    /* ---------- Diamond 2: Designing a calmer way in ---------- */
+    /* ---------- Designing a calmer way in ---------- */
 
     {
       id: 'wayfinding',
-      diamond: 'solution',
-      stage: 'diverge',
       nav: 'Wayfinding',
       heading: 'We let people find a practice by need, level or tradition.',
       body: [
@@ -147,8 +135,6 @@
 
     {
       id: 'testing',
-      diamond: 'solution',
-      stage: 'converge',
       nav: 'Testing',
       heading: 'Testing with 9+ people showed us where discovery broke down.',
       body: [
@@ -170,8 +156,6 @@
 
     {
       id: 'meditationwise',
-      diamond: 'solution',
-      stage: 'converge',
       nav: 'MeditationWise',
       heading: 'A calm, grounded app that invites a practice instead of a streak.',
       body: [
@@ -210,17 +194,14 @@
   ],
 
   checkpoints: [
-    { id: 'cp-tension', kind: 'pinch', chapter: 'tension', label: 'Less load, same depth' },
     {
       id: 'halfway',
       kind: 'interlude',
       chapter: 'tension',
       label: 'Halfway there',
-      eyebrow: 'Diamond 1 complete',
       heading: 'Halfway there.',
       lines: ['We knew what was in the way. Now we had to design around it.'],
     },
-    { id: 'cp-meditationwise', kind: 'pinch', chapter: 'meditationwise', label: 'MeditationWise' },
   ],
 
   metrics: {

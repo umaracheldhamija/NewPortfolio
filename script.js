@@ -145,11 +145,27 @@ function applyTheme(theme) {
    - Single RAF vs multiple setIntervals
    ============================================ */
 
+// The word the cursor label shows over each kind of target.
+const CURSOR_LABELS = [
+  ['.project-card, .project-row', 'View'],
+  ['.deck-card', 'Read'],
+  ['.st-zoomable, .exploration-trigger', 'Zoom'],
+];
+
 function setupMouseTracking() {
   document.addEventListener('mousemove', (e) => {
     state.target.x = e.clientX;
     state.target.y = e.clientY;
   }, { passive: true });
+
+  const label = dom.cursorDot;
+  if (!label) return;
+  document.addEventListener('mouseover', (e) => {
+    const hit = CURSOR_LABELS.find(([sel]) => e.target.closest?.(sel));
+    if (hit) label.textContent = hit[1];
+    label.classList.toggle('is-on', !!hit);
+  }, { passive: true });
+  document.documentElement.addEventListener('mouseleave', () => label.classList.remove('is-on'));
 }
 
 function runBackgroundLoop(now) {
@@ -176,10 +192,12 @@ function runBackgroundLoop(now) {
       dom.stormReveal.style.webkitMaskImage = mask;
     }
 
-    // --- Cursor dot — shown in BOTH modes ---
+    // --- Cursor label: trails the pointer slightly (see section 5 of styles.css) ---
     if (dom.cursorDot) {
-      dom.cursorDot.style.left = `${state.target.x}px`;
-      dom.cursorDot.style.top  = `${state.target.y}px`;
+      state.mouse.x += (state.target.x - state.mouse.x) * 0.35;
+      state.mouse.y += (state.target.y - state.mouse.y) * 0.35;
+      dom.cursorDot.style.left = `${state.mouse.x}px`;
+      dom.cursorDot.style.top  = `${state.mouse.y}px`;
     }
 
     // --- Magnetic elements — nearby buttons/social/control icons lean toward the cursor ---
@@ -284,10 +302,11 @@ const SPLASH_CLICK_START_SCALE = 0.10;
 const SPLASH_CLICK_PUNCH_MS    = 620;  // how long the concentrated drop lasts
 const SPLASH_CLICK_PUNCH_AMP   = 2.6;  // peak alpha multiplier at the moment of impact
 
-// The ambient system keeps its presence low — a separate, higher
-// ceiling only exists so a click can still add one on top without being
-// blocked by the ambient cap; those extras fade out on their own after.
-const SPLASH_AMBIENT_MAX = 2;
+// No ambient blooms: the page stays clean until the reader presses on
+// the background, and each press adds one (up to SPLASH_MAX_BLOOMS),
+// which fades out on its own. Raise SPLASH_AMBIENT_MAX to have the
+// page seed and top up a few blooms by itself again.
+const SPLASH_AMBIENT_MAX = 0;
 const SPLASH_MAX_BLOOMS = 5;
 const SPLASH_SPAWN_MIN = 4500, SPLASH_SPAWN_MAX = 9000;
 
@@ -520,10 +539,10 @@ function makeSplashBloom(now, ageOffsetMs, pos) {
 function seedInitialSplashBlooms(now) {
   computeSplashDocMetrics();
   splashBlooms = [];
-  // Only the ambient ceiling's worth (1–2) at load, staggered slightly
-  // so at least one is visibly still growing rather than all appearing
-  // pre-grown — anything more than that is left for the user's own
-  // clicks to add, not the page itself.
+  // Only the ambient ceiling's worth at load (none by default), staggered
+  // slightly so at least one is visibly still growing rather than all
+  // appearing pre-grown — anything more than that is left for the
+  // user's own clicks to add, not the page itself.
   for (let i = 0; i < SPLASH_AMBIENT_MAX; i++) {
     const b = makeSplashBloom(now, 0);
     // Modest stagger — the field opens with one wash mid-spread and one
@@ -702,6 +721,8 @@ function setupSplashClickSpawn() {
     if (state.theme === 'dark') return;
     if (state.reducedMotion || state.quietMode || window.innerWidth < 768) return;
     if (e.target.closest(SPLASH_CLICK_INTERACTIVE_SELECTOR)) return;
+    // The hero card, nav and footer have their own splash (setupPressSplash)
+    if (e.target.closest(SPLASH_PRESS_AREAS)) return;
 
     const pos = { x: e.clientX, y: e.clientY + window.scrollY };
     const b = makeSplashBloom(performance.now(), 0, pos);
@@ -750,15 +771,6 @@ function setupNavScroll() {
 
   const updateNavState = () => {
     dom.nav.classList.toggle('scrolled', window.scrollY > 16);
-
-    // On mobile: hide accessibility controls once user has scrolled past
-    // the initial area; only show again when back near the top.
-    if (window.innerWidth < 768) {
-      const accessibilityControls = document.querySelector('.accessibility-controls');
-      if (accessibilityControls) {
-        accessibilityControls.classList.toggle('hidden', window.scrollY > 150);
-      }
-    }
   };
 
   window.addEventListener('scroll', debounce(updateNavState, 100), { passive: true });
@@ -996,7 +1008,7 @@ function setupTiltCards() {
     let rect = null;
     let isActive = false;
     const parsedMax = Number(card.dataset.tiltMax);
-    const maxTilt = Number.isFinite(parsedMax) ? parsedMax : 8;
+    const maxTilt = Number.isFinite(parsedMax) ? parsedMax : 10;
     const ease = 0.18;
 
     let currentTiltX = 0;
@@ -1115,95 +1127,6 @@ function setupTiltCards() {
       card.addEventListener('pointercancel', handleLeave, { passive: true });
     }
     card.addEventListener('focusout', handleLeave);
-  });
-}
-
-
-/* ============================================
-   11b. PROJECT CARD HIGHLIGHTS
-   With a mouse, hovering or focusing a card shows its highlights
-   over the image, one bullet at a time, with a dot per bullet.
-   A new bullet rises in every 2 seconds; hovering a dot jumps to
-   that bullet. Phones and touch screens list
-   the bullets in the card instead (CSS only), so nothing runs there.
-   ============================================ */
-
-function setupCardHighlights() {
-  const panels = document.querySelectorAll('.project-card .card-highlights');
-  if (!panels.length) return;
-
-  // Must match the media query that places the panel over the image.
-  const overImage = window.matchMedia('(hover: hover) and (min-width: 769px)');
-  const DWELL = 2000; // ms each bullet stays up
-
-  panels.forEach(panel => {
-    const card = panel.closest('.project-card');
-    const items = [...panel.querySelectorAll('.card-bullets li')];
-    if (!card || !items.length) return;
-
-    const foot = document.createElement('div');
-    foot.className = 'card-highlights-foot';
-    foot.setAttribute('aria-hidden', 'true');
-    foot.innerHTML = '<span class="card-highlights-label">Highlights</span><span class="card-dots"></span>';
-    const dotRow = foot.querySelector('.card-dots');
-    const dots = items.map((_, i) => {
-      const dot = document.createElement('span');
-      dot.className = 'card-dot';
-      dot.addEventListener('mouseenter', () => { if (running) { show(i); schedule(); } });
-      dotRow.appendChild(dot);
-      return dot;
-    });
-    panel.appendChild(foot);
-
-    let index = 0;
-    let running = false;
-    let timer = null;
-
-    items[0].classList.add('is-active');
-
-    function show(next) {
-      if (next !== index) {
-        const out = items[index];
-        out.classList.remove('is-active');
-        out.classList.add('was-active');
-        // Once it has faded, drop it back below, ready to rise in again.
-        setTimeout(() => { if (!out.classList.contains('is-active')) out.classList.remove('was-active'); }, 500);
-      }
-      index = next;
-      items[index].classList.remove('was-active');
-      items[index].classList.add('is-active');
-      dotRow.style.setProperty('--dwell', DWELL + 'ms');
-      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-    }
-
-    function schedule() {
-      clearTimeout(timer);
-      if (items.length < 2) return;
-      timer = setTimeout(() => {
-        show((index + 1) % items.length);
-        schedule();
-      }, DWELL);
-    }
-
-    function start() {
-      if (running || !overImage.matches) return;
-      running = true;
-      show(0);
-      schedule();
-    }
-
-    function stop() {
-      if (card.matches(':hover') || card.matches(':focus-visible')) return;
-      running = false;
-      clearTimeout(timer);
-      // Clearing the dots now restarts the fill from empty next time.
-      dots.forEach(dot => dot.classList.remove('is-active'));
-    }
-
-    card.addEventListener('mouseenter', start);
-    card.addEventListener('mouseleave', () => setTimeout(stop));
-    card.addEventListener('focus', () => { if (card.matches(':focus-visible')) start(); });
-    card.addEventListener('blur', () => setTimeout(stop));
   });
 }
 
@@ -1845,18 +1768,23 @@ function setupViewportMaintenance() {
 
 
 /* ============================================
-   INTERACTIVE AURORA BLOBS
-   Listen for clicks on profile-image to create
-   fun, colorful expanding ripples behind the hero card.
+   PAINT SPLASH ON PRESS
+   Pressing the hero card, the top bar or the footer (anywhere but
+   their links and buttons) bursts colourful paint from that spot,
+   behind the content, with a soft chime. Mouse and trackpad sizes
+   only (768px and up), and never with Motion paused; with reduced
+   motion the chime plays but no paint moves.
    ============================================ */
 
-function setupInteractiveAuroraBlobs() {
+const SPLASH_PRESS_AREAS = '.hero-content, .site-nav, footer';
+
+function setupPressSplash() {
   if (window.innerWidth < 768) return;
 
-  const profileImage = document.querySelector('.profile-image');
-  const blobsContainer = document.getElementById('aurora-blobs-container');
-
-  if (!profileImage || !blobsContainer) return;
+  const layer = document.createElement('div');
+  layer.className = 'press-splash-layer';
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(layer);
 
   // Warm aurora colors: orange, coral, honey, clay (see --pop-* tokens)
   const colors = ['blob-orange', 'blob-coral', 'blob-yellow', 'blob-clay'];
@@ -1897,64 +1825,32 @@ function setupInteractiveAuroraBlobs() {
     }
   }
 
-  profileImage.addEventListener('click', () => {
-    if (state.quietMode) return; // Respect quiet mode
-    
-    // Play a subtle chime
+  // Bubble phase, so presses that already do something (the footer
+  // name's hidden poem stops propagation) don't splash as well.
+  document.addEventListener('click', (e) => {
+    if (state.quietMode) return;
+    if (!e.target.closest(SPLASH_PRESS_AREAS)) return;
+    if (e.target.closest(SPLASH_CLICK_INTERACTIVE_SELECTOR)) return;
+
     playChime();
-    
-    // Get hero section dimensions for relative positioning
-    const hero = document.getElementById('hero');
-    if (!hero) return;
-    
-    const heroRect = hero.getBoundingClientRect();
-    
-    // Create multiple blobs per click for more intense splashes
-    const blobCount = 3 + Math.floor(Math.random() * 3); // 3-5 blobs per click
-    
+    if (state.reducedMotion) return;
+
+    // 3-5 blobs around the press, cascading 80ms apart
+    const blobCount = 3 + Math.floor(Math.random() * 3);
     for (let i = 0; i < blobCount; i++) {
-      // Stagger the blob creation for cascading effect
       setTimeout(() => {
-        // Random position within the hero section (but keep blobs behind the card)
-        const randomX = Math.random() * heroRect.width;
-        const randomY = Math.random() * heroRect.height * 0.8; // Bias towards upper half
-        
-        // Random blob size (350-550px diameter for big splashes)
-        const blobSize = 350 + Math.random() * 200;
-        
-        // Pick a random color
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Create blob element
+        const size = 260 + Math.random() * 180;
         const blob = document.createElement('div');
-        blob.className = `aurora-blob ${randomColor}`;
-        blob.style.left = `${randomX}px`;
-        blob.style.top = `${randomY}px`;
-        blob.style.width = `${blobSize}px`;
-        blob.style.height = `${blobSize}px`;
-        
-        blobsContainer.appendChild(blob);
-        
-        // Remove blob after animation completes (2 seconds)
-        setTimeout(() => {
-          blob.remove();
-        }, 2000);
-      }, i * 80); // 80ms delay between each blob for cascade effect
+        blob.className = `aurora-blob ${colors[Math.floor(Math.random() * colors.length)]}`;
+        blob.style.left = `${e.clientX + (Math.random() - 0.5) * 160}px`;
+        blob.style.top = `${e.clientY + (Math.random() - 0.5) * 120}px`;
+        blob.style.width = `${size}px`;
+        blob.style.height = `${size}px`;
+        layer.appendChild(blob);
+        // The expand-and-fade animation lasts 2 seconds
+        setTimeout(() => blob.remove(), 2000);
+      }, i * 80);
     }
-  });
-
-  // Also allow mousedown for extra interactivity
-  profileImage.addEventListener('mousedown', (e) => {
-    // Visual feedback: slight scale down
-    profileImage.style.transform = 'scale(0.98)';
-  });
-
-  profileImage.addEventListener('mouseup', () => {
-    profileImage.style.transform = '';
-  });
-
-  profileImage.addEventListener('mouseleave', () => {
-    profileImage.style.transform = '';
   });
 }
 
@@ -1963,6 +1859,9 @@ function setupInteractiveAuroraBlobs() {
 
 /* ============================================
    20. WRITING — STACKED CARD DECK
+   The chips above it filter by topic and sort by date, using
+   data-topic and data-date (YYYY-MM) on each card. Cards left out
+   are hidden; the deck, dots and counter cover only the rest.
    ============================================ */
 
 function setupWritingDeck() {
@@ -1970,6 +1869,10 @@ function setupWritingDeck() {
   if (!stack) return;
 
   const cards = [...stack.querySelectorAll('.deck-card')];
+  const filters = document.querySelector('.writing-filters');
+  let deck = [...cards]; // the cards on show, in deck order
+  let topic = 'all';
+  let sort = 'newest';
   const prevBtn = stack.querySelector('.deck-prev');
   const nextBtn = stack.querySelector('.deck-next');
   const dotsContainer = stack.querySelector('.deck-dots');
@@ -1990,21 +1893,22 @@ function setupWritingDeck() {
     dotsContainer.after(counter);
   }
 
-  // Build dots
-  dotsContainer.innerHTML = '';
-  cards.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'deck-dot';
-    dot.setAttribute('role', 'tab');
-    dot.setAttribute('aria-label', `Go to article ${i + 1}`);
-    dot.addEventListener('click', () => goTo(i));
-    dotsContainer.appendChild(dot);
-  });
+  function buildDots() {
+    dotsContainer.innerHTML = '';
+    deck.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'deck-dot';
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', `Go to article ${i + 1}`);
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    });
+  }
 
   function updatePositions() {
-    const count = cards.length;
-    cards.forEach((card, i) => {
+    const count = deck.length;
+    deck.forEach((card, i) => {
       // Skip the card currently exiting — it manages its own state
       if (card.classList.contains('deck-exit')) return;
 
@@ -2021,7 +1925,7 @@ function setupWritingDeck() {
       dot.setAttribute('aria-selected', i === activeIndex ? 'true' : 'false');
     });
 
-    counter.textContent = `${activeIndex + 1} / ${cards.length}`;
+    counter.textContent = `${activeIndex + 1} / ${deck.length}`;
     // Don't announce every automatic turn, only ones the reader makes.
     counter.setAttribute('aria-live', autoplaying() ? 'off' : 'polite');
   }
@@ -2029,12 +1933,12 @@ function setupWritingDeck() {
   function goTo(index) {
     if (isAnimating) return;
     const prevIndex = activeIndex;
-    activeIndex = (index + cards.length) % cards.length;
+    activeIndex = (index + deck.length) % deck.length;
     if (prevIndex === activeIndex) return;
     lastMove = performance.now();
 
     isAnimating = true;
-    const leavingCard = cards[prevIndex];
+    const leavingCard = deck[prevIndex];
 
     // Remove from stack positioning and apply exit animation
     leavingCard.removeAttribute('data-deck-pos');
@@ -2045,15 +1949,48 @@ function setupWritingDeck() {
 
     setTimeout(() => {
       leavingCard.classList.remove('deck-exit');
-      // Assign it a hidden position in the new stack order
-      const count = cards.length;
-      const pos = (prevIndex - activeIndex + count) % count;
-      leavingCard.setAttribute('data-deck-pos', pos > 2 ? '-1' : pos);
-      leavingCard.setAttribute('tabindex', '-1');
-      leavingCard.setAttribute('aria-hidden', 'true');
       isAnimating = false;
+      // Gives it a hidden position in the new stack order (and copes
+      // with a filter change made while it was leaving).
+      updatePositions();
     }, 400);
   }
+
+  // Newest or oldest first; cards from the same month keep page order.
+  function applyFilters() {
+    const dir = sort === 'newest' ? -1 : 1;
+    deck = cards
+      .filter((card) => topic === 'all' || card.dataset.topic === topic)
+      .sort((a, b) => dir * (a.dataset.date || '').localeCompare(b.dataset.date || ''));
+    cards.forEach((card) => {
+      card.hidden = !deck.includes(card);
+      card.classList.remove('deck-exit');
+      if (card.hidden) {
+        card.setAttribute('data-deck-pos', '-1');
+        card.setAttribute('tabindex', '-1');
+        card.setAttribute('aria-hidden', 'true');
+      }
+    });
+    activeIndex = 0;
+    isAnimating = false;
+    lastMove = performance.now();
+    // One card left: nothing to flip through.
+    stack.classList.toggle('is-single', deck.length < 2);
+    buildDots();
+    updatePositions();
+  }
+
+  filters?.addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    if (chip.dataset.topic) topic = chip.dataset.topic;
+    if (chip.dataset.sort) sort = chip.dataset.sort;
+    filters.querySelectorAll('.filter-chip').forEach((c) => {
+      const on = c.dataset.topic ? c.dataset.topic === topic : c.dataset.sort === sort;
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    applyFilters();
+  });
 
   function next() { goTo(activeIndex + 1); }
   function prev() { goTo(activeIndex - 1); }
@@ -2062,11 +1999,11 @@ function setupWritingDeck() {
   nextBtn?.addEventListener('click', next);
 
   // Card click: advance if not front, open if front
-  cards.forEach((card, i) => {
+  cards.forEach((card) => {
     card.addEventListener('click', () => {
       if (card.classList.contains('deck-exit')) return;
       const pos = card.getAttribute('data-deck-pos');
-      if (pos !== '0') { goTo(i); return; }
+      if (pos !== '0') { goTo(deck.indexOf(card)); return; }
       activateCard(card);
     });
 
@@ -2126,153 +2063,29 @@ function setupWritingDeck() {
     if (performance.now() - lastMove >= DECK_INTERVAL) next();
   }, 250);
 
-  updatePositions();
+  applyFilters();
 }
 
 
 /* ============================================
-   20b. WORK CAROUSEL
-   From page load, the project row glides slowly to the left on a
-   loop: a copy of the cards follows the originals, and once the
-   first copy reaches the start the row jumps back by one set, which
-   looks identical. It pauses while hovered or focused, off screen,
-   in a hidden tab, and for a few seconds after the reader scrolls or
-   presses an arrow. It never runs with reduced motion or the Motion
-   toggle off (the site's pause control; phones start with it off),
-   and then the row is a plain snapping scroller.
+   20b. MORE PROJECTS FILTER
+   The chips above the list show one type of project at a time
+   (data-type on each chip and list item).
    ============================================ */
 
-const WORK_GLIDE_SPEED = 30;    // px per second
-const WORK_RESUME_AFTER = 3000; // ms after the reader's last move
+function setupMoreProjects() {
+  const wrap = document.querySelector('.more-projects');
+  if (!wrap) return;
+  const chips = [...wrap.querySelectorAll('.filter-chip')];
+  const items = [...wrap.querySelectorAll('.more-list li')];
 
-function setupWorkCarousel() {
-  const root = document.getElementById('work-carousel');
-  const grid = document.getElementById('projects-grid');
-  if (!root || !grid) return;
-
-  const cards = [...grid.querySelectorAll('.project-card')];
-  const prevBtn = root.querySelector('.work-prev');
-  const nextBtn = root.querySelector('.work-next');
-  if (!cards.length) return;
-
-  let clones = [];
-  let hovered = false;
-  let inView = false;
-  let pos = grid.scrollLeft;    // where the glide has the row (sub-pixel)
-  let lastSet = -1;             // what the glide last wrote to scrollLeft
-  let lastUserScroll = 0;
-  let resumeAt = performance.now() + 1500; // let the page settle first
-  let lastFrame = 0;
-
-  const motionAllowed = () => !state.reducedMotion && !state.quietMode;
-  const smooth = () => (motionAllowed() ? 'smooth' : 'auto');
-  const looping = () => clones.length > 0;
-  // One full set of cards: how far the row travels before it repeats.
-  const setWidth = () => (looping() ? clones[0].offsetLeft - cards[0].offsetLeft : 0);
-  const stops = () => [...cards, ...clones].map((c) => c.offsetLeft - cards[0].offsetLeft);
-  const holdOff = () => { resumeAt = performance.now() + WORK_RESUME_AFTER; };
-
-  // Copies are for the eye only: screen readers and the Tab key get
-  // each project once. They can still be clicked.
-  function buildLoop() {
-    if (looping()) return;
-    clones = cards.map((card) => {
-      const copy = card.cloneNode(true);
-      copy.classList.add('is-clone');
-      copy.setAttribute('aria-hidden', 'true');
-      copy.setAttribute('tabindex', '-1');
-      grid.appendChild(copy);
-      return copy;
-    });
-    grid.classList.add('is-looping');
-  }
-
-  // Past the first set, jump back by one set: the view is identical.
-  function wrap() {
-    const w = setWidth();
-    if (w && grid.scrollLeft >= w) {
-      grid.scrollLeft -= w;
-      pos = grid.scrollLeft;
-      lastSet = grid.scrollLeft;
-    }
-  }
-
-  function step(dir) {
-    holdOff();
-    const x = grid.scrollLeft;
-    const max = grid.scrollWidth - grid.clientWidth;
-    let list = stops();
-    if (looping()) {
-      // Going back from the very start: hop forward a set first.
-      if (dir < 0 && x < 4) { grid.scrollLeft = x + setWidth(); list = stops(); }
-      const cur = grid.scrollLeft;
-      const target = dir > 0 ? list.find((o) => o > cur + 4) : [...list].reverse().find((o) => o < cur - 4);
-      if (target != null) grid.scrollTo({ left: Math.min(target, max), behavior: smooth() });
-      return;
-    }
-    // No loop (Motion off): wrap from one end to the other.
-    if (dir > 0 && x >= max - 4) return grid.scrollTo({ left: 0, behavior: smooth() });
-    if (dir < 0 && x <= 4) return grid.scrollTo({ left: max, behavior: smooth() });
-    const target = dir > 0 ? list.find((o) => o > x + 4) : [...list].reverse().find((o) => o < x - 4);
-    grid.scrollTo({ left: Math.min(target ?? 0, max), behavior: smooth() });
-  }
-
-  // Build now, so a returning reader's saved spot (restored before the
-  // first frame, see index.html <head>) can land among the copies.
-  if (motionAllowed()) buildLoop();
-  // If that restore already ran, the copies weren't there yet: redo it.
-  if (window.__homeRestored && looping()) {
-    try {
-      const saved = JSON.parse(sessionStorage.getItem('home-return'));
-      if (saved) grid.scrollLeft = saved.x;
-    } catch (_) {}
-  }
-
-  prevBtn?.addEventListener('click', () => step(-1));
-  nextBtn?.addEventListener('click', () => step(1));
-
-  // Anything that moves the row other than the glide counts as the
-  // reader taking over for a moment.
-  grid.addEventListener('scroll', () => {
-    if (Math.abs(grid.scrollLeft - lastSet) > 2) {
-      lastUserScroll = performance.now();
-      holdOff();
-    }
-  }, { passive: true });
-  grid.addEventListener('touchstart', holdOff, { passive: true });
-  grid.addEventListener('wheel', holdOff, { passive: true });
-
-  root.addEventListener('mouseenter', () => { hovered = true; });
-  root.addEventListener('mouseleave', () => { hovered = false; });
-  root.addEventListener('focusin', () => { hovered = true; });
-  root.addEventListener('focusout', (e) => {
-    if (!root.contains(e.relatedTarget)) hovered = false;
+  wrap.addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    const type = chip.dataset.type;
+    chips.forEach((c) => c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'));
+    items.forEach((li) => { li.hidden = type !== 'all' && li.dataset.type !== type; });
   });
-  new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; }, { threshold: 0.3 }).observe(grid);
-
-  function frame(now) {
-    const dt = lastFrame ? Math.min(now - lastFrame, 100) : 0;
-    lastFrame = now;
-    if (motionAllowed()) buildLoop();
-
-    const idle = now - lastUserScroll > 400;
-    const gliding = looping() && motionAllowed() && !hovered && inView && !document.hidden
-      && !window.__vtRunning && now >= resumeAt;
-
-    if (gliding) {
-      // Pick up from wherever the reader left the row.
-      if (Math.abs(grid.scrollLeft - lastSet) > 2) pos = grid.scrollLeft;
-      pos += (WORK_GLIDE_SPEED * dt) / 1000;
-      const w = setWidth();
-      if (w && pos >= w) pos -= w;
-      grid.scrollLeft = pos;
-      lastSet = grid.scrollLeft;
-    } else if (looping() && idle) {
-      wrap();
-    }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
 }
 
 
@@ -2600,15 +2413,14 @@ function init() {
   setupContactSubmissionFlow();
   setupExplorationGallery();
   setupWritingDeck();      // replaces setupWritingCarousel
-  setupWorkCarousel();
+  setupMoreProjects();
   setupContactQuotes();
   setupScrollTopButton();
   setupViewportMaintenance();
   setupTiltCards();
-  setupCardHighlights();
   setupBioTab();
   setupLiquidMetal();
-  setupInteractiveAuroraBlobs();
+  setupPressSplash();
   setupResumeModal();
   setupSplashField();
   updateQuietIcon();

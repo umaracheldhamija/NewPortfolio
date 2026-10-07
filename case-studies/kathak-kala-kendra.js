@@ -40,15 +40,10 @@
     ],
   },
 
-  diamonds: [
-    { id: 'build', label: 'The process', title: 'From a surprise idea to a live site', stages: ['Discover', 'Deliver'] },
-  ],
 
   chapters: [
     {
       id: 'idea',
-      diamond: 'build',
-      stage: 'diverge',
       nav: 'The idea',
       heading: 'My teacher for 15 years had no website, so I built one for him.',
       body: [
@@ -70,8 +65,6 @@
 
     {
       id: 'constraints',
-      diamond: 'build',
-      stage: 'diverge',
       nav: 'Constraints',
       heading: 'It had to work on limited internet, and he had to be able to run it himself.',
       body: [
@@ -93,8 +86,6 @@
 
     {
       id: 'prototype',
-      diamond: 'build',
-      stage: 'converge',
       nav: 'Prototype',
       heading: 'His students shaped the site before he ever saw it.',
       body: [
@@ -127,8 +118,6 @@
 
     {
       id: 'content',
-      diamond: 'build',
-      stage: 'converge',
       nav: 'Content',
       heading: 'Thirty years of teaching, told through his students.',
       body: [
@@ -167,8 +156,6 @@
 
     {
       id: 'site',
-      diamond: 'build',
-      stage: 'converge',
       nav: 'The site',
       heading: 'A site he can run himself, and a surprise he never saw coming.',
       body: [
@@ -249,9 +236,6 @@
     },
   ],
 
-  checkpoints: [
-    { id: 'cp-site', kind: 'pinch', chapter: 'site', label: 'Live' },
-  ],
 
   reflection: {
     heading: 'Reflection',
@@ -268,6 +252,6 @@
     story: true,
     title: 'Securely training AI on private data',
     subtitle: 'OpenMined · Capstone',
-    image: { src: 'images/story/kindred/om-hero-wordmark-800.jpg', alt: 'OpenMined logo and name' },
+    image: { src: 'images/story/kindred/om-logo-800.jpg', alt: 'OpenMined logo and name' },
   },
 };

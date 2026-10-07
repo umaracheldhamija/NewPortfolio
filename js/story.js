@@ -65,6 +65,14 @@
   }
 
   const pad = (n) => String(n).padStart(2, '0');
+
+  // What a chapter or round taught us: 'text', or { label, text } to
+  // call it a Finding or Impact instead of an Insight.
+  function insightHTML(ins, cls = '', i = 1) {
+    if (!ins) return '';
+    const { label = 'Insight', text } = typeof ins === 'string' ? { text: ins } : ins;
+    return `<p class="st-insight ${cls}" style="--i:${i}"><span class="st-insight-label">${esc(label)}</span>${linkify(text)}</p>`;
+  }
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
   // Deterministic jitter, so the idea scatter looks the same every visit.
@@ -131,6 +139,12 @@
     if (m.placeholder) {
       return `<figure class="st-figure st-reveal ${cls}" style="--i:${i}${grow}${max}">${placeholderTag(m)}</figure>`;
     }
+    // One screen in a phone frame: a screenshot, or a live prototype.
+    if (m.frame === 'phone') {
+      const screen = m.embed ? embedHTML(m, 'phone') : `<div class="st-screen-media">${imgTag(m, { sizes: '300px' })}</div>`;
+      const phoneCap = m.caption ? `<figcaption>${linkify(m.caption, m.links)}</figcaption>` : '';
+      return `<figure class="st-figure st-figure--phone st-reveal ${cls}" style="--i:${i}">${frameHTML('phone', screen, m)}${phoneCap}</figure>`;
+    }
     if (m.embed) {
       const embedCap = m.caption ? `<figcaption>${linkify(m.caption, m.links)}</figcaption>` : '';
       return `<figure class="st-figure st-figure--embed st-reveal ${cls}" style="--i:${i}${max}">${frameHTML('browser', embedHTML(m, 'browser'), { url: m.url })}${embedCap}</figure>`;
@@ -188,18 +202,20 @@
             <h1 class="st-title">${esc(m.title)}</h1>
             <p class="st-subtitle">${esc(m.subtitle)}</p>
             <ul class="st-tags" role="list">${tags}</ul>
-            ${summaryHTML(c)}
-            ${skip}
+            ${c.summary ? summaryHTML(c, skip) : skip}
           </div>
         </div>
       </header>`;
   }
 
-  function summaryHTML(c) {
+  // The skip link sits inside the expanded summary, after the metrics.
+  function summaryHTML(c, skip = '') {
     const s = c.summary;
     if (!s) return '';
     const points = (s.points || []).map((p) => `<div><dt>${esc(p.label)}</dt><dd>${linkify(p.text)}</dd></div>`).join('');
-    const metrics = s.showMetrics && c.metrics ? metricsList(c.metrics.items, 'st-metrics--compact') : '';
+    // summary.metrics can list more numbers than the closing section shows.
+    const items = s.metrics || (s.showMetrics && c.metrics ? c.metrics.items : null);
+    const metrics = items ? metricsList(items, 'st-metrics--compact') : '';
     return `
       <div class="st-summary">
         <p class="st-summary-lead">${linkify(s.lead)}</p>
@@ -209,6 +225,7 @@
         <div class="st-summary-more" id="st-summary-more" hidden>
           <dl class="st-summary-points">${points}</dl>
           ${metrics}
+          ${skip}
         </div>
       </div>`;
   }
@@ -258,7 +275,7 @@
     return `
       <section class="st-interlude" id="${esc(cp.id)}" aria-labelledby="${esc(cp.id)}-title" tabindex="-1">
         <div class="st-interlude-inner">
-          ${diamondArt(c.diamonds.length, diamondIndex + 1)}
+          ${c.diamonds.length ? diamondArt(c.diamonds.length, diamondIndex + 1) : ''}
           ${cp.eyebrow ? `<p class="st-eyebrow st-reveal" style="--i:0">${esc(cp.eyebrow)}</p>` : ''}
           <h2 class="st-interlude-title st-reveal" id="${esc(cp.id)}-title" style="--i:1">${esc(cp.heading || cp.label)}</h2>
           ${lines}
@@ -271,7 +288,9 @@
     const d = ctx.diamondById[ch.diamond];
     const stage = d?.stages ? d.stages[ch.stage === 'converge' ? 1 : 0] : '';
     let layout = ch.layout && ch.layout !== 'auto' ? ch.layout : AUTO_LAYOUTS[idx % AUTO_LAYOUTS.length];
-    const pinned = ch.visual && (ch.visual.type === 'phone-rounds' || ch.visual.type === 'pinned');
+    // visual can be one visual or a list of them, shown in order.
+    const visuals = [].concat(ch.visual || []);
+    const pinned = visuals.length && (visuals[0].type === 'phone-rounds' || visuals[0].type === 'pinned');
     if (pinned) layout = 'rounds';
     const hid = `${ch.id}-title`;
 
@@ -283,10 +302,11 @@
 
     const text = `
       <div class="st-text">
-        <p class="st-eyebrow st-reveal" style="--i:0"><span class="st-num">${pad(idx + 1)}</span>${stage ? `<span class="st-stage">${esc(stage)}</span>` : ''}</p>
+        <p class="st-eyebrow st-reveal" style="--i:0"><span class="st-num">${pad(idx + 1)}</span>${stage ? `<span class="st-stage">${esc(stage)}</span>` : ''}${ch.kicker ? `<span class="st-stage">${esc(ch.kicker)}</span>` : ''}</p>
         <h3 class="st-heading st-reveal" id="${hid}" style="--i:0">${esc(ch.heading)}</h3>
         <div class="st-body st-reveal" style="--i:1">${(ch.body || []).map((p) => `<p>${linkify(p, ch.links)}</p>`).join('')}</div>
         ${quote}
+        ${insightHTML(ch.insight, 'st-reveal', 2)}
       </div>`;
 
     const sizes = SIZES[layout] || SIZES.default;
@@ -294,17 +314,17 @@
       : ch.mediaColumns === 2
         ? `<div class="st-media st-media--pairs">${pairsHTML(ch.media, { sizes: SIZES.gallery, i: 3 })}</div>`
         : `<div class="st-media">${ch.media.map((m) => figureTag(m, { sizes, drift: true })).join('')}</div>`;
-    const visual = ch.visual && layout !== 'rounds'
-      ? `<div class="st-visual st-visual--${esc(ch.visual.type)} st-reveal" style="--i:2">${visualHTML(ch.visual, ch)}</div>`
+    const visual = visuals.length && layout !== 'rounds'
+      ? `<div class="st-visuals">${visuals.map((v) => `<div class="st-visual st-visual--${esc(v.type)} st-reveal" style="--i:2">${visualHTML(v, ch)}</div>`).join('')}</div>`
       : '';
     // Split layouts put media beside the text; everywhere else the
     // visual comes first, then images (headline, body, visual, image).
     const split = layout === 'text-left' || layout === 'text-right';
-    const inner = layout === 'rounds' ? roundsHTML(ch.visual, text) : split ? text + media + visual : text + visual + media;
+    const inner = layout === 'rounds' ? roundsHTML(visuals[0], text) : split ? text + media + visual : text + visual + media;
     const visualOnly = !media && visual ? ' st-visual-only' : '';
 
     return `
-      <section class="st-chapter st-layout-${esc(layout)}${pinned ? ` st-frame-${frameOf(ch.visual)}` : ''}${visualOnly}" id="${esc(ch.id)}" data-chapter="${esc(ch.id)}" data-stage="${esc(ch.stage || '')}" aria-labelledby="${hid}" tabindex="-1">
+      <section class="st-chapter st-layout-${esc(layout)}${pinned ? ` st-frame-${frameOf(visuals[0])}` : ''}${visualOnly}" id="${esc(ch.id)}" data-chapter="${esc(ch.id)}" data-stage="${esc(ch.stage || '')}" aria-labelledby="${hid}" tabindex="-1">
         <div class="st-chapter-inner">${inner}</div>
       </section>`;
   }
@@ -534,6 +554,7 @@
         <p class="st-round-label">${esc(r.label)}</p>
         ${r.text ? `<p class="st-round-text">${linkify(r.text)}</p>` : ''}
         ${r.points?.length ? `<ul class="st-round-points" role="list">${r.points.map((p) => `<li>${linkify(p)}</li>`).join('')}</ul>` : ''}
+        ${insightHTML(r.insight, 'st-round-insight')}
         ${r.link ? `<a class="st-round-link" href="${esc(r.link.href)}" target="_blank" rel="noopener noreferrer">${esc(r.link.label)} <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i><span class="st-sr"> (opens in a new tab)</span></a>` : ''}
         ${frameHTML(frame, screen(r.media), v, 'st-frame-inline')}
       </li>`).join('');
@@ -598,7 +619,7 @@
       html += `
         <section class="st-next" aria-labelledby="st-next-title">
           <h2 class="st-next-title" id="st-next-title">Next story</h2>
-          <a href="${esc(n.href)}" class="project-card tilt-card st-next-card" data-project="${esc(n.homeCard || '')}">
+          <a href="${esc(n.href)}" class="project-card st-next-card" data-project="${esc(n.homeCard || '')}">
             <div class="project-thumb">${n.image ? imgTag(n.image, { sizes: '(min-width: 700px) 640px, 100vw' }) : ''}</div>
             <div class="project-body">
               <h3>${esc(n.title)}</h3>
@@ -652,8 +673,10 @@
       const s = spans[di];
       const firstConverge = chs.findIndex((ch) => ch.stage === 'converge');
       const widest = s.top + s.h * (firstConverge > 0 ? firstConverge / chs.length : 0.5);
-      outline += ` L20 ${s.top} L6 ${widest} L20 ${s.top + s.h} L34 ${widest} L20 ${s.top}`
-        + ` M20 ${s.top + s.h}`;
+      if (d.id !== null) {
+        outline += ` L20 ${s.top} L6 ${widest} L20 ${s.top + s.h} L34 ${widest} L20 ${s.top}`
+          + ` M20 ${s.top + s.h}`;
+      }
       chs.forEach((ch, i) => { chapterY[ch.id] = s.top + s.h * ((i + 0.5) / chs.length); });
       if (di < ds.length - 1) outline += ` L20 ${spans[di + 1].top}`;
     });
@@ -699,7 +722,7 @@
       }
       const inner = st.kind === 'chapter'
         ? `<span class="st-menu-num">${st.num}</span><span>${esc(st.label)}</span>`
-        : `<span class="st-menu-num"><i class="fas fa-diamond" aria-hidden="true"></i></span><span>${esc(st.label)}</span>`;
+        : `<span class="st-menu-num"><i class="fas ${c.diamonds.length ? 'fa-diamond' : 'fa-circle-dot'}" aria-hidden="true"></i></span><span>${esc(st.label)}</span>`;
       return `${head}<li><a class="st-menu-link${st.kind === 'chapter' ? '' : ' is-checkpoint'}" href="#${esc(st.id)}" data-target="${esc(st.id)}">${inner}</a></li>`;
     }).join('');
     const marks = stops.filter((s) => s.kind !== 'chapter')
@@ -730,6 +753,8 @@
     const c = content || (window.CaseStudies || {})[slug];
     if (!c) { console.error(`[story] no content registered for "${slug}"`); return; }
     ROOT = main.dataset.root || '/';
+    // A story without diamonds is told as plain numbered chapters.
+    c.diamonds ||= [];
     check(c);
 
     const ctx = { diamondById: Object.fromEntries((c.diamonds || []).map((d) => [d.id, d])) };
@@ -1139,7 +1164,9 @@
         if (el) m.style.left = `${clamp((el.getBoundingClientRect().top + scrollY - geo.vh * READING_LINE) / span, 0, 1) * 100}%`;
       });
 
-      if (!desktopMQ.matches) { geo.strands = null; return; }
+      // The line is the double diamond; a plain story has only the
+      // navigator's straight progress line.
+      if (!desktopMQ.matches || !c.diamonds.length) { geo.strands = null; return; }
 
       const cx = W / 2;
       const col = $('.st-chapter-inner', main).getBoundingClientRect();

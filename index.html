@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&display=swap" rel="stylesheet">
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <!-- Immediately hide intro for returning visitors this session. Runs before paint -->
@@ -27,11 +27,13 @@
     (function () {
       // 1. Clicking a story card names its image frame, so the story's
       //    opening card can grow out of it.
-      // 2. Coming back, that card is named again and the page and
-      //    carousel scroll are restored before the first frame, so the
-      //    image shrinks back into its card.
+      // 2. Coming back, that card is named again and the page scroll
+      //    is restored before the first frame, so the image shrinks
+      //    back into its card. (Cards and the More projects rows both
+      //    count: STORY_LINKS.)
       // 3. While a transition runs, window.__vtRunning lets script.js
       //    pause heavy background effects so the morph stays smooth.
+      var STORY_LINKS = '.project-card[data-story], .project-row[data-story]';
       var ss = {
         get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
         set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} },
@@ -44,26 +46,23 @@
         frame.style.setProperty('view-transition-class', on ? 'story-card story-img' : '');
       }
       function nameOnly(card) {
-        document.querySelectorAll('.project-card[data-story]').forEach(function (c) { name(c, c === card); });
+        document.querySelectorAll(STORY_LINKS).forEach(function (c) { name(c, c === card); });
       }
 
       document.addEventListener('click', function (e) {
-        var card = e.target.closest && e.target.closest('.project-card');
+        var card = e.target.closest && e.target.closest('.project-card, .project-row');
         if (!card) return;
-        var grid = document.querySelector('.projects-grid');
-        ss.set('home-return', JSON.stringify({ y: window.scrollY, x: grid ? grid.scrollLeft : 0 }));
+        ss.set('home-return', JSON.stringify({ y: window.scrollY }));
         if (card.hasAttribute('data-story')) {
           nameOnly(card);
-          // Flatten the 3D hover tilt so the morph starts from a flat image.
+          // Drop the hover lift so the morph starts from the resting card.
           card.classList.add('is-leaving');
-          card.style.setProperty('--tilt-x', '0deg');
-          card.style.setProperty('--tilt-y', '0deg');
         }
       }, true);
 
       // Back/forward cache restores the page as it was left: un-flatten.
       window.addEventListener('pageshow', function () {
-        document.querySelectorAll('.project-card.is-leaving').forEach(function (c) { c.classList.remove('is-leaving'); });
+        document.querySelectorAll('.is-leaving').forEach(function (c) { c.classList.remove('is-leaving'); });
       });
 
       window.addEventListener('pagereveal', function (e) {
@@ -76,8 +75,6 @@
         if (nav && nav.type === 'back_forward' && saved && !window.__homeRestored) {
           try {
             var pos = JSON.parse(saved);
-            var grid = document.querySelector('.projects-grid');
-            if (grid) grid.scrollLeft = pos.x;
             document.documentElement.scrollTop = pos.y;
             window.__homeRestored = true;
           } catch (err) { /* fall back to the normal landing */ }
@@ -85,14 +82,7 @@
         var last = ss.get('last-story');
         ss.del('last-story');
         if (e.viewTransition && last) {
-          // The row loops, so a project can appear twice: morph into
-          // the one nearest the middle of the screen.
-          var card = null, best = Infinity;
-          document.querySelectorAll('.project-card[data-story][data-project="' + last + '"]').forEach(function (c) {
-            var r = c.getBoundingClientRect();
-            var d = Math.abs(r.left + r.width / 2 - window.innerWidth / 2);
-            if (d < best) { best = d; card = c; }
-          });
+          var card = document.querySelector('[data-story][data-project="' + last + '"]');
           if (card) nameOnly(card);
         }
       });
@@ -104,7 +94,7 @@
   <script type="speculationrules">
     {
       "prerender": [
-        { "where": { "selector_matches": ".project-card[data-story]" }, "eagerness": "moderate" }
+        { "where": { "selector_matches": ".project-card[data-story], .project-row[data-story]" }, "eagerness": "moderate" }
       ],
       "prefetch": [
         { "where": { "href_matches": "/work/*" }, "eagerness": "moderate" }
@@ -148,26 +138,6 @@
 
 
 
-  <!-- ============================================
-       ACCESSIBILITY CONTROLS
-       Motion button: pause icon when playing, play icon when paused.
-       JS in setupQuietIcon() drives the swap.
-       ============================================ -->
-
-  <div class="accessibility-controls" aria-label="Accessibility settings">
-    <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Switch to light mode">
-      <i class="fas fa-sun" aria-hidden="true"></i>
-      <span class="control-label">Light</span>
-    </button>
-    <button class="control-btn" id="quiet-toggle" title="Pause animations" aria-label="Pause animations">
-      <i class="fas fa-pause" aria-hidden="true"></i>
-      <span class="control-label">Motion</span>
-    </button>
-    <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Increase text size">
-      <i class="fas fa-text-height" aria-hidden="true"></i>
-      <span class="control-label">Text size</span>
-    </button>
-  </div>
 
 
   <!-- ============================================
@@ -194,6 +164,21 @@
         <li><a href="#explorations">Explorations</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
+      <!-- Theme, motion and text size (setupAccessibilityControls in script.js) -->
+      <div class="accessibility-controls" role="group" aria-label="Display settings">
+        <button class="control-btn" id="theme-toggle" title="Toggle light/dark mode" aria-label="Switch to light mode">
+          <i class="fas fa-sun" aria-hidden="true"></i>
+          <span class="control-label">Light</span>
+        </button>
+        <button class="control-btn" id="quiet-toggle" title="Pause animations" aria-label="Pause animations">
+          <i class="fas fa-pause" aria-hidden="true"></i>
+          <span class="control-label">Motion</span>
+        </button>
+        <button class="control-btn" id="text-size-toggle" title="Increase text size" aria-label="Increase text size">
+          <i class="fas fa-text-height" aria-hidden="true"></i>
+          <span class="control-label">Text size</span>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -210,14 +195,14 @@
        ============================================ -->
 
   <section class="hero-section" id="hero" aria-label="Introduction">
-    <!-- Interactive aurora blobs container (behind glass card) -->
-    <div class="aurora-blobs" id="aurora-blobs-container" aria-hidden="true"></div>
-
-    <div class="hero-content tilt-card" data-tilt-max="6">
+    <!-- Pressing the card splashes paint (setupPressSplash in script.js) -->
+    <div class="hero-content tilt-card" data-tilt-max="9">
 
       <h1 class="hero-name">Uma Dhamija</h1>
       <p class="hero-tagline">Designing better healthcare experiences.</p>
-      <p class="hero-role"><span class="role">&middot; User experience designer</span> <span class="role">&middot; Neurotech enthusiast</span> <span class="role">&middot; Kathak dancer</span></p>
+      <!-- What I do, then who I am outside work -->
+      <p class="hero-title">Design engineer</p>
+      <p class="hero-role"><span class="role">Neurotech enthusiast</span> <span class="role">&middot; Kathak dancer</span></p>
 
       <!-- Social links original URLs preserved -->
       <div class="social-links" aria-label="Social links">
@@ -238,13 +223,13 @@
       <!-- CTA buttons -->
       <div class="cta-group">
         <a href="#work" class="btn btn-primary">
-          <span>View My Work</span>
+          <span>View Case Studies</span>
           <i class="fas fa-arrow-down" aria-hidden="true"></i>
         </a>
-        <button type="button" class="btn btn-secondary" data-action="view-resume" aria-label="View resume PDF">
-          <span>View Resume</span>
-          <i class="fas fa-file-pdf" aria-hidden="true"></i>
-        </button>
+        <a href="Uma_Dhamija_Resume.pdf" class="btn btn-secondary" download aria-label="Download resume (PDF)">
+          <span>Download Resume</span>
+          <i class="fas fa-download" aria-hidden="true"></i>
+        </a>
       </div>
 
     </div>
@@ -253,7 +238,11 @@
 
   <!-- ============================================
        WORK SECTION
-       Six story cards, each linking to work/<slug>/.
+       Four featured case studies in a 2x2 grid, then the rest as a
+       short list that can be filtered by type (setupMoreProjects()
+       in script.js). Every card and row links to work/<slug>/, and its
+       .project-thumb frame morphs into the story's opening image
+       (see the <head> script).
        ============================================ -->
 
   <section class="section" id="work" aria-labelledby="work-title">
@@ -262,15 +251,37 @@
       <p class="section-intro" data-poem-trigger="website">Creating this website was also fun ;)</p>
     </div>
 
-    <!-- Carousel: glides slowly through the projects on a loop
-         (paused on hover, focus, off screen, or with Motion off), and
-         can still be scrolled by hand or with the arrows.
-         setupWorkCarousel() in script.js. -->
-    <div class="work-carousel" id="work-carousel">
-      <div class="projects-grid-wrapper">
-        <div class="projects-grid" id="projects-grid" data-reveal-stagger>
+    <div class="projects-grid" id="projects-grid" data-reveal-stagger>
 
-          <!-- 1. UPMC Magee Hospital Care2Care -->
+          <!-- 1. OpenMined Capstone -->
+          <a href="work/kindred/" class="project-card tilt-card" data-project="kindred" data-story>
+            <div class="project-thumb">
+              <img
+                src="images/story/kindred/om-logo-800.jpg"
+                srcset="images/story/kindred/om-logo-800.jpg 800w, images/story/kindred/om-logo-1600.jpg 1600w"
+                sizes="(min-width: 769px) 560px, 100vw"
+                alt="OpenMined logo and name"
+                loading="lazy"
+                decoding="async"
+                width="1600"
+                height="900"
+              >
+            </div>
+            <div class="project-body">
+              <h3>Securely training AI on private data</h3>
+              <p class="card-subtitle">OpenMined · Capstone</p>
+              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Patients rated their likelihood to use it 8/10, clinicians 8.5/10</span></p>
+              <div class="project-tags">
+                <span class="tag">AI Ethics</span>
+                <span class="tag">User Research</span>
+                <span class="tag">System Design</span>
+                <span class="tag">Product + Interface Design</span>
+                <span class="tag">Healthcare UX</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 2. UPMC Magee Hospital Care2Care -->
           <a href="work/care2care/" class="project-card tilt-card" data-project="care2care" data-story>
             <div class="project-thumb">
               <img
@@ -288,56 +299,13 @@
                 <p class="card-subtitle">Care2Care · UPMC</p>
                 <span class="card-badge">Grant-funded · Ongoing</span>
               </div>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>Partnered with CancerBridges, Family CARE Center at UPMC, the University of Pittsburgh and CMU to deliver Care2Care - a final prototype during a 3-month period.</li>
-                  <li>Currently supported by Family CARE Center to build out the app.</li>
-                </ul>
-              </div>
+              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Award-funded and in development with UPMC's Family CARE Center</span></p>
               <div class="project-tags">
                 <span class="tag">Healthcare UX</span>
                 <span class="tag">Service Design</span>
                 <span class="tag">Research</span>
                 <span class="tag">Journey Mapping</span>
                 <span class="tag">Stakeholder Interviews</span>
-              </div>
-            </div>
-          </a>
-
-          <!-- 2. OpenMined Capstone (second, so it sits in the middle on load) -->
-          <a href="work/kindred/" class="project-card tilt-card" data-project="kindred" data-story>
-            <div class="project-thumb">
-              <img
-                src="images/story/kindred/om-hero-wordmark-800.jpg"
-                srcset="images/story/kindred/om-hero-wordmark-800.jpg 800w, images/story/kindred/om-hero-wordmark-1600.jpg 1600w"
-                sizes="370px"
-                alt="OpenMined logo and name"
-                loading="lazy"
-                decoding="async"
-                width="1600"
-                height="900"
-              >
-            </div>
-            <div class="project-body">
-              <h3>Securely training AI on private data</h3>
-              <p class="card-subtitle">OpenMined · Capstone</p>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>Led discovery for OpenMined's first consumer app concept, Kindred, a verified peer support network for people with chronic conditions</li>
-                  <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
-                  <li>Kindred tested at an average recommendation score of 8/10 from patients and 8.5/10 from clinicians</li>
-                </ul>
-              </div>
-              <div class="project-tags">
-                <span class="tag">AI Ethics</span>
-                <span class="tag">User Research</span>
-                <span class="tag">System Design</span>
-                <span class="tag">Product + Interface Design</span>
-                <span class="tag">Healthcare UX</span>
               </div>
             </div>
           </a>
@@ -360,14 +328,7 @@
                 <p class="card-subtitle">MeditationWise</p>
                 <span class="card-badge">Startup · Ongoing</span>
               </div>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>9+ usability sessions over 4 months uncovered the major pitfalls for a meditation practice using an app</li>
-                  <li>Redesigned discovery to reduce cognitive load while honoring cultural depth</li>
-                </ul>
-              </div>
+              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Shipped to the App Store and Google Play after 30+ user interviews</span></p>
               <div class="project-tags">
                 <span class="tag">Wellness UX</span>
                 <span class="tag">Product Design</span>
@@ -393,14 +354,7 @@
             <div class="project-body">
               <h3>How might we make eye-therapy exercises work for children?</h3>
               <p class="card-subtitle">GlowUp Eye Care · Northwestern</p>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>Pinpointed adherence (not awareness) as the core problem through 4 weeks of research with over 6 interviews with leading ophthalmologists.</li>
-                  <li>Designed an XR exercise proposal built around child attention spans</li>
-                </ul>
-              </div>
+              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>6+ ophthalmologist interviews found adherence, not awareness, was the problem</span></p>
               <div class="project-tags">
                 <span class="tag">XR Design</span>
                 <span class="tag">Healthcare</span>
@@ -411,9 +365,21 @@
             </div>
           </a>
 
-          <!-- 5. Electric Scooters for Kids -->
-          <a href="work/electric-scooters/" class="project-card tilt-card" data-project="electric-scooters" data-story>
-            <div class="project-thumb">
+    </div>
+
+    <div class="more-projects" data-reveal>
+      <div class="more-projects-head">
+        <h3 class="more-projects-title" id="more-projects-title">More projects</h3>
+        <div class="filter-group" role="group" aria-label="Filter projects by type">
+          <button type="button" class="filter-chip" data-type="all" aria-pressed="true">All</button>
+          <button type="button" class="filter-chip" data-type="physical" aria-pressed="false">Physical product</button>
+          <button type="button" class="filter-chip" data-type="web" aria-pressed="false">Website</button>
+        </div>
+      </div>
+      <ul class="more-list" role="list" aria-labelledby="more-projects-title">
+        <li data-type="physical">
+          <a href="work/electric-scooters/" class="project-row" data-project="electric-scooters" data-story>
+            <span class="project-thumb">
               <img
                 src="images/photo.png"
                 alt="Electric scooter prototype for kids"
@@ -422,70 +388,38 @@
                 width="822"
                 height="566"
               >
-            </div>
-            <div class="project-body">
-              <h3>When the rider is 8 years old, everything about the design changes</h3>
-              <p class="card-subtitle">Electric Scooters for Kids</p>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>Mapped 4 critical ride scenarios across an 8-week course to anchor every design decision</li>
-                  <li>3 prototype iterations validated control placement against real handling behavior</li>
-                </ul>
-              </div>
-              <div class="project-tags">
-                <span class="tag">Physical Prototyping</span>
-                <span class="tag">Safety Design</span>
-                <span class="tag">Ergonomics</span>
-                <span class="tag">User Research</span>
-                <span class="tag">Iteration</span>
-              </div>
-            </div>
+            </span>
+            <span class="project-row-text">
+              <span class="project-row-name">Electric Scooters for Kids</span>
+              <span class="project-row-line">3 prototype rounds tested against real handling behavior</span>
+            </span>
+            <span class="project-row-type">Physical product</span>
+            <i class="fas fa-arrow-right project-row-arrow" aria-hidden="true"></i>
           </a>
-
-          <!-- 6. Kathak Kala Kendra -->
-          <a href="work/kathak-kala-kendra/" class="project-card tilt-card" data-project="kathak-kala-kendra" data-story>
-            <div class="project-thumb">
+        </li>
+        <li data-type="web">
+          <a href="work/kathak-kala-kendra/" class="project-row" data-project="kathak-kala-kendra" data-story>
+            <span class="project-thumb">
               <img
                 src="images/story/kathak-kala-kendra/homepage-800.jpg"
-                srcset="images/story/kathak-kala-kendra/homepage-800.jpg 800w, images/story/kathak-kala-kendra/homepage-1264.jpg 1264w"
-                sizes="370px"
+                  srcset="images/story/kathak-kala-kendra/homepage-800.jpg 800w, images/story/kathak-kala-kendra/homepage-1264.jpg 1264w"
+                  sizes="160px"
                 alt="Kathak Kala Kendra dance school website"
                 loading="lazy"
                 decoding="async"
                 width="1264"
                 height="842"
               >
-            </div>
-            <div class="project-body">
-              <h3>A surprise website for my Kathak teacher.</h3>
-              <p class="card-subtitle">Kathak Kala Kendra</p>
-              <!-- Highlights: over the image, one at a time, on hover or
-                   focus; listed in the card on phones and touch screens -->
-              <div class="card-highlights">
-                <ul class="card-bullets">
-                  <li>Built solo in 1 month, designed for Dharamshala's bandwidth and a non-technical client</li>
-                  <li>Now connects Guru Dharmendra Jain (30+ years of teaching) with students worldwide</li>
-                </ul>
-              </div>
-              <div class="project-tags">
-                <span class="tag">Web Design</span>
-                <span class="tag">Content Strategy</span>
-                <span class="tag">Solo Project</span>
-                <span class="tag">Low-Resource Design</span>
-                <span class="tag">Handoff</span>
-              </div>
-            </div>
+            </span>
+            <span class="project-row-text">
+              <span class="project-row-name">Kathak Kala Kendra</span>
+              <span class="project-row-line">Built solo in 1 month, now reaching students worldwide</span>
+            </span>
+            <span class="project-row-type">Website</span>
+            <i class="fas fa-arrow-right project-row-arrow" aria-hidden="true"></i>
           </a>
-
-        </div>
-      </div>
-
-      <div class="deck-controls work-controls">
-        <button class="deck-btn work-prev" type="button" aria-label="Previous project" aria-controls="projects-grid">&#8249;</button>
-        <button class="deck-btn work-next" type="button" aria-label="Next project" aria-controls="projects-grid">&#8250;</button>
-      </div>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -496,7 +430,7 @@
 
   <section class="section" id="education" aria-labelledby="education-title">
     <div class="section-header" data-reveal>
-      <h2 class="section-title" id="education-title">Expensive Paperweight</h2>
+      <h2 class="section-title" id="education-title">Education</h2>
       <p class="section-intro">Learning never ends.</p>
     </div>
 
@@ -707,6 +641,21 @@
       <p class="section-intro">Thoughts on design, technology, and the human experience.</p>
     </div>
 
+    <!-- Topic filter and date sort. setupWritingDeck() in script.js
+         reads data-topic and data-date (YYYY-MM) on each card. -->
+    <div class="writing-filters" data-reveal>
+      <div class="filter-group" role="group" aria-label="Filter by topic">
+        <button type="button" class="filter-chip" data-topic="all" aria-pressed="true">All</button>
+        <button type="button" class="filter-chip" data-topic="healthcare" aria-pressed="false">Healthcare</button>
+        <button type="button" class="filter-chip" data-topic="neurotech" aria-pressed="false">Neurotech</button>
+        <button type="button" class="filter-chip" data-topic="design" aria-pressed="false">Design</button>
+      </div>
+      <div class="filter-group" role="group" aria-label="Sort by date">
+        <button type="button" class="filter-chip" data-sort="newest" aria-pressed="true">Newest</button>
+        <button type="button" class="filter-chip" data-sort="oldest" aria-pressed="false">Oldest</button>
+      </div>
+    </div>
+
     <div class="writing-stack" data-reveal id="writing-stack">
       <div class="deck-viewport" role="region" aria-label="Writing articles">
 
@@ -714,30 +663,35 @@
         <div
           class="deck-card"
           data-modal="blog-1"
+          data-topic="neurotech"
+          data-date="2025-12"
           role="button"
           tabindex="0"
           aria-label="Read: The Neural Interface Designing for the Mind"
         >
           <div class="writing-meta">
-            <span class="writing-date">Dec 2025</span>
-            <span class="writing-read-time">On-site</span>
+            <span class="writing-date">Dec 2025 &middot; 3 min read</span>
+            <span class="tag">Neurotech</span>
           </div>
           <h3>The Neural Interface: Designing for the Mind</h3>
           <p>Exploring the intersection of brain-computer interfaces and human-centered design principles.</p>
           <span class="deck-read-more">Read <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
         </div>
 
-        <!-- Card 2 Beyond the Screen (external Medium link) -->
+        <!-- Card 2 Beyond the Screen (external Medium link; same layout,
+             but "Read on Medium" says it opens elsewhere) -->
         <div
           class="deck-card"
           data-external="https://medium.com/@umaracheldhamija/beyond-the-screen-user-centered-design-in-urban-bike-sharing-systems-7b118196a82d"
+          data-topic="design"
+          data-date="2024-12"
           role="button"
           tabindex="-1"
           aria-label="Read Beyond the Screen on Medium (opens in new tab)"
         >
           <div class="writing-meta">
-            <span class="writing-date">Medium</span>
-            <span class="deck-external-badge"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> External</span>
+            <span class="writing-date">Dec 2024 &middot; 3 min read</span>
+            <span class="tag">Design</span>
           </div>
           <h3>Beyond the Screen</h3>
           <p>User-Centered Design in Urban Bike-Sharing Systems.</p>
@@ -748,13 +702,15 @@
         <div
           class="deck-card"
           data-modal="blog-2"
+          data-topic="design"
+          data-date="2025-12"
           role="button"
           tabindex="-1"
           aria-label="Read: The Paradox at the Heart of Design"
         >
           <div class="writing-meta">
-            <span class="writing-date">Dec 2025</span>
-            <span class="writing-read-time">On-site</span>
+            <span class="writing-date">Dec 2025 &middot; 3 min read</span>
+            <span class="tag">Design</span>
           </div>
           <h3>The Paradox at the Heart of Design</h3>
           <p>The deepest paradox in design is this: the best design often disappears.</p>
@@ -766,13 +722,16 @@
         <div
           class="deck-card"
           data-modal="blog-3"
+          data-topic="design"
+          data-date="2026-01"
           role="button"
           tabindex="-1"
           aria-label="Read: Is AI replacing human creativity?"
         >
           <div class="writing-meta">
             <span class="writing-date">Jan 2026</span>
-            <span class="writing-read-time">On-site</span>
+            (when published, add "&middot; N min read" to the date)
+            <span class="tag">Design</span>
           </div>
           <h3>Is AI replacing human creativity?</h3>
           <p>A developing essay on authorship, taste, and what meaningful human craft should look like in AI-assisted workflows.</p>
@@ -784,13 +743,16 @@
         <div
           class="deck-card"
           data-modal="blog-5"
+          data-topic="healthcare"
+          data-date="2026-08"
           role="button"
           tabindex="-1"
           aria-label="Read: Designing Trust Into a Nation-Scale Health Record System"
         >
           <div class="writing-meta">
             <span class="writing-date">Aug 2026</span>
-            <span class="writing-read-time">On-site</span>
+            (when published, add "&middot; N min read" to the date)
+            <span class="tag">Healthcare</span>
           </div>
           <h3>Designing Trust Into a Nation-Scale Health Record System</h3>
           <p>As of July 20, 2026, India had created 948.7 million ABHA health IDs. The infrastructure is remarkable. The UX, less so.</p>
@@ -801,13 +763,15 @@
         <div
           class="deck-card"
           data-modal="blog-6"
+          data-topic="healthcare"
+          data-date="2026-08"
           role="button"
           tabindex="-1"
           aria-label="Read: Stitching Together the Fragmented Patient Journey"
         >
           <div class="writing-meta">
-            <span class="writing-date">Aug 2026</span>
-            <span class="writing-read-time">On-site</span>
+            <span class="writing-date">Aug 2026 &middot; 1 min read</span>
+            <span class="tag">Healthcare</span>
           </div>
           <h3>Stitching Together the Fragmented Patient Journey</h3>
           <p>Care is real in India. Continuity isn't. Designing for the whole patient story, not just the single visit.</p>
@@ -818,13 +782,15 @@
         <div
           class="deck-card"
           data-modal="blog-7"
+          data-topic="healthcare"
+          data-date="2026-08"
           role="button"
           tabindex="-1"
           aria-label="Read: Making Consent Actually Mean Something"
         >
           <div class="writing-meta">
-            <span class="writing-date">Aug 2026</span>
-            <span class="writing-read-time">On-site</span>
+            <span class="writing-date">Aug 2026 &middot; 1 min read</span>
+            <span class="tag">Healthcare</span>
           </div>
           <h3>Making Consent Actually Mean Something</h3>
           <p>As health data becomes easier to share, does anyone actually understand what they've agreed to?</p>
@@ -835,13 +801,15 @@
         <div
           class="deck-card"
           data-modal="blog-8"
+          data-topic="healthcare"
+          data-date="2026-08"
           role="button"
           tabindex="-1"
           aria-label="Read: Getting Clinics and Providers to Actually Want the Tools They're Given"
         >
           <div class="writing-meta">
-            <span class="writing-date">Aug 2026</span>
-            <span class="writing-read-time">On-site</span>
+            <span class="writing-date">Aug 2026 &middot; 1 min read</span>
+            <span class="tag">Healthcare</span>
           </div>
           <h3>Getting Clinics and Providers to Actually Want the Tools They're Given</h3>
           <p>Incentives can push adoption. They can't manufacture enthusiasm. The real problem is provider buy-in.</p>

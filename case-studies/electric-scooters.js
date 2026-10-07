@@ -33,19 +33,13 @@
     showMetrics: true,
   },
 
-  diamonds: [
-    { id: 'problem', label: 'Diamond 1', title: 'Understanding young riders', stages: ['Discover', 'Define'] },
-    { id: 'solution', label: 'Diamond 2', title: 'Prototyping a safer ride', stages: ['Develop', 'Deliver'] },
-  ],
 
   chapters: [
 
-    /* ---------- Diamond 1: Understanding young riders ---------- */
+    /* ---------- Understanding young riders ---------- */
 
     {
       id: 'brief',
-      diamond: 'problem',
-      stage: 'diverge',
       nav: 'The brief',
       heading: 'When the rider is 8 years old, everything about the design changes.',
       body: [
@@ -59,8 +53,6 @@
 
     {
       id: 'research',
-      diamond: 'problem',
-      stage: 'diverge',
       nav: 'Research',
       heading: 'We asked kids and parents what feels easy, what feels hard and what feels unsafe.',
       body: [
@@ -83,8 +75,6 @@
 
     {
       id: 'scenarios',
-      diamond: 'problem',
-      stage: 'converge',
       nav: '4 ride scenarios',
       heading: 'The biggest tension was between fun and safety.',
       body: [
@@ -114,12 +104,10 @@
       ],
     },
 
-    /* ---------- Diamond 2: Prototyping a safer ride ---------- */
+    /* ---------- Prototyping a safer ride ---------- */
 
     {
       id: 'sketching',
-      diamond: 'solution',
-      stage: 'diverge',
       nav: 'Sketching',
       heading: 'We designed from first principles, not from adult scooters.',
       body: [
@@ -154,8 +142,6 @@
 
     {
       id: 'build',
-      diamond: 'solution',
-      stage: 'converge',
       nav: 'Prototyping',
       heading: 'Controls a child can understand quickly and reach comfortably.',
       body: [
@@ -198,8 +184,6 @@
 
     {
       id: 'scooter',
-      diamond: 'solution',
-      stage: 'converge',
       nav: 'The prototype',
       heading: 'Predictable handling beat aggressive performance.',
       body: [
@@ -221,17 +205,14 @@
   ],
 
   checkpoints: [
-    { id: 'cp-scenarios', kind: 'pinch', chapter: 'scenarios', label: 'Fun versus safety' },
     {
       id: 'halfway',
       kind: 'interlude',
       chapter: 'scenarios',
       label: 'Halfway there',
-      eyebrow: 'Diamond 1 complete',
       heading: 'Halfway there.',
       lines: ['Four scenarios to design for. Now we had to build it.'],
     },
-    { id: 'cp-scooter', kind: 'pinch', chapter: 'scooter', label: 'The prototype' },
   ],
 
   metrics: {

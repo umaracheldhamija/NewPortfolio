@@ -167,14 +167,15 @@
   --sp-24: 6rem;     /* 96px */
 
   /* --- Typography ---
-     Two families, site-wide, loaded by every page with the same
-     Google Fonts URL. Nothing else is loaded.
-     Display (headings): Cormorant Garamond, for elegance.
-     Body (everything else, incl. buttons, forms, captions):
-     Google Sans Flex, a variable font (weight 100 to 700, optical
-     size 6 to 144), for technical precision with warmth. */
-  --font-display: 'Cormorant Garamond', 'Georgia', serif;
-  --font-body:    'Google Sans Flex', system-ui, -apple-system, sans-serif;
+     The resume's two families, site-wide, loaded by every page with
+     the same Google Fonts URL. Nothing else is loaded.
+     Display (name, headings, big numbers): Fraunces, a variable
+     serif whose optical size follows the font size.
+     Body (everything else, incl. labels, buttons, forms, captions):
+     Inter. Labels are Inter bold caps in the accent, as on the
+     resume's EXPERIENCE / EDUCATION headings. */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
 
   --text-xs:   0.75rem;    /* 12px — labels, captions */
   --text-sm:   0.875rem;   /* 14px — secondary body */
@@ -184,7 +185,7 @@
   --text-2xl:  1.5rem;     /* 24px — sub-section headings */
   --text-3xl:  2rem;       /* 32px — section headings */
   --text-hero: clamp(2.75rem, 6vw, 4.5rem);
-  --text-section: clamp(1.85rem, 3.5vw, 2.75rem);
+  --text-section: clamp(2.25rem, 4.5vw, 3.75rem);
 
   /* --- Motion --- */
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -196,17 +197,18 @@
   --t-base:      var(--dur-base) var(--ease-smooth);
 
   /* --- Layout --- */
-  --max-w:      1200px;
+  --max-w:      1240px;
+  --content-w:  calc(var(--max-w) - 2 * var(--sp-8)); /* a section's inner width; nav and hero align to it */
   --max-w-text: 720px;
-  --r-sm:  8px;
-  --r-md:  12px;
-  --r-lg:  16px;
-  --r-xl:  24px;
-  --r-2xl: 32px;
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  18px;
+  --r-2xl: 24px;
   --r-pill: 9999px;
 
   /* ============================================
-     COLOUR SYSTEM: vivid warm orange on warm ivory.
+     COLOUR SYSTEM: the resume's rust on warm paper.
      Every colour on the site is defined in this block (and its dark
      twin below), once. Components only ever read these tokens; alpha
      tints are derived with color-mix() rather than re-typed as rgba()
@@ -229,22 +231,25 @@
      ============================================ */
 
   /* --- Base palette: warm neutrals --- */
-  --bg:             #F5F4F0;  /* page background (unchanged) */
-  --surface:        #EFEBE4;  /* panels, modals, cards */
-  --surface-raised: #E8E2D8;  /* deepest card tier */
-  --paper:          #FFFCF7;  /* warm white for light glass + buttons */
-  --line:           #DDD5C9;  /* hairlines and borders */
+  --bg:             #F7F4EF;  /* page background: warm paper */
+  --surface:        #F1ECE5;  /* panels, modals, cards */
+  --surface-raised: #E9E2D8;  /* deepest card tier */
+  --paper:          #FFFDF9;  /* warm white for light glass + buttons */
+  --line:           #DDD3CA;  /* hairlines and borders (the resume's rules) */
   --bg-late:        #EDEAE2;  /* 12am to 4am easter egg (index.html) */
 
   /* --- Text --- */
-  --text:           #1F1A16;
-  --text-secondary: #5B534B;
-  --text-muted:     #685F56;
+  --text:           #1F1A17;  /* the resume's ink */
+  --text-secondary: #4E4640;
+  --text-muted:     #665C55;
 
-  /* --- Site accent: vivid orange --- */
-  --accent:         #F86612;
-  --accent-strong:  #A53700;
-  --accent-deep:    #772800;
+  /* --- Site accent: the resume's rust for lines and washes, and a
+     warmer burnt orange for text and buttons (#B4532A passes AA on
+     the page but not on tinted chips; #A3440B passes on both, and
+     white on it is 6.2:1). --- */
+  --accent:         #B4532A;
+  --accent-strong:  #A3440B;
+  --accent-deep:    #7C330A;
   --accent-2:       #E3A04A;  /* honey: gradient partner */
   --blush:          #EFB29B;  /* rose-peach: gradient partner */
 
@@ -359,10 +364,11 @@ body[data-project] {
   --text-muted:     #AE9F8F;
   --text-on-accent: var(--shade);
 
-  /* Site accent */
-  --accent:         #FF843D;
-  --accent-strong:  #FF8547;
-  --accent-deep:    #FFA77A;
+  /* Site accent: the same rust, lifted for a dark ground, with a warm
+     orange for text and buttons */
+  --accent:         #E0855A;
+  --accent-strong:  #F5934A;
+  --accent-deep:    #F9B98A;
   --accent-2:       #F0B96A;
   --blush:          #E9A08A;
 
@@ -437,7 +443,7 @@ body.large-text {
   --text-2xl:     1.65rem;
   --text-3xl:     2.2rem;
   --text-hero:    clamp(3rem, 6.5vw, 5rem);
-  --text-section: clamp(2rem, 4vw, 3rem);
+  --text-section: clamp(2.5rem, 5vw, 4rem);
 }
 
 
@@ -457,13 +463,12 @@ html {
   /* scroll-behavior: smooth is set here as fallback;
      JS overrides with reduced-motion awareness */
   scroll-behavior: smooth;
-  /* Safety net: fixed-position elements (e.g. .accessibility-controls)
-     are positioned relative to the viewport itself, so they bypass
-     body's own overflow-x:clip below and can inflate the page's real
-     scrollWidth, forcing page-level horizontal scroll on narrow
-     viewports. This traps that at the root without touching any
-     element's own internal scrolling (.projects-grid keeps its
-     horizontal overflow-x:auto carousel working normally). */
+  /* Safety net: fixed-position elements are positioned relative to
+     the viewport itself, so they bypass body's own overflow-x:clip
+     below and can inflate the page's real scrollWidth, forcing
+     page-level horizontal scroll on narrow viewports. This traps that
+     at the root without touching any element's own internal
+     scrolling. */
   overflow-x: hidden;
 }
 
@@ -499,6 +504,11 @@ body {
 .skip-link:focus,
 .skip-link:focus-visible {
   transform: translateY(0);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  color: var(--text-primary);
 }
 
 /* Fix: 100% not 100vw — prevents horizontal overflow
@@ -641,9 +651,9 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 
 
 /* ============================================
-   INTERACTIVE AURORA BLOBS
-   Colorful expanding ripples behind glass card.
-   Triggered by profile-image clicks.
+   PAINT SPLASH BLOBS
+   Colorful expanding ripples from a press on the hero card, nav or
+   footer (setupPressSplash in script.js).
    ============================================ */
 
 @keyframes blob-expand {
@@ -657,10 +667,13 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   }
 }
 
-.aurora-blobs {
-  position: absolute;
+/* Pressing the hero card, the nav or the footer bursts paint from
+   that spot (setupPressSplash in script.js). The layer sits above
+   the page background and behind every section's content. */
+.press-splash-layer {
+  position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 5;
   overflow: hidden;
   pointer-events: none;
 }
@@ -734,50 +747,49 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 }
 
 /* ============================================
-   5. CUSTOM CURSOR
-   Dark mode: accent-colored dot with additive blend.
-   Light mode: dark dot + warm radial glow.
+   5. CURSOR LABEL
+   The system pointer always stays as it is. Over a project, an
+   article or a zoomable image, a soft circle with one word (View,
+   Read, Zoom) eases in beside it; script.js picks the word
+   (CURSOR_LABELS) and moves it. Never shown on touch screens, on
+   phones, with reduced motion, or with Motion paused.
    ============================================ */
 
 .cursor-dot {
   position: fixed;
-  width: 7px;
-  height: 7px;
+  left: 0;
+  top: 0;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-on-accent);
+  background: color-mix(in srgb, var(--accent-primary) 80%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--shade) 16%, transparent);
+  opacity: 0;
+  /* Centred a little below-right of the pointer tip, so the arrow
+     itself stays clear */
+  transform: translate(-10%, -10%) scale(0.3);
+  transition: opacity 0.2s ease, transform 0.3s var(--ease-out);
   will-change: left, top;
-  transition: width 100ms, height 100ms, opacity 150ms;
 }
 
-/* Dark mode dot — glowing accent, additive blend */
-body:not([data-theme="light"]) .cursor-dot {
-  background: var(--accent);
-  opacity: 0.92;
-  mix-blend-mode: plus-lighter;
-  box-shadow: 0 0 6px 2px color-mix(in srgb, var(--accent) 40%, transparent);
+.cursor-dot.is-on {
+  opacity: 1;
+  transform: translate(-10%, -10%) scale(1);
 }
 
-/* Light mode dot — tracks --accent-primary, so it (and the magnet
-   trail, which already used --accent-glow) pick up each project's
-   theme color automatically via the data-project overrides below. */
-[data-theme="light"] .cursor-dot {
-  background: var(--accent);
-  opacity: 0.75;
-  mix-blend-mode: normal;
-  box-shadow: 0 0 0 2px var(--accent-glow);
-}
-
-/* Hide on touch/coarse devices */
 @media (pointer: coarse) {
   .cursor-dot { display: none !important; }
-  body { cursor: default !important; }
-}
-
-/* Custom cursor only on fine-pointer devices */
-@media (pointer: fine) {
-  body { cursor: none; }
 }
 
 
@@ -805,7 +817,7 @@ body:not([data-theme="light"]) .cursor-dot {
 }
 
 .nav-container {
-  max-width: var(--max-w);
+  max-width: var(--content-w);
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -815,14 +827,19 @@ body:not([data-theme="light"]) .cursor-dot {
 /* Logo */
 .nav-logo {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--accent-primary);
-  letter-spacing: 0.02em;
+  font-size: 1.375rem;
+  font-weight: 450;
+  color: var(--text-primary); /* ink, as the name is on the resume */
+  letter-spacing: -0.015em;
   transition: color var(--t-base), transform var(--t-base);
 }
 
-.nav-logo:hover { color: var(--accent-secondary); }
+.nav-logo:hover { color: var(--accent-primary); }
+.nav-logo { white-space: nowrap; }
+
+@media (max-width: 768px) {
+  .nav-logo { font-size: 1.1875rem; }
+}
 .nav-logo:focus-visible { border-radius: var(--r-sm); }
 
 /* Nav links */
@@ -831,6 +848,7 @@ body:not([data-theme="light"]) .cursor-dot {
   list-style: none;
   gap: var(--sp-8);
   align-items: center;
+  margin-left: auto; /* links sit at the right, beside the display controls */
 }
 
 .nav-links a {
@@ -898,38 +916,23 @@ body:not([data-theme="light"]) .cursor-dot {
 
 /* ============================================
    7. ACCESSIBILITY CONTROLS
-   Minimal glass panel with clear hover/focus states.
+   Icon buttons at the right end of the nav bar (theme, motion, text
+   size), so they never cover page content. Their names come from
+   aria-label; the visible word labels are for screen readers only.
    ============================================ */
 
 .accessibility-controls {
-  position: fixed;
-  top: 4.75rem;
-  right: var(--sp-6);
-  z-index: 901;
   display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-1);
-  border-radius: var(--r-lg);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: var(--shadow-sm);
-  opacity: 0.84;
-  transition: opacity var(--t-base), border-color var(--t-base), transform 0.3s var(--ease-smooth);
-}
-
-/* Show fully on hover OR when keyboard focus is inside */
-.accessibility-controls:hover,
-.accessibility-controls:focus-within {
-  opacity: 1;
-  border-color: var(--glass-border-hover);
+  align-items: center;
+  gap: var(--sp-1);
+  margin-left: var(--sp-6);
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--border-subtle);
 }
 
 .control-btn {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 44px;
+  height: 44px;
   min-width: 44px;
   min-height: 44px;
   display: flex;
@@ -940,8 +943,8 @@ body:not([data-theme="light"]) .cursor-dot {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
   background: transparent;
   box-shadow: none;
   color: var(--text-secondary);
@@ -1002,7 +1005,8 @@ body:not([data-theme="light"]) .cursor-dot {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--sp-8);
+  /* Top padding clears the fixed nav, now that the card holds a photo */
+  padding: calc(77px + var(--sp-8)) var(--sp-8) var(--sp-8);
   z-index: 10;
   overflow: hidden;
 }
@@ -1046,7 +1050,7 @@ body.intro-active .hero-content {
 }
 
 .hero-content.tilt-card {
-  --tilt-lift: -2px;
+  --tilt-lift: -4px;
 }
 
 /* Light mode: warmer, more opaque glass panel */
@@ -1058,57 +1062,44 @@ body.intro-active .hero-content {
   box-shadow: var(--shadow-glass);
 }
 
-/* Profile image */
-.profile-image {
-  width: 140px;
-  height: 140px;
-  margin: 0 auto var(--sp-6);
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--glass-border);
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--shade) 30%, transparent),
-              0 0 0 8px var(--accent-subtle);
-  transition: transform var(--t-base), box-shadow var(--t-base);
-}
-
-.profile-image:hover {
-  transform: scale(1.04) translateY(-2px);
-  box-shadow: 0 14px 40px color-mix(in srgb, var(--shade) 35%, transparent),
-              0 0 0 10px var(--accent-subtle);
-}
-
-.profile-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Hero name — display font, elegant weight */
+/* Hero name: Fraunces, set tight */
 .hero-name {
   font-family: var(--font-display);
   font-size: var(--text-hero);
-  font-weight: 300; /* Light weight = more elegance for Cormorant */
-  letter-spacing: 0.05em;
+  font-weight: 400;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
-  line-height: 1.05;
-  margin-bottom: var(--sp-3);
+  line-height: 1;
+  margin-bottom: var(--sp-4);
 }
 
-/* Tagline, then the roles on a line of their own */
+/* Tagline, then the professional role, then a quieter personal line */
 .hero-tagline {
-  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.625rem);
+  font-weight: 350;
+  font-style: italic;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
-  font-weight: 500;
-  line-height: 1.6;
+  line-height: 1.35;
   max-width: 46rem;
   margin: 0 auto var(--sp-2);
 }
 
+.hero-title {
+  font-size: clamp(0.82rem, 1.2vw, 0.95rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  font-weight: 700;
+  line-height: 1.6;
+  margin: var(--sp-4) auto var(--sp-1);
+}
+
 .hero-role {
   font-size: clamp(0.82rem, 1.2vw, 0.95rem);
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
   font-weight: 500;
   line-height: 1.9;
   max-width: 46rem;
@@ -1116,9 +1107,8 @@ body.intro-active .hero-content {
 }
 
 /* Each role keeps its words (and the dot before it) on one row, so on
-   phones the line only breaks between roles. Below 360px "user
-   experience designer" is wider than the row, so there it may break
-   rather than spill off screen. */
+   phones the line only breaks between roles. Below 360px a role may
+   still break rather than spill off screen. */
 @media (min-width: 360px) {
   .hero-role .role { white-space: nowrap; }
 }
@@ -1132,10 +1122,10 @@ body.intro-active .hero-content {
   line-height: 1.82;
 }
 
-/* Social icons row */
+/* Social icons row: round, hairline, quiet until hovered */
 .social-links {
   display: flex;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
   justify-content: center;
   margin-bottom: var(--sp-8);
   flex-wrap: wrap;
@@ -1153,10 +1143,9 @@ body.intro-active .hero-content {
   position: relative;
   isolation: isolate;
   overflow: visible;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-sm);
-  background: var(--glass-bg);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
   color: var(--text-secondary);
   /* Magnetic hover — same --magnet-x/--magnet-y as .btn (JS treats
      .social-link as magnetic too, see dom.magneticBtns) */
@@ -1207,8 +1196,8 @@ body.intro-active .hero-content {
 }
 
 .social-link:hover {
-  color: var(--text-primary);
-  border-color: var(--glass-border-hover);
+  color: var(--accent-primary);
+  border-color: var(--accent);
   background: var(--accent-subtle);
   transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 1px));
 }
@@ -1254,7 +1243,6 @@ body.intro-active .hero-content {
   border: 1px solid var(--glass-border);
   text-decoration: none;
   background: color-mix(in srgb, var(--surface) 72%, transparent);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--shade) 30%, transparent);
   color: var(--text-primary);
   /* Magnetic hover — JS sets --magnet-x/--magnet-y (px) when the cursor
      is nearby; 0px when it isn't, so idle buttons sit exactly in place. */
@@ -1293,13 +1281,11 @@ body.intro-active .hero-content {
   transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 1px));
   border-color: var(--glass-border-hover);
   background: color-mix(in srgb, var(--bg-card) 82%, transparent);
-  box-shadow: 0 12px 26px color-mix(in srgb, var(--shade) 34%, transparent);
 }
 
 /* Press: sink back to the magnet position */
 .btn:active {
   transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--shade) 30%, transparent);
 }
 
 .btn-primary {
@@ -1339,13 +1325,11 @@ body.intro-active .hero-content {
   background: color-mix(in srgb, var(--paper) 92%, transparent);
   color: var(--text-primary);
   border-color: color-mix(in srgb, var(--accent) 20%, transparent);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 [data-theme="light"] .btn:hover {
   background: var(--paper);
   border-color: color-mix(in srgb, var(--accent) 32%, transparent);
-  box-shadow: 0 12px 24px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 [data-theme="light"] .btn-primary {
@@ -1364,6 +1348,39 @@ body.intro-active .hero-content {
     var(--paper) 100%
   );
 }
+
+/* Primary is solid accent, secondary is outlined, so the two hero
+   actions read as a clear first and second choice in both themes.
+   (Placed after the theme treatments above, which they replace.) */
+.btn-primary,
+[data-theme="light"] .btn-primary {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+.btn-primary:hover,
+[data-theme="light"] .btn-primary:hover {
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+}
+
+.btn-secondary,
+[data-theme="light"] .btn-secondary {
+  background: transparent;
+  border: 1.5px solid var(--accent-primary);
+  color: var(--accent-primary);
+  box-shadow: none;
+}
+
+.btn-secondary:hover,
+[data-theme="light"] .btn-secondary:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent-primary);
+}
+
+/* The tracking glow would wash out a solid fill */
+.btn-primary::before { display: none; }
 
 /* Animated scroll indicator */
 .scroll-indicator {
@@ -1434,8 +1451,8 @@ body.intro-active .hero-content {
   font-weight: 400;
   color: var(--text-primary);
   margin-bottom: var(--sp-4);
-  letter-spacing: 0.025em;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
 .section-intro {
@@ -1521,15 +1538,20 @@ body.intro-active .hero-content {
    10. WORK / PROJECT CARDS
    ============================================ */
 
+/* Four featured case studies, two per row (one column on phones) */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: clamp(1.75rem, 2.8vw, 2.6rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 2.8vw, 2.25rem);
+}
+
+@media (max-width: 768px) {
+  .projects-grid { grid-template-columns: 1fr; }
 }
 
 .project-card {
   display: block;
-  background: var(--bg-card);
+  background: var(--paper);
   /* Border borrows the card's project colour (--project-accent, set
      by [data-project] in the tokens block); tags inside stay site orange. */
   --tilt-stroke-1: color-mix(in srgb, var(--project-accent, var(--accent)) 60%, transparent);
@@ -1545,13 +1567,18 @@ body.intro-active .hero-content {
               border-color var(--t-base);
 }
 
-.project-card:not(.coming-soon):hover {
-  box-shadow: var(--shadow-hover);
+/* Hover and keyboard focus: a soft glow in the project's colour and
+   the image eases in a little (below). Tilting cards lift and tilt
+   with the pointer (.tilt-card); any others just rise. */
+.project-card:not(.coming-soon):hover,
+.project-card:focus-visible {
   border-color: color-mix(in srgb, var(--project-accent, var(--accent)) 45%, transparent);
+  box-shadow: var(--shadow-hover), 0 0 0 4px color-mix(in srgb, var(--project-accent, var(--accent)) 10%, transparent);
 }
 
-.project-card:not(.coming-soon):hover:not(.tilt-card) {
-  transform: translateY(-6px);
+.project-card:not(.tilt-card):hover,
+.project-card:not(.tilt-card):focus-visible {
+  transform: translateY(-4px);
 }
 
 .tilt-card {
@@ -1560,7 +1587,7 @@ body.intro-active .hero-content {
   --glow-x: 50%;
   --glow-y: 50%;
   --lift: 0px;
-  --tilt-lift: -6px;
+  --tilt-lift: -8px;
   --reveal-y: 0px;
   --intro-scale: 1; /* only ever changed on .hero-content, see settle-in above */
   position: relative;
@@ -1631,12 +1658,19 @@ body.intro-active .hero-content {
   z-index: 1;
 }
 
-/* Clicked story card: settle instantly (no tilt, no easing) so the
-   page transition captures a flat image. See index.html <head>. */
+/* Clicked story card or row: settle instantly (no lift, no easing)
+   so the page transition captures the resting image. See index.html
+   <head>. */
 .project-card.is-leaving,
-.project-card.is-leaving * {
+.project-card.is-leaving *,
+.project-row.is-leaving,
+.project-row.is-leaving * {
   transition: none !important;
 }
+
+.project-card.is-leaving,
+.project-row.is-leaving .project-thumb img,
+.project-card.is-leaving .project-thumb img { transform: none !important; }
 
 /* Story cards (data-story) hint at what's inside: on hover or keyboard
    focus a thread draws out from the centre of the image's base, the
@@ -1651,7 +1685,7 @@ body.intro-active .hero-content {
   height: 2px;
   z-index: 2;
   background: var(--project-accent, var(--accent));
-  transform: translateZ(17px) scaleX(0);
+  transform: scaleX(0);
   transform-origin: center;
   transition: transform 0.6s cubic-bezier(0.2, 0.75, 0.2, 1);
   pointer-events: none;
@@ -1659,21 +1693,20 @@ body.intro-active .hero-content {
 
 .project-card[data-story]:hover .project-thumb::after,
 .project-card[data-story]:focus-visible .project-thumb::after {
-  transform: translateZ(17px) scaleX(1);
+  transform: scaleX(1);
 }
 
-/* Image container — shorter to give more room for card body.
-   --thumb-h is shared with the highlights panel that covers it. */
-.project-card { --thumb-h: 175px; }
-
+/* Thumbnail: a mat tinted with the project's colour, with the image
+   inset as a rounded print, so logos and photos share one frame in
+   both themes. The story's opening image (.st-card-media in
+   css/story.css) uses the same mat, so the morph between them lines
+   up. */
 .project-thumb {
+  display: block;
   width: 100%;
-  height: var(--thumb-h);
-  background: linear-gradient(
-    135deg,
-    var(--accent-subtle) 0%,
-    color-mix(in srgb, var(--accent-2) 6%, transparent) 100%
-  );
+  aspect-ratio: 16 / 9;
+  padding: clamp(14px, 4.5%, 26px);
+  background: color-mix(in srgb, var(--project-accent, var(--accent)) 12%, var(--paper));
   overflow: hidden;
   position: relative;
   /* Own top corners, matching the card, so the image frame keeps its
@@ -1681,45 +1714,18 @@ body.intro-active .hero-content {
   border-radius: var(--r-xl) var(--r-xl) 0 0;
 }
 
-.project-thumb::after {
-  content: '';
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(
-      circle at var(--glow-x) var(--glow-y),
-      var(--accent-glow-lg),
-      transparent 58%
-    ),
-    radial-gradient(
-      circle at calc(100% - var(--glow-x)) calc(100% - var(--glow-y)),
-      var(--accent-glow),
-      transparent 62%
-    );
-  opacity: 0;
-  transition: opacity var(--t-base), transform 0.6s var(--ease-smooth);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 2;
-  transform: translateZ(20px) scale(1.08);
-}
-
-.project-card.tilt-card:hover .project-thumb::after,
-.project-card.tilt-card:focus-visible .project-thumb::after {
-  opacity: 0.35;
-}
-
 .project-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  position: relative;
-  z-index: 1;
-  transform: translateZ(16px) scale(1.02);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  outline: 1px solid color-mix(in srgb, var(--project-accent, var(--accent)) 14%, transparent);
   transition: transform 0.65s var(--ease-smooth);
 }
 
-.project-card:hover .project-thumb img { transform: translateZ(16px) scale(1.06); }
+.project-card:hover .project-thumb img,
+.project-card:focus-visible .project-thumb img { transform: scale(1.025); }
 
 /* Placeholder when no image */
 .project-thumb-placeholder {
@@ -1757,21 +1763,24 @@ body.intro-active .hero-content {
 /* Tag pills — sit at the bottom of the card after bullets */
 .project-tags {
   display: flex;
-  gap: var(--sp-2);
+  gap: 10px var(--sp-2); /* extra room between wrapped rows */
   flex-wrap: wrap;
   margin-top: auto;
   padding-top: var(--sp-3);
 }
 
+/* Quiet, see-through chips with even padding; 12px is the floor for
+   legible text, so they get smaller through padding and weight. */
 .tag {
-  padding: 0.3rem 0.875rem;
-  background: var(--accent-subtle);
-  border: 1px solid var(--border-subtle);
+  padding: 0.2rem 0.625rem;
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
   border-radius: var(--r-pill);
   font-size: var(--text-xs);
+  line-height: 1.5;
   color: var(--accent-primary);
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
 }
 
 /* Tool icons row */
@@ -1867,14 +1876,12 @@ body.intro-active .hero-content {
   font-size: var(--text-sm);
 }
 
+
+
 .education-panel {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--sp-4);
-}
-
-.education-panel::before {
-  content: none;
 }
 
 .education-item {
@@ -1891,7 +1898,7 @@ body.intro-active .hero-content {
 }
 
 .education-item.tilt-card {
-  --tilt-lift: -4px;
+  --tilt-lift: -6px;
 }
 
 .education-item:hover {
@@ -2289,18 +2296,27 @@ body.intro-active .hero-content {
   justify-content: flex-start;
 }
 
+/* The email is the call to action: set large in Fraunces, with a
+   rust underline that fills in on hover */
 .contact-email {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-2);
-  color: var(--accent-primary);
-  font-weight: 500;
-  font-size: var(--text-base);
-  transition: color var(--t-base);
-  margin-bottom: var(--sp-6);
+  gap: var(--sp-3);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1rem + 1.4vw, 2.125rem);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  padding-bottom: 4px;
+  background: linear-gradient(var(--accent), var(--accent)) left bottom / 100% 1.5px no-repeat;
+  transition: color var(--t-base), background-size 0.5s var(--ease-out);
+  margin: var(--sp-6) 0 var(--sp-6);
+  overflow-wrap: anywhere;
 }
 
-.contact-email:hover { color: var(--accent-secondary); }
+.contact-email i { font-size: 0.6em; color: var(--accent-primary); }
+
+.contact-email:hover { color: var(--accent-primary); background-size: 100% 3px; }
 
 /* Contact form */
 .contact-form {
@@ -2582,30 +2598,50 @@ body.intro-active .hero-content {
    16. FOOTER
    ============================================ */
 
+/* Footer: the name large on the left, links and copyright on the
+   right, on the content width, under a rust rule */
 footer {
   position: relative;
   z-index: 10;
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-subtle);
-  padding: var(--sp-12) var(--sp-8);
-  text-align: center;
+  background: transparent;
+  padding: 0 var(--sp-8) var(--sp-12);
+}
+
+.footer-content {
+  max-width: var(--content-w);
+  margin: 0 auto;
+  padding-top: var(--sp-12);
+  border-top: 2px solid var(--accent);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--sp-4) var(--sp-8);
 }
 
 .footer-name {
+  grid-row: span 2;
   font-family: var(--font-display);
-  font-size: var(--text-2xl);
+  font-size: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
   font-weight: 400;
+  line-height: 1;
   color: var(--text-primary);
-  margin-bottom: var(--sp-6);
-  letter-spacing: 0.04em;
+  letter-spacing: -0.035em;
 }
 
 .footer-links {
   display: flex;
   gap: var(--sp-6);
-  justify-content: center;
-  margin-bottom: var(--sp-6);
+  justify-content: flex-end;
   flex-wrap: wrap;
+}
+
+.footer-copy { text-align: right; }
+
+@media (max-width: 600px) {
+  .footer-content { grid-template-columns: 1fr; }
+  .footer-name { grid-row: auto; }
+  .footer-links { justify-content: flex-start; }
+  .footer-copy { text-align: left; }
 }
 
 .footer-links a {
@@ -3100,12 +3136,15 @@ footer {
 
   .nav-links a { font-size: var(--text-base); }
 
-  /* Removed entirely on mobile — the panel ate too much screen space
-     and its text labels ran past the viewport edge. Dark/motion/text-size
-     preferences remain reachable on desktop/tablet. */
+  /* Phones: the three icons sit just left of the menu button */
   .accessibility-controls {
-    display: none !important;
+    order: 1;
+    margin-left: auto;
+    margin-right: var(--sp-1);
+    padding-left: 0;
+    border-left: 0;
   }
+  .nav-toggle { order: 2; }
 
   .section {
     padding: var(--sp-16) var(--sp-4);
@@ -3296,8 +3335,6 @@ footer {
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  body { cursor: auto !important; }
-
   /* Disable decorative animations — keep functional state transitions */
   .scroll-indicator,
   .storm-reveal,
@@ -3387,10 +3424,6 @@ body.quiet-mode .storm-reveal,
 body.quiet-mode .cursor-dot,
 body.quiet-mode .splash-canvas { display: none !important; }
 
-@media (pointer: fine) {
-  body.quiet-mode { cursor: auto !important; }
-}
-
 @media (pointer: coarse) {
   .tilt-card {
     transform: none;
@@ -3452,37 +3485,20 @@ body.quiet-mode [data-reveal-stagger] > * {
 
 /* ============================================
    21. ACCESSIBILITY CONTROL LABELS
+   Visually hidden: the icons carry the meaning on screen.
    ============================================ */
 
-.control-btn {
-  flex-direction: column;
-  gap: 3px;
-  height: auto;
-  min-height: 52px;
-  padding: var(--sp-2) var(--sp-1);
-  width: 3rem;
-  min-width: 48px;
-}
-
 .control-label {
-  font-size: 0.6rem;
-  letter-spacing: 0.01em;
-  text-transform: none;
-  color: var(--text-muted);
-  line-height: 1;
-  pointer-events: none;
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-/* Scale control buttons and labels in large-text mode */
+/* Scale control icons in large-text mode */
 body.large-text .control-btn { font-size: 1.05rem; }
-body.large-text .control-label { font-size: 0.68rem; }
-
-.control-btn:hover .control-label,
-.control-btn.active .control-label {
-  color: var(--text-secondary);
-}
 
 
 /* ============================================
@@ -3583,43 +3599,14 @@ body.large-text .control-label { font-size: 0.68rem; }
 
 
 /* ============================================
-   24. WORK SECTION — HORIZONTAL SCROLL
+   24. WORK SECTION — FEATURED GRID + MORE PROJECTS
+   Featured cards: title, subtitle, one impact line, tags. The rest
+   of the projects sit below as a short list with a type filter
+   (setupMoreProjects() in script.js).
    ============================================ */
 
-.projects-grid-wrapper {
-  position: relative;
-  /* No overflow: hidden — allows card box-shadows to show */
-}
-
-
-.projects-grid {
-  display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  gap: clamp(1.5rem, 2.5vw, 2rem);
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  /* A scroller clips everything outside it, so its padding has to
-     hold the whole hover shadow (0 20px 52px) on every side. Negative
-     margins give that space back to the layout, and scroll-padding
-     makes cards snap to the padded edge (not flush with the clip), so
-     they sit exactly where they did and the shadow shows in full. */
-  padding: 40px 64px 84px;
-  margin: -16px -64px -56px;
-  scroll-padding-inline: 64px;
-  /* No visible scrollbar: the arrows below are the visible control,
-     and the row still scrolls by trackpad, touch and Tab. */
-  scrollbar-width: none;
-  grid-template-columns: unset;
-}
-
-.projects-grid::-webkit-scrollbar { display: none; }
-
-/* Every card: fixed width; heights match because the row stretches
-   them to the tallest card. */
+/* Cards in a row share a height; tags sit at the bottom. */
 .project-card {
-  flex: 0 0 370px;
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
 }
@@ -3628,253 +3615,147 @@ body.large-text .control-label { font-size: 0.68rem; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* clips only at the card boundary */
 }
 
-/* Card subtitle — sits quietly below the title */
+/* Card subtitle — sits quietly below the title, in italic like the
+   resume's descriptor lines */
 .card-subtitle {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
+  font-style: italic;
   text-transform: none;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 400;
   margin-top: calc(var(--sp-1) * -1); /* pull up slightly */
   margin-bottom: var(--sp-3);
 }
 
-/* Card title (interesting line) — primary */
+/* Card headline: Fraunces, like every other heading */
 .project-body h3 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.35;
-  margin-bottom: var(--sp-1);
-}
-
-/* Highlights: the card's impact bullets. By default (phones, touch
-   screens) they're a plain list between the subtitle and the tags.
-   With a mouse, they sit over the image instead and appear one at a
-   time on hover or keyboard focus, with a dot per bullet
-   (setupCardHighlights() in script.js cycles them). Screen readers
-   get every bullet either way. */
-.card-highlights {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.1rem + 0.6vw, 1.625rem);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
   margin-bottom: var(--sp-2);
 }
 
-.card-bullets {
-  display: grid;
+/* The outcome, readable at a glance */
+.project-body .card-impact {
+  display: flex;
+  align-items: baseline;
   gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.card-impact i {
+  flex-shrink: 0;
+  font-size: 0.8em;
+  color: var(--accent-primary);
+}
+
+/* --- More projects --- */
+.more-projects {
+  margin-top: clamp(var(--sp-12), 6vw, var(--sp-16));
+}
+
+.more-projects-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-6);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.more-projects-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.more-list {
+  list-style: none;
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
-.card-bullets li {
-  color: var(--text-secondary);
+.more-list li[hidden] { display: none; }
+
+.project-row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-4) var(--sp-2);
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  transition: background var(--t-base), box-shadow var(--t-base);
+}
+
+.project-row:hover,
+.project-row:focus-visible {
+  background: color-mix(in srgb, var(--project-accent, var(--accent)) 6%, transparent);
+}
+
+/* Same mat as the cards, at row size */
+.project-row .project-thumb {
+  padding: 6px;
+  border-radius: var(--r-md);
+}
+
+.project-row .project-thumb img { border-radius: var(--r-sm); }
+
+.project-row:hover .project-thumb img,
+.project-row:focus-visible .project-thumb img { transform: scale(1.04); }
+
+.project-row-text {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.project-row-name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.project-row-line {
   font-size: var(--text-sm);
-  line-height: 1.55;
-  padding-left: var(--sp-4);
-  position: relative;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
-.card-bullets li::before {
-  content: '·';
-  position: absolute;
-  left: 0;
+.project-row-type {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.project-row-arrow {
   color: var(--accent-primary);
-  font-size: 1.3em;
-  line-height: 1.15;
+  transition: transform var(--t-base);
 }
 
-/* Built by script.js; only used over the image. */
-.card-highlights-foot { display: none; }
+.project-row:hover .project-row-arrow,
+.project-row:focus-visible .project-row-arrow { transform: translateX(4px); }
 
-@media (hover: hover) and (min-width: 769px) {
-  /* The panel is positioned from the body, so it can sit exactly over
-     the image above it; the card itself still clips at its edge. */
-  .project-card .project-body {
-    position: relative;
-    overflow: visible;
+@media (max-width: 600px) {
+  .project-row {
+    grid-template-columns: 96px minmax(0, 1fr) auto;
+    gap: var(--sp-4);
   }
-
-  /* Larger text needs a taller frame for the longest bullet. */
-  body.large-text .project-card { --thumb-h: 200px; }
-
-  .card-highlights {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    height: var(--thumb-h);
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: var(--sp-4) var(--sp-6) var(--sp-3);
-    border-radius: var(--r-xl) var(--r-xl) 0 0;
-    background:
-      linear-gradient(135deg, color-mix(in srgb, var(--project-accent, var(--accent)) 12%, transparent), transparent 70%),
-      color-mix(in srgb, var(--paper) 94%, transparent);
-    opacity: 0;
-    /* Out quickly; in after a beat, so sweeping the mouse across the
-       row doesn't flash every card. */
-    transition: opacity 0.25s ease;
-    pointer-events: none;
-  }
-
-  .project-card:hover .card-highlights,
-  .project-card:focus-visible .card-highlights {
-    opacity: 1;
-    transition: opacity 0.35s ease 0.12s;
-  }
-
-  /* All bullets share one cell; only the current one shows. */
-  .card-bullets {
-    flex: 1;
-    grid-template-areas: 'bullet';
-    align-items: center;
-    min-height: 0;
-  }
-
-  .card-bullets li {
-    grid-area: bullet;
-    font-size: var(--text-base);
-    line-height: 1.5;
-    padding-left: 0;
-    color: var(--text-primary);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.35s ease, transform 0.45s var(--ease-out);
-  }
-
-  .card-bullets li::before { content: none; }
-
-  /* Outgoing bullet drifts up as the next one rises in. */
-  .card-bullets li.was-active {
-    transform: translateY(-10px);
-  }
-
-  .card-bullets li.is-active {
-    opacity: 1;
-    transform: none;
-  }
-
-  .card-highlights-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-3);
-    padding-top: var(--sp-2);
-  }
-
-  .card-highlights-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  /* One dot per bullet. The current one stretches into a bar that
-     fills while its bullet is showing. Each dot has a larger hover
-     area than it looks, and hovering one jumps to its bullet. */
-  .card-dots {
-    display: flex;
-    align-items: center;
-    pointer-events: auto;
-  }
-
-  .card-dot {
-    display: grid;
-    place-items: center;
-    height: 20px;
-    padding: 0 4px;
-    cursor: pointer;
-  }
-
-  .card-dot::before {
-    content: '';
-    display: block;
-    width: 7px;
-    height: 7px;
-    border-radius: 999px;
-    background:
-      linear-gradient(var(--project-accent, var(--accent)), var(--project-accent, var(--accent))) left / 0% 100% no-repeat,
-      color-mix(in srgb, var(--project-accent, var(--accent)) 30%, transparent);
-    transition: width 0.35s var(--ease-out);
-  }
-
-  .card-dot.is-active::before {
-    width: 22px;
-    animation: card-dot-fill var(--dwell, 2s) linear forwards;
-  }
-
-  /* Story cards: the thread under the image draws out here too. */
-  .project-card[data-story] .card-highlights::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 2px;
-    background: var(--project-accent, var(--accent));
-    transform: scaleX(0);
-    transition: transform 0.6s cubic-bezier(0.2, 0.75, 0.2, 1);
-  }
-
-  .project-card[data-story]:hover .card-highlights::after,
-  .project-card[data-story]:focus-visible .card-highlights::after {
-    transform: scaleX(1);
-  }
-
-  /* Clicked story card: drop the panel at once so the page
-     transition grows the image, not the text. */
-  .project-card.is-leaving .card-highlights { opacity: 0; }
+  .project-row-type { display: none; }
 }
-
-@keyframes card-dot-fill {
-  to { background-size: 100% 100%; }
-}
-
-/* Reduced motion or Motion paused: bullets crossfade in place and the
-   current dot is simply filled. */
-@media (prefers-reduced-motion: reduce) {
-  .card-bullets li,
-  .card-bullets li.was-active { transform: none; transition: opacity 0.3s ease; }
-  .card-dot.is-active::before { animation: none; background-size: 100% 100%; }
-}
-
-body.quiet-mode .card-bullets li,
-body.quiet-mode .card-bullets li.was-active { transform: none; transition: opacity 0.3s ease; }
-body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 100% 100%; }
-
-/* --- Work carousel (setupWorkCarousel() in script.js) ---
-   The row glides on a loop; copies of the cards (.is-clone) follow
-   the originals so the end joins back to the start. Snapping would
-   fight the glide, so it's off while the loop is running. The
-   writing deck's arrows sit below. */
-.projects-grid.is-looping { scroll-snap-type: none; }
-
-.work-controls { margin-top: var(--sp-4); }
-
-@media (max-width: 768px) {
-  .projects-grid {
-    /* Full-bleed on phones: cards line up with the page gutter */
-    padding: 24px 16px 40px;
-    margin: -8px -16px -16px;
-    scroll-padding-inline: 16px;
-  }
-
-  /* Was a flat 280px — cramped the 3 bullet points + tags into a narrow
-     column and read as "squished." Scale with the viewport instead
-     (capped so it doesn't balloon on tablets), with the next card
-     still peeking in at the right edge as the "swipe for more" cue. */
-  .project-card {
-    flex: 0 0 86vw;
-    max-width: 340px;
-  }
-}
-
-/* No separate <480px override needed — the 86vw/340px rule above
-   already scales down proportionally on the smallest phones. */
 
 
 /* ============================================
@@ -3952,6 +3833,11 @@ body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 
   background: var(--bg-elevated);
 }
 
+/* Cards behind the front one show as blank backs: their faded text
+   would fall below AA contrast, and only the front card is readable
+   anyway (the rest are aria-hidden) */
+.deck-card:not([data-deck-pos="0"]) > * { visibility: hidden; }
+
 /* Hidden cards */
 .deck-card[data-deck-pos="3"],
 .deck-card[data-deck-pos="-1"] {
@@ -4010,16 +3896,6 @@ body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 
   gap: var(--sp-3);
 }
 
-.deck-external-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 .deck-controls {
   display: flex;
   align-items: center;
@@ -4053,26 +3929,88 @@ body.quiet-mode .card-dot.is-active::before { animation: none; background-size: 
 
 .deck-dots {
   display: flex;
-  gap: 6px;
 }
 
+/* A 7px dot inside a 24px hit area (WCAG 2.2 target size) */
 .deck-dot {
+  box-sizing: content-box;
   width: 7px;
   height: 7px;
+  padding: 8.5px;
+  background-clip: content-box;
   border-radius: 50%;
-  background: var(--border);
+  background-color: var(--border);
   border: 0;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
-  padding: 0;
 }
 
+/* The current dot grows inside its 24px hit area, not past it */
 .deck-dot.active {
-  background: var(--accent-primary);
-  transform: scale(1.25);
+  width: 9px;
+  height: 9px;
+  padding: 7.5px;
+  background-color: var(--accent-primary);
+}
+
+/* Filtered out by the chips above the deck */
+.deck-card[hidden] { display: none; }
+
+/* Only one card matches: no arrows or dots to use (kept in the
+   layout so the section doesn't jump) */
+.writing-stack.is-single .deck-controls { visibility: hidden; }
+
+/* Topic filter and date sort above the deck (setupWritingDeck) */
+.writing-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-6);
+  margin: 0 auto var(--sp-8);
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+
+.filter-group + .filter-group {
+  padding-left: var(--sp-6);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.filter-chip {
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
+}
+
+.filter-chip:hover {
+  border-color: var(--glass-border-hover);
+  color: var(--accent-primary);
+}
+
+.filter-chip[aria-pressed="true"] {
+  background: var(--accent-subtle);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent-primary);
 }
 
 @media (max-width: 480px) {
+  .filter-group + .filter-group { padding-left: 0; border-left: 0; }
+  /* Narrow enough for all four topics on one row at 390px */
+  .filter-chip { padding: 0 0.625rem; }
   .writing-stack { max-width: 100%; padding: 0 var(--sp-6); }
   .deck-viewport { height: 340px; }
   .deck-card { padding: var(--sp-6); }
@@ -5046,11 +4984,7 @@ html.intro-skip #intro-screen { display: none !important; }
 /* ============================================
    MOBILE SCROLL FIXES
 
-   1. touch-action: pan-x on .projects-grid
-      Tells the browser this element handles
-      horizontal panning. Vertical touches bubble
-      up to the page, preventing the card row from
-      capturing vertical page scroll on mobile.
+   1. (Removed with the work carousel.)
 
    2. overscroll-behavior-y: none on html
       Prevents the over-scroll bounce / rubber-band
@@ -5062,12 +4996,6 @@ html.intro-skip #intro-screen { display: none !important; }
       + overscroll-behavior: contain so modal scroll
       doesn't chain to the page behind it.
    ============================================ */
-
-/* 1. Project cards — vertical scroll passes through to page */
-.projects-grid {
-  touch-action: pan-x pan-y;
-  overscroll-behavior-x: contain;
-}
 
 /* 2. Page-level overscroll */
 @media (max-width: 768px) {
@@ -5113,7 +5041,7 @@ html.intro-skip #intro-screen { display: none !important; }
   .storm-reveal,
   .cursor-dot,
   .project-badge,
-  .aurora-blobs,
+  .press-splash-layer,
   .splash-canvas,
   .scroll-indicator {
     display: none !important;
@@ -5385,8 +5313,9 @@ body[data-project="electric-scooters"] .tilt-card:hover {
     --text-sm: 1.125rem;
   }
 
-  /* Sizes set outside the type scale */
-  .hero-tagline,
+  /* Sizes set outside the type scale (the tagline is display type,
+     already larger) */
+  .hero-title,
   .hero-role,
   .card-badge,
   .card-label,
@@ -5429,10 +5358,6 @@ body[data-project="electric-scooters"] .tilt-card:hover {
   /* The open menu was see-through (a blurred panel inside the blurred
      nav can't blur), so page text showed through it. */
   .nav-links { background: var(--bg); }
-
-  /* The floating accessibility panel is already hidden on portrait
-     phones; landscape phones get the same. */
-  .accessibility-controls { display: none !important; }
 
   /* The side "About" tab covered the left edge of cards on phones;
      Home in the menu does the same job. */

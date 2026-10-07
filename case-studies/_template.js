@@ -45,7 +45,8 @@
     // Use the SAME image as the homepage card for a seamless morph.
     hero: { src: 'images/card-image.jpg', alt: 'What the image shows', width: 1600, height: 900 },
     // Or, until images are approved: hero: { placeholder: 'IMAGE: ...', width: 1600, height: 900 }
-    skipTo: { label: 'Skip to the final product', chapter: 'final' },  // optional
+    // Optional. Shown inside the expanded summary, after the metrics.
+    skipTo: { label: 'Skip to the final product', chapter: 'final' },
   },
 
   /* --- Summary: one visible line; the rest expands on request --- */
@@ -58,9 +59,16 @@
       { label: 'Outcome', text: '...' },
     ],
     showMetrics: true,   // repeat the metrics inside the expanded summary
+    // Or list them here to show more numbers in the summary than in
+    // the closing By the numbers section (same shape as metrics.items).
+    // metrics: [{ value: 65, label: 'interviews' }, ...],
   },
 
-  /* --- Diamonds: 1, 2 or more ---
+  /* --- Diamonds: optional, 1, 2 or more ---
+     Only for projects that really ran a double diamond (Kindred).
+     Leave diamonds out, along with chapter diamond/stage and pinch
+     checkpoints, for a plain numbered story: a single thread runs
+     down beside the text instead.
      Each diamond spans from its first chapter to its last. The line
      widens through 'diverge' chapters, is widest where 'converge'
      chapters begin, and pinches to a point after the diamond's last
@@ -76,11 +84,16 @@
       diamond: 'main',           // a diamond id, or null for chapters outside the line
       stage: 'diverge',          // 'diverge' | 'converge'
       nav: 'Short label',        // navigator tooltip + mobile Chapters menu
+      kicker: 'Low fidelity',    // optional: an extra label in the eyebrow, after the stage
 
       heading: 'An insight, not an activity.',   // headings say "we"; body copy says "I"
       body: ['Paragraph one.', 'Paragraph two.'],
 
       quote: { text: '...', cite: 'Who said it' },          // optional, shown large
+      // Optional: what this chapter taught us, in a tinted box under
+      // the body. A string is labelled Insight; { label: 'Finding' |
+      // 'Impact', text } changes the label.
+      insight: 'One line a reader can take away.',
       links: { 'phrase in the copy': 'https://example.com' },  // optional, first match is linked
 
       // Optional. 'auto' (default) cycles text-left, text-right, wide.
@@ -92,7 +105,7 @@
       // A 'phone-rounds' visual always uses its own pinned layout.
       layout: 'auto',
 
-      visual: null,              // optional, see VISUAL TYPES below
+      visual: null,              // optional, see VISUAL TYPES below; or a list of visuals, shown in order
 
       // Images. An entry with 'placeholder' renders a labeled box, so
       // gaps stay visible.
@@ -108,6 +121,10 @@
           maxWidth: 480,         // optional: cap small source images near their real size
         },
         { placeholder: 'IMAGE: what should go here', ratio: '16 / 9' },
+        // One app screen in a phone frame: a screenshot (src), or a live
+        // prototype (embed, inert until "Try the prototype" is pressed).
+        { frame: 'phone', src: 'images/screen.png', alt: '...', width: 810, height: 1698 },
+        { frame: 'phone', embed: 'https://...', title: 'What screen readers hear' },
         // Video: silent, loops, loads near the screen, plays while
         // visible (never by itself with reduced motion), has a pause
         // button. Export as H.264 .mp4, 720p, ~2 Mbps.
@@ -131,7 +148,7 @@
      progress bar. A diamond without a pinch checkpoint still closes,
      just without a label. */
   checkpoints: [
-    { id: 'cp-done', kind: 'pinch', chapter: 'kebab-case-id', label: 'The outcome' },
+    { id: 'cp-done', kind: 'pinch', chapter: 'kebab-case-id', label: 'The outcome' },  // diamonds only
     {
       id: 'halfway',
       kind: 'interlude',
@@ -202,6 +219,7 @@
    { type: 'phone-rounds',
      rounds: [{ label: 'Low fidelity', text: 'optional line',
                 points: ['optional finding', '...'],   // bullets under the label
+                insight: 'What this round taught us',  // optional, same shape as chapter.insight
                 media: { src, alt } | { placeholder } | { embed: 'https://...', title },
                 link: { label, href } }] }            // link: optional
        A pinned phone whose screen changes per round (900px and up);

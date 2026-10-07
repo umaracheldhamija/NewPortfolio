@@ -17,9 +17,10 @@
     subtitle: 'A privacy-first AI health companion for people living with chronic conditions.',
     tags: ['Client: OpenMined', '8 months', 'Team of 4', 'Role: UX Designer'],
     // Same image as the homepage card, so the card can morph into it.
+    // Rendered from OpenMined's official logo (openmined.org/logos).
     hero: {
-      src: 'images/story/kindred/om-hero-wordmark-1600.jpg',
-      srcset: 'images/story/kindred/om-hero-wordmark-800.jpg 800w, images/story/kindred/om-hero-wordmark-1600.jpg 1600w',
+      src: 'images/story/kindred/om-logo-1600.jpg',
+      srcset: 'images/story/kindred/om-logo-800.jpg 800w, images/story/kindred/om-logo-1600.jpg 1600w',
       alt: 'OpenMined logo and name',
       width: 1600,
       height: 900,
@@ -30,12 +31,20 @@
   summary: {
     lead: 'Turned an open-ended brief into a clinician-validated product concept, ready for development, in 8 months.',
     points: [
-      { label: 'Problem', text: 'OpenMined had powerful privacy technology and no consumer use case.' },
+      { label: 'Problem', text: "OpenMined had built technology that lets AI compute with personal data on a person's own device, safely, but it had no consumer product and no use case that made it matter to everyday people. Meanwhile, 58.5% of US adults already search online for health information, trading their privacy for answers they can't verify." },
       { label: 'Role', text: 'UX Designer' },
-      { label: 'Process', text: 'Two rounds of the double diamond with my team of four: from technology to 36 ideas to one use case, then from 36 features to 17 worth testing to the 5 feature sets that mattered.' },
-      { label: 'Outcome', text: 'Kindred, with an average recommendation score of 8/10 from patients and 8.5/10 from clinicians.' },
+      { label: 'Process', text: 'Two rounds of the double diamond with my team of four: from technology to 36 ideas to one use case, then from 36 features to 17 worth testing to the 4 feature sets that mattered.' },
+      { label: 'Outcome', text: 'Kindred, a privacy-first AI health companion for people living with chronic conditions. It brings scattered health records into one private timeline, where AI and verified patients with the same diagnosis help make sense of them. Patients rated their likelihood to use it 8/10, and clinicians 8.5/10.' },
     ],
-    showMetrics: true,
+    // The full set of numbers; the closing section keeps only the scores.
+    metrics: [
+      { value: 123, label: 'research articles and papers' },
+      { value: 82, label: 'survey responses' },
+      { value: 65, label: 'patient, clinician and SME interviews' },
+      { value: 36, label: 'use case ideas' },
+      { value: 50, label: 'speed-dating intercepts' },
+      { value: 8, suffix: '/10', label: 'likelihood to use, rated by patients', detail: '8.5/10 from clinicians' },
+    ],
   },
 
   diamonds: [
@@ -81,6 +90,7 @@
       nav: 'The technology',
       heading: 'Before we could narrow down, we had to understand the technology.',
       body: [
+        "OpenMined's privacy technology lets AI compute with personal data on your own device, safely. The data never leaves your hands; only the insight it produces is shared.",
         'I spent a month on desk research into secure computation and decentralized communities, reading 50 primary research articles and 73 secondary papers.',
         'Alongside it, I ran a survey on how people feel about AI and privacy. It drew 82 responses.',
       ],
@@ -228,127 +238,117 @@
       id: 'understanding',
       diamond: 'solution',
       stage: 'diverge',
-      nav: 'What patients wanted',
+      kicker: 'Low fidelity',
+      nav: 'Low fidelity',
       heading: 'We designed for sharing. Patients wanted understanding.',
       body: [
         "We assumed OpenMined's technology was best suited to a network of patients with the same condition sharing experiences, with the system showing them how many people their data had helped.",
-        "Co-design sessions with 11 people, and interviews with clinicians, showed otherwise. Patients didn't want to feel watched. They wanted insight from others' data and their own, with the help of AI, personalized to their condition.",
-        'Over two rounds of testing, 36 feature ideas became 17 worth testing, then the 5 feature sets that mattered most to patients and clinicians. I also made sure clinicians were comfortable with the direction.',
+        'I tested that over three rounds, from low fidelity to a working prototype, with over 30 participants. In low fidelity, we sketched 36 possible features and brought them to co-design sessions with 11 people, who narrowed them to the 17 worth testing.',
+        "Those sessions, and interviews with clinicians, showed otherwise. Patients didn't want to feel watched. They wanted insight from others' data and their own, with the help of AI, personalized to their condition.",
       ],
-      layout: 'centered',
-      visual: {
-        type: 'feature-cards',
-        items: [
-          {
-            title: 'Community Q&A',
-            text: 'Answers from patients with a verified diagnosis, ranked by how closely they match you.',
-            image: { src: 'images/kindred-feature-community-qa.png', alt: 'Community Q&A screen showing answers from patients with a verified diagnosis', width: 571, height: 851 },
-          },
-          {
-            title: 'Timeline of You',
-            text: 'Every diagnosis, lab and prescription from connected providers, on one private timeline.',
-            image: { src: 'images/kindred-feature-timeline-of-you.png', alt: 'Timeline of You screen showing diagnoses, labs and prescriptions in date order', width: 566, height: 851 },
-          },
-          {
-            title: 'Learning Modules',
-            text: 'Short explainers that turn numbers like eGFR into what they mean day to day.',
-            image: { src: 'images/kindred-feature-learning-modules.png', alt: 'Learning Modules screen explaining what an eGFR result means', width: 567, height: 851 },
-          },
-          {
-            title: 'AI Search',
-            text: 'Plain-language answers with every source shown. Context, never a diagnosis.',
-            image: { src: 'images/kindred-feature-ai-search.png', alt: 'AI Search screen showing a plain-language answer with its sources listed', width: 576, height: 861 },
-          },
-          // Four cards for the five feature sets: one card covers two.
-        ],
-      },
-      media: [],
+      insight: 'Features built around sharing data gave way to features that help people understand their own health.',
+      layout: 'text-left',
+      media: [
+        { frame: 'phone', src: 'images/om-low-fidelity.png', alt: 'Low-fidelity home screen in greyscale: a greeting, an Ask anything search, a learning module, and a timeline preview', width: 810, height: 1698 },
+      ],
     },
 
     {
-      id: 'testing',
+      id: 'mid-fidelity',
       diamond: 'solution',
       stage: 'converge',
-      nav: 'Testing',
-      heading: 'Three rounds of testing, each one sharper.',
-      body: ['Low fidelity, then mid fidelity, then a working high-fidelity prototype, with over 30 participants across the rounds.'],
-      visual: {
-        type: 'phone-rounds',
-        rounds: [
-          {
-            label: 'Low fidelity',
-            // Draft: edit freely.
-            points: [
-              'We sketched 36 possible features and brought them to co-design sessions with 11 people.',
-              'Together, we narrowed them to the 17 worth testing.',
-            ],
-            media: { src: 'images/om-low-fidelity.png', alt: 'Low-fidelity home screen in greyscale: a greeting, an Ask anything search, a learning module, and a timeline preview', width: 810, height: 1698 },
-          },
-          {
-            label: 'Mid fidelity',
-            // Draft: edit freely.
-            points: [
-              'We built the 17 into mid-fidelity screens and narrowed them to the 5 feature sets that mattered most to patients and clinicians.',
-              "Each of the 5 also had to deliver on what makes OpenMined's technology valuable: insight is shared, but the data never moves.",
-            ],
-            media: { src: 'images/om-mid-fi.png', alt: 'Mid-fidelity home screen with widgets for a kidney learning module, the kidney community, the health timeline and an upcoming appointment', width: 818, height: 1700 },
-          },
-          {
-            label: 'High fidelity',
-            text: 'The final round was a working prototype. Try it here.',
-            media: { embed: 'https://oolusina.github.io/Kindred_prototype/#/home', title: 'Kindred high-fidelity prototype' },
-            link: { label: 'Open the prototype in a new tab', href: 'https://oolusina.github.io/Kindred_prototype/#/home' },
-          },
-        ],
-      },
-      media: [],
-    },
-
-    {
-      id: 'codesign',
-      diamond: 'solution',
-      stage: 'converge',
-      nav: 'Co-design',
+      kicker: 'Mid fidelity',
+      nav: 'Mid fidelity',
       heading: 'We designed with patients and clinicians, not just for them.',
-      body: ['Through co-design sessions and design workshops, patients and clinicians shaped the product alongside us.'],
-      layout: 'wide',
-      visual: {
-        type: 'gallery',
-        columns: 2,   // side-by-side pairs, heights matched
-        media: [
-          {
-            src: 'images/story/kindred/codesign-session-1161.jpg',
-            srcset: 'images/story/kindred/codesign-session-800.jpg 800w, images/story/kindred/codesign-session-1161.jpg 1161w',
-            alt: 'Patients at a Kindred co-design session, gathered around a whiteboard of research artifacts',
-            caption: 'A co-design session where patients overturned our model of the patient journey.',
-            width: 1161,
-            height: 668,
-          },
-          {
-            src: 'images/om-co-design-2.png',
-            alt: 'Three team members reviewing research notes pinned to a wall',
-            width: 252,
-            height: 144,
-          },
-          {
-            src: 'images/story/kindred/hmw-affinity-1600.jpg',
-            srcset: 'images/story/kindred/hmw-affinity-800.jpg 800w, images/story/kindred/hmw-affinity-1600.jpg 1600w',
-            alt: 'How Might We affinity diagram for The Informed Patient, grouped into themes like safe haven, ease of use, support, credibility and accuracy',
-            caption: 'How Might We statements from a design workshop, grouped by theme.',
-            width: 1600,
-            height: 832,
-          },
-          {
-            src: 'images/story/kindred/journey-map-1600.jpg',
-            srcset: 'images/story/kindred/journey-map-800.jpg 800w, images/story/kindred/journey-map-1600.jpg 1600w',
-            alt: 'User journey map for The Informed Patient, showing stages, touchpoints and pain points',
-            caption: 'The patient journey, mapped with the people living it.',
-            width: 1600,
-            height: 620,
-          },
-        ],
-      },
-      media: [],
+      body: [
+        'Through co-design sessions and design workshops, patients and clinicians shaped the product alongside us.',
+        'We built the 17 features into mid-fidelity screens and tested them again. I also made sure clinicians were comfortable with the direction.',
+      ],
+      insight: "We combined the 17 features into 4 feature sets. Each one helps patients understand their health, and each keeps the promise of OpenMined's technology: insight is shared, but the data never moves.",
+      layout: 'text-left',
+      media: [
+        { frame: 'phone', src: 'images/om-mid-fi.png', alt: 'Mid-fidelity home screen with widgets for a kidney learning module, the kidney community, the health timeline and an upcoming appointment', width: 818, height: 1700 },
+      ],
+      // The 4 feature sets, then the co-design sessions behind them.
+      visual: [
+        {
+          type: 'feature-cards',
+          items: [
+            {
+              title: 'Community Q&A',
+              text: 'Answers from patients with a verified diagnosis, ranked by how closely they match you.',
+              image: { src: 'images/kindred-feature-community-qa.png', alt: 'Community Q&A screen showing answers from patients with a verified diagnosis', width: 571, height: 851 },
+            },
+            {
+              title: 'Timeline of You',
+              text: 'Every diagnosis, lab and prescription from connected providers, on one private timeline.',
+              image: { src: 'images/kindred-feature-timeline-of-you.png', alt: 'Timeline of You screen showing diagnoses, labs and prescriptions in date order', width: 566, height: 851 },
+            },
+            {
+              title: 'Learning Modules',
+              text: 'Short explainers that turn numbers like eGFR into what they mean day to day.',
+              image: { src: 'images/kindred-feature-learning-modules.png', alt: 'Learning Modules screen explaining what an eGFR result means', width: 567, height: 851 },
+            },
+            {
+              title: 'AI Search',
+              text: 'Plain-language answers with every source shown. Context, never a diagnosis.',
+              image: { src: 'images/kindred-feature-ai-search.png', alt: 'AI Search screen showing a plain-language answer with its sources listed', width: 576, height: 861 },
+            },
+          ],
+        },
+        {
+          type: 'gallery',
+          columns: 2,   // side-by-side pairs, heights matched
+          media: [
+            {
+              src: 'images/story/kindred/codesign-session-1161.jpg',
+              srcset: 'images/story/kindred/codesign-session-800.jpg 800w, images/story/kindred/codesign-session-1161.jpg 1161w',
+              alt: 'Patients at a Kindred co-design session, gathered around a whiteboard of research artifacts',
+              caption: 'A co-design session where patients overturned our model of the patient journey.',
+              width: 1161,
+              height: 668,
+            },
+            {
+              src: 'images/om-co-design-2.png',
+              alt: 'Three team members reviewing research notes pinned to a wall',
+              width: 252,
+              height: 144,
+            },
+            {
+              src: 'images/story/kindred/hmw-affinity-1600.jpg',
+              srcset: 'images/story/kindred/hmw-affinity-800.jpg 800w, images/story/kindred/hmw-affinity-1600.jpg 1600w',
+              alt: 'How Might We affinity diagram for The Informed Patient, grouped into themes like safe haven, ease of use, support, credibility and accuracy',
+              caption: 'How Might We statements from a design workshop, grouped by theme.',
+              width: 1600,
+              height: 832,
+            },
+            {
+              src: 'images/story/kindred/journey-map-1600.jpg',
+              srcset: 'images/story/kindred/journey-map-800.jpg 800w, images/story/kindred/journey-map-1600.jpg 1600w',
+              alt: 'User journey map for The Informed Patient, showing stages, touchpoints and pain points',
+              caption: 'The patient journey, mapped with the people living it.',
+              width: 1600,
+              height: 620,
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      id: 'high-fidelity',
+      diamond: 'solution',
+      stage: 'converge',
+      kicker: 'High fidelity',
+      nav: 'High fidelity',
+      heading: 'Patients and clinicians both said they were likely to use the working prototype.',
+      body: ['The final round was a working prototype, tested with patients and clinicians. Try it here, or open it in a new tab.'],
+      links: { 'open it in a new tab': 'https://oolusina.github.io/Kindred_prototype/#/home' },
+      insight: { label: 'Impact', text: 'Patients rated their likelihood to use the working prototype 8/10. Clinicians rated it 8.5/10.' },
+      layout: 'text-left',
+      media: [
+        { frame: 'phone', embed: 'https://oolusina.github.io/Kindred_prototype/#/home', title: 'Kindred high-fidelity prototype' },
+      ],
     },
 
     {
@@ -413,12 +413,8 @@
   metrics: {
     heading: 'By the numbers',
     items: [
-      { value: 123, label: 'research articles and papers' },
-      { value: 82, label: 'survey responses' },
-      { value: 65, label: 'patient, clinician and SME interviews' },
-      { value: 36, label: 'use case ideas' },
-      { value: 50, label: 'speed-dating intercepts' },
-      { value: 8, suffix: '/10', label: 'recommendation score from patients', detail: '8.5/10 from clinicians' },
+      { value: 8, suffix: '/10', label: 'likelihood to use, rated by patients' },
+      { value: 8.5, suffix: '/10', label: 'likelihood to use, rated by clinicians' },
     ],
   },
 

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Google+Sans+Flex:opsz,wght@6..144,100..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" fetchpriority="high" href="/images/MW-logo.png">
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -52,20 +52,6 @@
     <div class="aurora-layer"></div>
   </div>
 
-  <div class="accessibility-controls" aria-label="Accessibility settings">
-    <button class="control-btn" id="theme-toggle" aria-label="Switch to dark mode">
-      <i class="fas fa-moon" aria-hidden="true"></i>
-      <span class="control-label">Dark</span>
-    </button>
-    <button class="control-btn" id="quiet-toggle" aria-label="Pause animations">
-      <i class="fas fa-pause" aria-hidden="true"></i>
-      <span class="control-label">Motion</span>
-    </button>
-    <button class="control-btn" id="text-size-toggle" aria-label="Increase text size">
-      <i class="fas fa-text-height" aria-hidden="true"></i>
-      <span class="control-label">Text size</span>
-    </button>
-  </div>
 
   <nav class="site-nav" aria-label="Primary navigation">
     <div class="nav-container">
@@ -85,6 +71,21 @@
         <li><a href="/#explorations">Explorations</a></li>
         <li><a href="/#contact">Contact</a></li>
       </ul>
+      <!-- Theme, motion and text size (setupAccessibilityControls in script.js) -->
+      <div class="accessibility-controls" role="group" aria-label="Display settings">
+        <button class="control-btn" id="theme-toggle" aria-label="Switch to dark mode">
+          <i class="fas fa-moon" aria-hidden="true"></i>
+          <span class="control-label">Dark</span>
+        </button>
+        <button class="control-btn" id="quiet-toggle" aria-label="Pause animations">
+          <i class="fas fa-pause" aria-hidden="true"></i>
+          <span class="control-label">Motion</span>
+        </button>
+        <button class="control-btn" id="text-size-toggle" aria-label="Increase text size">
+          <i class="fas fa-text-height" aria-hidden="true"></i>
+          <span class="control-label">Text size</span>
+        </button>
+      </div>
     </div>
   </nav>
 

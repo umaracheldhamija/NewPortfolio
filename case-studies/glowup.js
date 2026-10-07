@@ -34,19 +34,13 @@
     showMetrics: true,
   },
 
-  diamonds: [
-    { id: 'problem', label: 'Diamond 1', title: 'Finding the real problem', stages: ['Discover', 'Define'] },
-    { id: 'solution', label: 'Diamond 2', title: 'Designing for play', stages: ['Develop', 'Deliver'] },
-  ],
 
   chapters: [
 
-    /* ---------- Diamond 1: Finding the real problem ---------- */
+    /* ---------- Finding the real problem ---------- */
 
     {
       id: 'context',
-      diamond: 'problem',
-      stage: 'diverge',
       nav: 'The context',
       heading: 'Children with early oculomotor challenges can struggle to stay engaged with repetitive eye exercises.',
       body: [
@@ -59,8 +53,6 @@
 
     {
       id: 'research',
-      diamond: 'problem',
-      stage: 'diverge',
       nav: 'Research',
       heading: 'Families were given instructions, and very little else.',
       body: [
@@ -89,8 +81,6 @@
 
     {
       id: 'adherence',
-      diamond: 'problem',
-      stage: 'converge',
       nav: 'Adherence',
       heading: 'The real problem was adherence, not awareness.',
       body: [
@@ -102,12 +92,10 @@
       media: [],
     },
 
-    /* ---------- Diamond 2: Designing for play ---------- */
+    /* ---------- Designing for play ---------- */
 
     {
       id: 'sessions',
-      diamond: 'solution',
-      stage: 'diverge',
       nav: 'Short sessions',
       heading: "I built each session around a child's attention span, not a clinic's schedule.",
       body: [
@@ -129,8 +117,6 @@
 
     {
       id: 'glowup',
-      diamond: 'solution',
-      stage: 'converge',
       nav: 'GlowUp',
       heading: 'Play and therapy became the same action.',
       body: [
@@ -155,17 +141,14 @@
   ],
 
   checkpoints: [
-    { id: 'cp-adherence', kind: 'pinch', chapter: 'adherence', label: 'Adherence, not awareness' },
     {
       id: 'halfway',
       kind: 'interlude',
       chapter: 'adherence',
       label: 'Halfway there',
-      eyebrow: 'Diamond 1 complete',
       heading: 'Halfway there.',
       lines: ['Children did not need to know more. They needed a reason to keep going.'],
     },
-    { id: 'cp-glowup', kind: 'pinch', chapter: 'glowup', label: 'GlowUp Eye Care' },
   ],
 
   metrics: {
