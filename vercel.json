@@ -1,19 +1,95 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/openmined/", "destination": "/work/kindred", "permanent": true },
-    { "source": "/upmc/", "destination": "/work/care2care", "permanent": true },
-    { "source": "/meditationwise/", "destination": "/work/meditationwise", "permanent": true },
-    { "source": "/northwestern/", "destination": "/work/glowup", "permanent": true },
-    { "source": "/scooter/", "destination": "/work/electric-scooters", "permanent": true },
-    { "source": "/openmined/:path*", "destination": "/work/kindred/:path*", "permanent": true },
-    { "source": "/upmc/:path*", "destination": "/work/care2care/:path*", "permanent": true },
-    { "source": "/meditationwise/:path*", "destination": "/work/meditationwise/:path*", "permanent": true },
-    { "source": "/northwestern/:path*", "destination": "/work/glowup/:path*", "permanent": true },
-    { "source": "/scooter/:path*", "destination": "/work/electric-scooters/:path*", "permanent": true },
-    { "source": "/kathak", "destination": "/work/kathak-kala-kendra", "permanent": true },
-    { "source": "/kathak/", "destination": "/work/kathak-kala-kendra", "permanent": true },
-    { "source": "/kathak/index", "destination": "/work/kathak-kala-kendra", "permanent": true },
-    { "source": "/kathak/index.html", "destination": "/work/kathak-kala-kendra", "permanent": true }
+    {
+      "source": "/openmined/",
+      "destination": "/work/kindred",
+      "permanent": true
+    },
+    {
+      "source": "/upmc/",
+      "destination": "/work/care2care",
+      "permanent": true
+    },
+    {
+      "source": "/meditationwise/",
+      "destination": "/work/meditationwise",
+      "permanent": true
+    },
+    {
+      "source": "/northwestern/",
+      "destination": "/work/glowup",
+      "permanent": true
+    },
+    {
+      "source": "/scooter/",
+      "destination": "/work/electric-scooters",
+      "permanent": true
+    },
+    {
+      "source": "/openmined/:path*",
+      "destination": "/work/kindred/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/upmc/:path*",
+      "destination": "/work/care2care/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/meditationwise/:path*",
+      "destination": "/work/meditationwise/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/northwestern/:path*",
+      "destination": "/work/glowup/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/scooter/:path*",
+      "destination": "/work/electric-scooters/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/kathak",
+      "destination": "/work/kathak-kala-kendra",
+      "permanent": true
+    },
+    {
+      "source": "/kathak/",
+      "destination": "/work/kathak-kala-kendra",
+      "permanent": true
+    },
+    {
+      "source": "/kathak/index",
+      "destination": "/work/kathak-kala-kendra",
+      "permanent": true
+    },
+    {
+      "source": "/kathak/index.html",
+      "destination": "/work/kathak-kala-kendra",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    }
   ]
 }

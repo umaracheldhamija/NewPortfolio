@@ -435,6 +435,6 @@
     story: true,
     title: 'Cancer caregivers also need support. We built an app for them.',
     subtitle: 'Care2Care · UPMC',
-    image: { src: 'images/UPMC-logo.jpg', alt: 'UPMC Magee Hospital Gynecologic Oncology Unit' },
+    image: { src: 'images/story/care2care/upmc-800.jpg', alt: 'UPMC Magee Hospital Gynecologic Oncology Unit' },
   },
 };

@@ -19,7 +19,13 @@
     subtitle: 'Playful XR exercises that help children stick with the eye training they need.',
     tags: ['Northwestern capstone', '6 weeks', 'Individual thesis', 'Role: Research and Experience Design'],
     // Same image as the homepage card, so the card can morph into it.
-    hero: { src: 'images/NWphoto.jpg', alt: 'A child in a VR headset pointing upward in a bright classroom', width: 1024, height: 1024 },
+    hero: {
+      src: 'images/NWphoto.jpg',
+      srcset: 'images/story/glowup/nwphoto-800.jpg 800w, images/NWphoto.jpg 1024w',
+      alt: 'A child in a VR headset pointing upward in a bright classroom',
+      width: 1024,
+      height: 1024,
+    },
     skipTo: { label: 'Skip to the design', chapter: 'sessions' },
   },
 
@@ -175,6 +181,6 @@
     story: true,
     title: 'When the rider is 8 years old, everything about the design changes',
     subtitle: 'Electric Scooters for Kids',
-    image: { src: 'images/photo.png', alt: 'Render of the scooter handlebar with labeled controls' },
+    image: { src: 'images/story/electric-scooters/scooter-480.png', alt: 'Render of the scooter handlebar with labeled controls' },
   },
 };

@@ -19,7 +19,13 @@
     subtitle: 'A support app for caregivers of gynecologic oncology patients at UPMC Magee-Womens Hospital.',
     tags: ['Client: UPMC Magee-Womens', '8 months', 'Team of 3', 'Role: UX Research and Design', 'Ongoing'],
     // Same image as the homepage card, so the card can morph into it.
-    hero: { src: 'images/UPMC-logo.jpg', alt: 'The UPMC Magee-Womens sign on a wooden wall', width: 2046, height: 949 },
+    hero: {
+      src: 'images/story/care2care/upmc-1600.jpg',
+      srcset: 'images/story/care2care/upmc-800.jpg 800w, images/story/care2care/upmc-1600.jpg 1600w',
+      alt: 'The UPMC Magee-Womens sign on a wooden wall',
+      width: 1600,
+      height: 742,
+    },
     skipTo: { label: 'Skip to the final product', chapter: 'care2care' },
   },
 

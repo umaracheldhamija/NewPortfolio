@@ -229,6 +229,6 @@
     story: true,
     title: 'How might we make eye-therapy exercises work for children?',
     subtitle: 'GlowUp Eye Care · Northwestern',
-    image: { src: 'images/NWphoto.jpg', alt: 'A child in a VR headset pointing upward' },
+    image: { src: 'images/story/glowup/nwphoto-800.jpg', alt: 'A child in a VR headset pointing upward' },
   },
 };

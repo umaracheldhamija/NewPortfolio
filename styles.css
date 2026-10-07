@@ -167,8 +167,8 @@
   --sp-24: 6rem;     /* 96px */
 
   /* --- Typography ---
-     The resume's two families, site-wide, loaded by every page with
-     the same Google Fonts URL. Nothing else is loaded.
+     The resume's two families, site-wide, served from this site
+     (fonts/fonts.css, linked by every page). Nothing else is loaded.
      Display (name, headings, big numbers): Fraunces, a variable
      serif whose optical size follows the font size.
      Body (everything else, incl. labels, buttons, forms, captions):
@@ -415,6 +415,79 @@ body[data-project] {
   --shadow-hover: 0 16px 48px color-mix(in srgb, var(--shade) 55%, transparent), 0 0 0 1px var(--glass-border-hover);
 }
 
+/* --- SEASONS ---
+   The homepage's accent follows a season (html[data-season], set in
+   index.html's <head>, changed from the palette by setupSeasons() in
+   script.js). Fall is the default rust above. Case studies keep their
+   own project colours (body[data-project] wins). The paper, cards
+   and hairlines take a hint of the season's undertone in light mode;
+   in dark mode the backgrounds and the storm lightning follow it.
+   Every -strong value passes AA as text on every surface of its
+   season, and white or shade text on it. A switch cross-fades a
+   snapshot of the page (a view transition, html.season-switch below;
+   setupSeasons in script.js), which the browser does on the GPU, so
+   it stays smooth however much is on the page. Fading the colours
+   themselves restyled the whole page every frame. */
+html.season-switch::view-transition-new(root) {
+  animation-duration: 0.9s;
+}
+
+/* Summer: warm green */
+:root[data-season="summer"] {
+  --bg: #F4F6F0; --surface: #EDF0E7; --surface-raised: #E3E8DB; --paper: #FDFEFB;
+  --line: #D5DCCB; --bg-base: #E7EBE0; --shadow-tint: #33402B;
+  --accent: #55AE29; --accent-strong: #2B6A0C; --accent-deep: #204E09;
+  --accent-2: #BCD94F; --blush: #8FD06A;
+  --pop-orange: #66C23A; --pop-coral: #93D66B; --pop-honey: #C6E35A; --pop-clay: #3F8F1A;
+  --splash-1: #9FD46F, #B8E28E, #8CCB5A, #CBEBAA;
+  --splash-2: #78BF45, #8ECD5E, #65B232, #A6D77F;
+  --splash-3: #3F8F1A, #4F9F27, #6BB43F, #8CC765;
+}
+
+/* Winter: cold blue */
+:root[data-season="winter"] {
+  --bg: #F3F5F7; --surface: #ECF0F3; --surface-raised: #E2E8EE; --paper: #FCFDFE;
+  --line: #D3DBE3; --bg-base: #E5EAEF; --shadow-tint: #2C3846;
+  --accent: #1F6BC1; --accent-strong: #0E57AA; --accent-deep: #093A71;
+  --accent-2: #6FA8E8; --blush: #A9CBF2;
+  --pop-orange: #3D8BE0; --pop-coral: #74AEEE; --pop-honey: #A8CDF5; --pop-clay: #135BB0;
+  --splash-1: #8DBDF0, #A9CEF4, #7BB1EC, #C3DCF7;
+  --splash-2: #5E9EE6, #4A8FDE, #76ACEA, #93BEEE;
+  --splash-3: #1F6BC1, #2E7BD0, #4B90DA, #6FA6E2;
+}
+
+/* Spring: blossom pink (rose, never purple) */
+:root[data-season="spring"] {
+  --bg: #F8F3F4; --surface: #F2EBED; --surface-raised: #EADFE3; --paper: #FFFCFD;
+  --line: #E2D2D8; --bg-base: #EFE4E7; --shadow-tint: #4A3239;
+  --accent: #DA3E77; --accent-strong: #AA134A; --accent-deep: #730D32;
+  --accent-2: #F28FB3; --blush: #F7B8CF;
+  --pop-orange: #EC5C90; --pop-coral: #F48CB2; --pop-honey: #F8B5CD; --pop-clay: #C22A62;
+  --splash-1: #F59BBB, #F8B7CE, #F287AD, #FBD0DF;
+  --splash-2: #EE6E9C, #E85A8D, #F283AB, #F59EBD;
+  --splash-3: #C92D66, #D63F76, #E05A8A, #E97AA2;
+}
+
+[data-theme="dark"][data-season] {
+  --line: color-mix(in srgb, var(--accent) 16%, transparent);
+  --bg-base: color-mix(in srgb, var(--shade) 13%, transparent);
+}
+[data-theme="dark"][data-season="summer"] {
+  --bg: #10140F; --surface: #161C15; --surface-raised: #232D21; --paper: #1C241A; --bg-card: #1C241A;
+  --accent: #65CF30; --accent-strong: #52CA16; --accent-deep: #C0F0A8;
+  --storm-hue: 67deg;   /* amber lightning turned leaf green */
+}
+[data-theme="dark"][data-season="winter"] {
+  --bg: #0F1217; --surface: #151A21; --surface-raised: #222B36; --paper: #1B212A; --bg-card: #1B212A;
+  --accent: #4C94E6; --accent-strong: #68A9F3; --accent-deep: #B6D4F7;
+  --storm-hue: 179deg;  /* ice blue */
+}
+[data-theme="dark"][data-season="spring"] {
+  --bg: #161012; --surface: #1E1619; --surface-raised: #302329; --paper: #261C20; --bg-card: #261C20;
+  --accent: #E76A98; --accent-strong: #F183AB; --accent-deep: #F6C1D4;
+  --storm-hue: -55deg;  /* rose, short of purple */
+}
+
 /* --- PROJECT ACCENTS ---
    A case study <body data-project="x"> swaps in its own triad. On the
    homepage, each card only borrows its project colour for its border
@@ -594,7 +667,7 @@ a, button, input, textarea, select, [tabindex]:not([tabindex="-1"]) {
   background-attachment: fixed;
   /* sepia + hue-rotate turn the photo's blue-violet storm amber, in
      keeping with the warm palette */
-  filter: blur(28px) brightness(0.1) contrast(0.75) sepia(1) hue-rotate(-12deg) saturate(1.8);
+  filter: blur(28px) brightness(0.1) contrast(0.75) sepia(1) hue-rotate(var(--storm-hue, -12deg)) saturate(1.8);
   opacity: 0.07;
 }
 
@@ -611,13 +684,18 @@ a, button, input, textarea, select, [tabindex]:not([tabindex="-1"]) {
   background-attachment: fixed;
   /* The source photo's lightning is blue-violet; sepia + a slight
      hue-rotate re-tints it amber so no purple ever shows. */
-  filter: brightness(0.48) contrast(1.2) sepia(1) hue-rotate(-12deg) saturate(2.2);
+  filter: brightness(0.48) contrast(1.2) sepia(1) hue-rotate(var(--storm-hue, -12deg)) saturate(2.2);
   opacity: 0;
   transition: opacity var(--dur-slow) var(--ease-smooth);
   z-index: 1;
   pointer-events: none;
   mix-blend-mode: screen;
   will-change: mask-image;
+  /* Hidden until the pointer is over the hero, where script.js draws
+     the spotlight; without this the whole photo showed when dark mode
+     was switched on further down the page. */
+  mask-image: linear-gradient(transparent, transparent);
+  -webkit-mask-image: linear-gradient(transparent, transparent);
 }
 
 /* Show reveal when animations are on */
@@ -665,6 +743,227 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
     transform: translate(-50%, -50%) scale(1);
     opacity: 0;
   }
+}
+
+/* --- Season tin ---
+   A small watercolour tin hidden just below the bottom-left corner,
+   with a paintbrush resting in it whose handle peeks out. Hovering or
+   clicking the brush pulls the tin out (the click keeps it out until
+   a click elsewhere or Escape); clicking a pan switches the season
+   (setupSeasons in script.js). Desktop and tablet only. */
+.season-palette {
+  position: fixed;
+  left: var(--sp-6);
+  bottom: var(--sp-6);
+  z-index: 850;
+  /* Hidden: the tin sits just under the window's edge */
+  transform: translateY(calc(100% + var(--sp-6)));
+  transition: transform 0.45s cubic-bezier(.2, .8, .25, 1) 0.3s;
+}
+
+.season-palette:hover,
+.season-palette.is-open {
+  transform: none;
+  transition-delay: 0s;
+}
+
+/* An invisible strip down to the window's edge: when the tin rises it
+   carries the brush up from under the pointer, and this keeps the
+   pointer "on" it, so it doesn't drop straight back down. */
+.season-palette::after {
+  content: '';
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: 100%;
+  height: calc(var(--sp-6) + 8px);
+}
+
+/* While it's hidden, its pans are out of reach of Tab and clicks */
+.season-palette .season-tin {
+  visibility: hidden;
+  transition: visibility 0s linear 0.75s;
+}
+
+.season-palette:hover .season-tin,
+.season-palette.is-open .season-tin {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* The brush rests in front of the tin with its tip in the current
+   season's pan, and moves to the new pan when the season changes.
+   With the tin hidden, only its wooden handle and the top of the
+   ferrule show. Pans are 24px wide and 4px apart, the first centred
+   18px in (border, padding, half a pan) and 18px up from the bottom,
+   so --pan picks the pan the tip (bottom centre) lands on. The brush
+   is only a picture (clicks pass through to the pans); the button is
+   .season-handle, over the part of the handle above the tin. */
+.season-palette { --pan: 0; }
+:root[data-season="winter"] .season-palette { --pan: 1; }
+:root[data-season="spring"] .season-palette { --pan: 2; }
+:root[data-season="summer"] .season-palette { --pan: 3; }
+
+.season-brush {
+  position: absolute;
+  left: calc(18px + var(--pan) * 28px - 8.5px);
+  bottom: 18px;
+  z-index: 2;
+  width: 17px;
+  height: 85px;
+  pointer-events: none;
+  transform: rotate(28deg);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(1px 2px 2px color-mix(in srgb, var(--shade) 30%, transparent));
+  transition: transform 0.35s var(--ease-out), left 0.45s var(--ease-out);
+}
+
+.season-brush .brush-tip { fill: var(--accent); }
+
+.season-palette:hover .season-brush,
+.season-handle:focus-visible ~ .season-brush {
+  transform: rotate(22deg) translateY(-3px);
+}
+
+/* The handle's hit area: the slice of brush above the tin, so it
+   never covers a pan */
+.season-handle {
+  position: absolute;
+  left: calc(18px + var(--pan) * 28px);
+  bottom: 100%;
+  z-index: 3;
+  width: 40px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  cursor: pointer;
+  transition: left 0.45s var(--ease-out);
+}
+
+.season-handle:focus-visible { outline-offset: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .season-palette,
+  .season-palette .season-tin,
+  .season-handle,
+  .season-brush { transition: none; }
+}
+
+/* White enamel on a thin metal rim, with the lid's hinge along the
+   top edge; the brush lies in front of it */
+.season-tin {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 4px;
+  padding: 6px 5px 5px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #FDFCF8, #ECE8E0);
+  border: 1px solid #CBC4B8;
+  box-shadow:
+    inset 0 1px 0 #FFFFFF,
+    0 0 0 1.5px #A9A398,
+    0 4px 10px color-mix(in srgb, var(--shade) 24%, transparent);
+}
+
+.season-tin::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: -3px;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(90deg, #9C968B, #C9C3B8 50%, #9C968B);
+}
+
+/* A pan: a matte cake of dried watercolour sunk in its well. The
+   brush has worn a paler, thinned dip into it, the pigment granulates
+   (a fine noise, multiplied in), and the edges dried darker where the
+   paint pooled. 24px square, the minimum target size. */
+.season-pan {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background:
+    radial-gradient(ellipse 44% 34% at 56% 58%, color-mix(in srgb, var(--white) 34%, transparent), transparent 72%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.42 0 0 0 0 0.4 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='48' height='48' filter='url(%23g)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 75% 75% at 50% 50%, transparent 55%, color-mix(in srgb, var(--paint) 72%, var(--shade)) 100%),
+    var(--paint);
+  background-size: auto, 48px 48px, auto, auto;
+  background-blend-mode: normal, multiply, normal, normal;
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, var(--shade) 45%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--white) 30%, transparent);
+  cursor: pointer;
+  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease;
+}
+
+.season-pan:hover,
+.season-pan:focus-visible { transform: translateY(-2px); }
+
+/* The current season, ringed in ink */
+.season-pan[aria-pressed="true"] {
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, var(--shade) 45%, transparent),
+    0 0 0 2px #FDFCF8, 0 0 0 3.5px var(--text);
+}
+
+.season-pan:focus-visible { outline-offset: 4px; }
+
+/* The hovered season's name, beside the tin (the brush is above it) */
+.season-name {
+  position: absolute;
+  left: calc(100% + var(--sp-3));
+  bottom: 50%;
+  transform: translateY(50%);
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.season-name.is-on { opacity: 1; }
+
+@media (max-width: 767px) {
+  .season-palette { display: none; }
+}
+
+/* One small splash of the new season's colour blooms from the pan,
+   with a wet, uneven edge (#wet-edge, built by script.js) */
+.season-splash {
+  position: fixed;
+  width: 220px;
+  height: 220px;
+  margin: -110px 0 0 -110px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--paint) 55%, transparent) 0%,
+    color-mix(in srgb, var(--paint) 30%, transparent) 42%,
+    transparent 68%);
+  filter: url(#wet-edge);
+  pointer-events: none;
+  z-index: 840;
+  animation: season-splash 1.6s ease-out forwards;
+}
+
+/* Blooms out quickly, holds its colour for a moment, then dries away */
+@keyframes season-splash {
+  0%   { transform: scale(0.15); opacity: 0.95; }
+  35%  { transform: scale(0.8); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 0; }
 }
 
 /* Pressing the hero card, the nav or the footer bursts paint from
@@ -747,49 +1046,22 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 }
 
 /* ============================================
-   5. CURSOR LABEL
-   The system pointer always stays as it is. Over a project, an
-   article or a zoomable image, a soft circle with one word (View,
-   Read, Zoom) eases in beside it; script.js picks the word
-   (CURSOR_LABELS) and moves it. Never shown on touch screens, on
-   phones, with reduced motion, or with Motion paused.
+   5. WATER WAKE
+   The cursor moves through the page like a fingertip through still
+   water (setupWaterWake in script.js). A low-resolution canvas,
+   stretched to the window, sits above the page background and
+   behind every section, so only the paper looks disturbed; text and
+   images never move. Not shown on touch screens, on phones, with
+   reduced motion or with Motion paused.
    ============================================ */
 
-.cursor-dot {
+.water-canvas {
   position: fixed;
-  left: 0;
-  top: 0;
-  width: 64px;
-  height: 64px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
   pointer-events: none;
-  z-index: 9999;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-on-accent);
-  background: color-mix(in srgb, var(--accent-primary) 80%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--shade) 16%, transparent);
-  opacity: 0;
-  /* Centred a little below-right of the pointer tip, so the arrow
-     itself stays clear */
-  transform: translate(-10%, -10%) scale(0.3);
-  transition: opacity 0.2s ease, transform 0.3s var(--ease-out);
-  will-change: left, top;
-}
-
-.cursor-dot.is-on {
-  opacity: 1;
-  transform: translate(-10%, -10%) scale(1);
-}
-
-@media (pointer: coarse) {
-  .cursor-dot { display: none !important; }
 }
 
 
@@ -1465,7 +1737,9 @@ body.intro-active .hero-content {
 
 /* --- Scroll Reveal ---
    JS adds .in-view via IntersectionObserver.
-   Elements start invisible + slightly below position.
+   Elements start invisible + slightly below position, but only once
+   html.js is set (index.html <head>), so without JavaScript, or if
+   script.js never runs, everything simply shows.
    Disabled when quiet-mode or prefers-reduced-motion. */
 
 [data-reveal],
@@ -1474,63 +1748,63 @@ body.intro-active .hero-content {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  [data-reveal] {
+  .js [data-reveal] {
     opacity: 0;
     transition: opacity 0.65s var(--ease-out),
                 transform 0.65s var(--ease-out);
   }
 
-  [data-reveal].in-view {
+  .js [data-reveal].in-view {
     opacity: 1;
   }
 
-  [data-reveal]:not(.tilt-card) {
+  .js [data-reveal]:not(.tilt-card) {
     transform: translateY(22px);
   }
 
-  [data-reveal].tilt-card {
+  .js [data-reveal].tilt-card {
     --reveal-y: 22px;
   }
 
-  [data-reveal].in-view:not(.tilt-card) {
+  .js [data-reveal].in-view:not(.tilt-card) {
     transform: translateY(0);
   }
 
-  [data-reveal].in-view.tilt-card {
+  .js [data-reveal].in-view.tilt-card {
     --reveal-y: 0px;
   }
 
   /* Staggered reveal for grid children */
-  [data-reveal-stagger] > * {
+  .js [data-reveal-stagger] > * {
     opacity: 0;
     transition: opacity 0.55s var(--ease-out),
                 transform 0.55s var(--ease-out);
   }
 
-  [data-reveal-stagger] > *:not(.tilt-card) {
+  .js [data-reveal-stagger] > *:not(.tilt-card) {
     transform: translateY(18px);
   }
 
-  [data-reveal-stagger] > .tilt-card {
+  .js [data-reveal-stagger] > .tilt-card {
     --reveal-y: 18px;
   }
 
-  [data-reveal-stagger].in-view > * { opacity: 1; }
+  .js [data-reveal-stagger].in-view > * { opacity: 1; }
 
-  [data-reveal-stagger].in-view > *:not(.tilt-card) {
+  .js [data-reveal-stagger].in-view > *:not(.tilt-card) {
     transform: translateY(0);
   }
 
-  [data-reveal-stagger].in-view > .tilt-card {
+  .js [data-reveal-stagger].in-view > .tilt-card {
     --reveal-y: 0px;
   }
 
-  [data-reveal-stagger].in-view > *:nth-child(1) { transition-delay: 0ms; }
-  [data-reveal-stagger].in-view > *:nth-child(2) { transition-delay: 85ms; }
-  [data-reveal-stagger].in-view > *:nth-child(3) { transition-delay: 170ms; }
-  [data-reveal-stagger].in-view > *:nth-child(4) { transition-delay: 255ms; }
-  [data-reveal-stagger].in-view > *:nth-child(5) { transition-delay: 340ms; }
-  [data-reveal-stagger].in-view > *:nth-child(6) { transition-delay: 420ms; }
+  .js [data-reveal-stagger].in-view > *:nth-child(1) { transition-delay: 0ms; }
+  .js [data-reveal-stagger].in-view > *:nth-child(2) { transition-delay: 85ms; }
+  .js [data-reveal-stagger].in-view > *:nth-child(3) { transition-delay: 170ms; }
+  .js [data-reveal-stagger].in-view > *:nth-child(4) { transition-delay: 255ms; }
+  .js [data-reveal-stagger].in-view > *:nth-child(5) { transition-delay: 340ms; }
+  .js [data-reveal-stagger].in-view > *:nth-child(6) { transition-delay: 420ms; }
 }
 
 
@@ -3338,7 +3612,7 @@ footer {
   /* Disable decorative animations — keep functional state transitions */
   .scroll-indicator,
   .storm-reveal,
-  .cursor-dot,
+  .water-canvas,
   .splash-canvas {
     display: none !important;
   }
@@ -3421,7 +3695,7 @@ footer {
 /* User-toggled quiet mode — more permissive than prefers-reduced-motion
    (keeps some transitions for usability) */
 body.quiet-mode .storm-reveal,
-body.quiet-mode .cursor-dot,
+body.quiet-mode .water-canvas,
 body.quiet-mode .splash-canvas { display: none !important; }
 
 @media (pointer: coarse) {
@@ -3656,6 +3930,92 @@ body.large-text .control-btn { font-size: 1.05rem; }
   flex-shrink: 0;
   font-size: 0.8em;
   color: var(--accent-primary);
+}
+
+/* The lines share one cell, so the tallest sets the height and the
+   card never jumps; only the current one shows (setupImpactRotation
+   in script.js). Screen readers read them all. */
+.card-impact-lines {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The old line fades up and out first; the new one rises in after
+   it, so the two never overlap. */
+.card-impact-lines li {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.25s ease, transform 0.3s ease;
+}
+
+.card-impact-lines li.is-active {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.45s ease 0.25s, transform 0.55s var(--ease-out) 0.25s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-impact-lines li { transform: none; transition: opacity 0.3s ease; }
+}
+
+/* One dot per line, under it. The current dot stretches into a bar
+   that fills over the line's turn (6s, IMPACT_INTERVAL in script.js);
+   hovering a dot shows its line. Each dot has a 24px hover area. */
+.card-impact-dots {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: calc(var(--sp-2) * -1) 0 var(--sp-2) calc(0.8em + var(--sp-2) - 9px);
+}
+
+.card-impact-dot {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: width 0.35s var(--ease-out);
+}
+
+/* The track (::before) and its fill (::after). The fill grows with a
+   transform, which the browser animates off the main thread. */
+.card-impact-dot::before,
+.card-impact-dot::after {
+  content: '';
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: 9px;
+  height: 6px;
+  border-radius: var(--r-pill);
+}
+
+.card-impact-dot::before {
+  background: color-mix(in srgb, var(--text-muted) 35%, transparent);
+}
+
+.card-impact-dot::after {
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.card-impact-dot.is-active { width: 40px; }
+
+.card-impact-dot.is-active::after {
+  animation: impact-fill 6s linear forwards;
+}
+
+/* Held (hovered, off screen, Motion off): the bar shows full */
+.card-impact-dots.is-paused .card-impact-dot.is-active::after {
+  animation: none;
+  transform: none;
+}
+
+@keyframes impact-fill {
+  to { transform: scaleX(1); }
 }
 
 /* --- More projects --- */
@@ -4854,7 +5214,8 @@ body.large-text .control-btn { font-size: 1.05rem; }
    Fades out once typing completes or user skips.
    ============================================ */
 
-html.intro-skip #intro-screen { display: none !important; }
+html.intro-skip #intro-screen,
+html:not(.js) #intro-screen { display: none !important; }
 
 #intro-screen {
   position: fixed;
@@ -5039,7 +5400,7 @@ html.intro-skip #intro-screen { display: none !important; }
   .aurora-layer,
   .storm-base,
   .storm-reveal,
-  .cursor-dot,
+  .water-canvas,
   .project-badge,
   .press-splash-layer,
   .splash-canvas,

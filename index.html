@@ -11,14 +11,44 @@
   <title>Uma Dhamija Experience Designer</title>
 
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&display=swap" rel="stylesheet">
+  <!-- Fonts and icons are served from this site (fonts/fonts.css, css/icons.css) -->
+  <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="css/icons.css">
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
-  <!-- Immediately hide intro for returning visitors this session. Runs before paint -->
-  <script>try{if(sessionStorage.getItem('intro-seen')==='true'){document.documentElement.classList.add('intro-skip');}}catch(e){}</script>
+  <!-- Season colours, set before first paint: the visitor's choice
+       (setupSeasons in script.js), or today's season, flipped for
+       southern-hemisphere time zones -->
+  <script>
+    (function () {
+      var season = null;
+      try { season = localStorage.getItem('season'); } catch (e) {}
+      if (!/^(fall|winter|spring|summer)$/.test(season || '')) {
+        var tz = '';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+        var south = /^(Australia|Antarctica)\/|^Pacific\/(Auckland|Chatham|Fiji|Tongatapu|Apia|Noumea|Efate)|^America\/(Argentina|Sao_Paulo|Santiago|Montevideo|Asuncion|La_Paz|Lima|Punta_Arenas|Campo_Grande|Cuiaba|Recife|Bahia|Maceio|Fortaleza|Belem)|^Africa\/(Johannesburg|Maputo|Harare|Lusaka|Windhoek|Gaborone|Maseru|Mbabane|Blantyre|Lubumbashi|Luanda)|^Indian\/(Antananarivo|Mauritius|Reunion|Mayotte)|^Atlantic\/Stanley/.test(tz);
+        var byMonth = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'fall', 'fall', 'fall', 'winter'];
+        season = byMonth[(new Date().getMonth() + (south ? 6 : 0)) % 12];
+      }
+      document.documentElement.setAttribute('data-season', season);
+    })();
+  </script>
+  <!-- Before paint: mark that JavaScript runs (sections start hidden and
+       fade in; see styles.css Scroll Reveal), and skip the intro for
+       returning visitors this session. Safety net: if script.js hasn't
+       started within 4 seconds (blocked, or a failed download), show
+       everything as it is. -->
+  <script>
+    document.documentElement.classList.add('js');
+    try { if (sessionStorage.getItem('intro-seen') === 'true') document.documentElement.classList.add('intro-skip'); } catch (e) {}
+    setTimeout(function () {
+      if (window.__siteReady) return;
+      document.documentElement.classList.remove('js');
+      document.documentElement.classList.add('intro-skip');
+    }, 4000);
+  </script>
   <!-- Card-to-story transitions (pairs with js/story.js). Hold the first
        frame until the Work section has been parsed, so a returning
        visitor's scroll position can be restored before anything shows. -->
@@ -123,7 +153,6 @@
        BACKGROUND SYSTEM
        ============================================ -->
 
-  <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
 
   <div class="bg-layer" aria-hidden="true">
     <div class="storm-base"></div>
@@ -270,7 +299,15 @@
             <div class="project-body">
               <h3>Securely training AI on private data</h3>
               <p class="card-subtitle">OpenMined · CMU Capstone</p>
-              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Patients rated their likelihood to use it 8/10, clinicians 8.5/10</span></p>
+              <!-- Takes turns with the project's other highlights (setupImpactRotation) -->
+              <div class="card-impact" data-rotate>
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                <ul class="card-impact-lines" role="list">
+                  <li class="is-active">Patients rated their likelihood to use it 8/10, clinicians 8.5/10</li>
+                  <li>Led discovery for OpenMined's first consumer app concept, Kindred, a verified peer support network for people with chronic conditions</li>
+                  <li>Co-designed with patients and clinicians across 36 candidate use cases, narrowed to one validated concept</li>
+                </ul>
+              </div>
               <div class="project-tags">
                 <span class="tag">AI Ethics</span>
                 <span class="tag">User Research</span>
@@ -285,12 +322,14 @@
           <a href="work/care2care/" class="project-card tilt-card" data-tilt-max="6" data-project="care2care" data-story>
             <div class="project-thumb">
               <img
-                src="images/UPMC-logo.jpg"
+                src="images/story/care2care/upmc-800.jpg"
+                srcset="images/story/care2care/upmc-800.jpg 800w, images/story/care2care/upmc-1600.jpg 1600w"
+                sizes="(min-width: 769px) 560px, 100vw"
                 alt="UPMC Magee Hospital Gynecologic Oncology Unit"
                 loading="lazy"
                 decoding="async"
-                width="2046"
-                height="949"
+                width="1600"
+                height="742"
               >
             </div>
             <div class="project-body">
@@ -299,7 +338,14 @@
                 <p class="card-subtitle">Care2Care · UPMC</p>
                 <span class="card-badge">Grant-funded · Ongoing</span>
               </div>
-              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Award-funded and in development with UPMC's Family CARE Center</span></p>
+              <!-- Takes turns with the project's other highlights (setupImpactRotation) -->
+              <div class="card-impact" data-rotate>
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                <ul class="card-impact-lines" role="list">
+                  <li class="is-active">Award-funded and in development with UPMC's Family CARE Center</li>
+                  <li>Partnered with CancerBridges, Family CARE Center at UPMC, the University of Pittsburgh and CMU to deliver Care2Care, a final prototype, during a 3-month period</li>
+                </ul>
+              </div>
               <div class="project-tags">
                 <span class="tag">Healthcare UX</span>
                 <span class="tag">Service Design</span>
@@ -328,7 +374,15 @@
                 <p class="card-subtitle">MeditationWise</p>
                 <span class="card-badge">Startup · Ongoing</span>
               </div>
-              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Shipped to the App Store and Google Play after 30+ user interviews</span></p>
+              <!-- Takes turns with the project's other highlights (setupImpactRotation) -->
+              <div class="card-impact" data-rotate>
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                <ul class="card-impact-lines" role="list">
+                  <li class="is-active">Shipped to the App Store and Google Play after 30+ user interviews</li>
+                  <li>9+ usability sessions over 4 months uncovered the major pitfalls for a meditation practice using an app</li>
+                  <li>Redesigned discovery to reduce cognitive load while honoring cultural depth</li>
+                </ul>
+              </div>
               <div class="project-tags">
                 <span class="tag">Wellness UX</span>
                 <span class="tag">Product Design</span>
@@ -343,7 +397,9 @@
           <a href="work/glowup/" class="project-card tilt-card" data-tilt-max="6" data-project="glowup" data-story>
             <div class="project-thumb">
               <img
-                src="images/NWphoto.jpg"
+                src="images/story/glowup/nwphoto-800.jpg"
+                srcset="images/story/glowup/nwphoto-800.jpg 800w, images/NWphoto.jpg 1024w"
+                sizes="(min-width: 769px) 560px, 100vw"
                 alt="GlowUp Eye Care VR project"
                 loading="lazy"
                 decoding="async"
@@ -354,7 +410,14 @@
             <div class="project-body">
               <h3>How might we make eye-therapy exercises work for children?</h3>
               <p class="card-subtitle">GlowUp Eye Care · Northwestern</p>
-              <p class="card-impact"><i class="fas fa-chart-line" aria-hidden="true"></i><span>6+ ophthalmologist interviews found adherence, not awareness, was the problem</span></p>
+              <!-- Takes turns with the project's other highlights (setupImpactRotation) -->
+              <div class="card-impact" data-rotate>
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                <ul class="card-impact-lines" role="list">
+                  <li class="is-active">6+ ophthalmologist interviews found adherence, not awareness, was the problem</li>
+                  <li>Designed an XR exercise proposal built around child attention spans</li>
+                </ul>
+              </div>
               <div class="project-tags">
                 <span class="tag">XR Design</span>
                 <span class="tag">Healthcare</span>
@@ -381,12 +444,12 @@
           <a href="work/electric-scooters/" class="project-row" data-project="electric-scooters" data-story>
             <span class="project-thumb">
               <img
-                src="images/photo.png"
+                src="images/story/electric-scooters/scooter-480.png"
                 alt="Electric scooter prototype for kids"
                 loading="lazy"
                 decoding="async"
-                width="822"
-                height="566"
+                width="480"
+                height="330"
               >
             </span>
             <span class="project-row-text">
@@ -401,8 +464,8 @@
           <a href="work/kathak-kala-kendra/" class="project-row" data-project="kathak-kala-kendra" data-story>
             <span class="project-thumb">
               <img
-                src="images/story/kathak-kala-kendra/homepage-800.jpg"
-                  srcset="images/story/kathak-kala-kendra/homepage-800.jpg 800w, images/story/kathak-kala-kendra/homepage-1264.jpg 1264w"
+                src="images/story/kathak-kala-kendra/homepage-400.jpg"
+                  srcset="images/story/kathak-kala-kendra/homepage-400.jpg 400w, images/story/kathak-kala-kendra/homepage-800.jpg 800w"
                   sizes="160px"
                 alt="Kathak Kala Kendra dance school website"
                 loading="lazy"
@@ -439,12 +502,12 @@
         <div class="education-logo-wrap">
           <img
             class="education-logo"
-            src="images/cmu.png"
+            src="images/cmu-160.png"
             alt="Carnegie Mellon University seal"
             loading="lazy"
             decoding="async"
-            width="600"
-            height="600"
+            width="160"
+            height="160"
           >
         </div>
         <div class="education-body">
@@ -477,12 +540,12 @@
         <div class="education-logo-wrap">
           <img
             class="education-logo"
-            src="images/nyu.png"
+            src="images/nyu-160.png"
             alt="New York University seal"
             loading="lazy"
             decoding="async"
-            width="860"
-            height="900"
+            width="153"
+            height="160"
           >
         </div>
         <div class="education-body">
@@ -513,18 +576,18 @@
         <button
           class="carousel-card exploration-trigger active"
           type="button"
-          data-image-src="images/paintings.png"
+          data-image-src="images/explore/paintings-1600.jpg"
           data-image-alt="Painting collection"
           aria-label="Expand image: Painting collection"
         >
           <span class="carousel-card-media">
             <img
-              src="images/paintings.png"
+              src="images/explore/paintings-600.jpg"
               alt="Painting collection"
               loading="lazy"
               decoding="async"
-              width="2142"
-              height="2111"
+              width="600"
+              height="591"
             >
           </span>
           <span class="card-label">Paintings</span>
@@ -532,18 +595,18 @@
         <button
           class="carousel-card exploration-trigger"
           type="button"
-          data-image-src="images/drawings.png"
+          data-image-src="images/explore/drawings-1168.jpg"
           data-image-alt="Sketch collection"
           aria-label="Expand image: Sketch collection"
         >
           <span class="carousel-card-media">
             <img
-              src="images/drawings.png"
+              src="images/explore/drawings-600.jpg"
               alt="Sketch collection"
               loading="lazy"
               decoding="async"
-              width="1168"
-              height="1138"
+              width="600"
+              height="584"
             >
           </span>
           <span class="card-label">Sketches</span>
@@ -551,18 +614,18 @@
         <button
           class="carousel-card exploration-trigger"
           type="button"
-          data-image-src="images/uma kathak.jpg"
+          data-image-src="images/explore/kathak-1600.jpg"
           data-image-alt="Kathak dance performance"
           aria-label="Expand image: Kathak dance performance"
         >
           <span class="carousel-card-media">
             <img
-              src="images/uma kathak.jpg"
+              src="images/explore/kathak-600.jpg"
               alt="Kathak dance performance"
               loading="lazy"
               decoding="async"
-              width="3648"
-              height="5472"
+              width="400"
+              height="600"
             >
           </span>
           <span class="card-label">Kathak</span>
@@ -570,18 +633,18 @@
         <button
           class="carousel-card exploration-trigger"
           type="button"
-          data-image-src="images/Diptychs.jpg"
+          data-image-src="images/explore/diptychs-1600.jpg"
           data-image-alt="Photography diptych"
           aria-label="Expand image: Photography diptych"
         >
           <span class="carousel-card-media">
             <img
-              src="images/Diptychs.jpg"
+              src="images/explore/diptychs-600.jpg"
               alt="Photography diptych"
               loading="lazy"
               decoding="async"
-              width="3000"
-              height="4050"
+              width="444"
+              height="600"
             >
           </span>
           <span class="card-label">Diptychs</span>
@@ -592,29 +655,31 @@
         <button
           class="carousel-card exploration-trigger"
           type="button"
-          data-image-src="images/michellegroup.jpg"
+          data-image-src="images/explore/group-1600.jpg"
           data-image-alt="Photography"
           aria-label="Expand photography: a group photograph and a portrait photograph"
         >
           <span class="carousel-card-media carousel-card-media--pair">
             <img
-              src="images/michellegroup.jpg"
+              src="images/explore/group-600.jpg"
+              data-full="images/explore/group-1600.jpg"
               alt="Group photograph"
               data-photo
               loading="lazy"
               decoding="async"
-              width="2000"
-              height="1500"
+              width="480"
+              height="360"
             >
             <img
               class="photo-portrait"
-              src="images/oldman.jpg"
+              src="images/explore/portrait-600.jpg"
+              data-full="images/explore/portrait-1600.jpg"
               alt="Portrait photograph"
               data-photo
               loading="lazy"
               decoding="async"
-              width="1500"
-              height="2000"
+              width="360"
+              height="480"
             >
           </span>
           <span class="card-label">Photography</span>
@@ -845,7 +910,7 @@
           <!-- Opens the photo full size in #headshot-modal -->
           <button type="button" class="about-headshot-btn" data-modal="headshot-modal" aria-label="View larger photo of Uma Dhamija">
             <img
-              src="images/Headshot.jpeg"
+              src="images/headshot-400.jpg"
               alt=""
               class="about-headshot"
               loading="lazy"
@@ -929,6 +994,48 @@
   </main>
 
 
+  <!-- Season colours: a small watercolour tin hidden below the
+       bottom-left corner, with only its brush's handle peeking out
+       (the brush rests in the current season's pan).
+       Hovering or clicking the brush pulls the tin out; clicking a pan
+       switches the season (setupSeasons in script.js). Desktop and
+       tablet only. -->
+  <div class="season-palette">
+    <p class="season-name" aria-hidden="true"></p>
+    <!-- The handle sticking out above the tin is the button; the brush
+         itself is a picture that clicks pass through to the pans -->
+    <button type="button" class="season-handle" aria-expanded="false" aria-controls="season-tin" aria-label="Season colours"></button>
+    <svg class="season-brush" viewBox="0 0 20 100" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="brush-wood" x1="0" x2="1">
+          <stop offset="0" stop-color="#9C5F2E"/>
+          <stop offset="0.45" stop-color="#D9A066"/>
+          <stop offset="1" stop-color="#8A5126"/>
+        </linearGradient>
+        <linearGradient id="brush-metal" x1="0" x2="1">
+          <stop offset="0" stop-color="#8F9498"/>
+          <stop offset="0.45" stop-color="#EEF0F2"/>
+          <stop offset="1" stop-color="#9A9EA2"/>
+        </linearGradient>
+      </defs>
+      <!-- Handle: lacquered wood, tapering to a rounded end -->
+      <path d="M7.6 2 C 8.6 0.6 11.4 0.6 12.4 2 L 13.6 58 L 6.4 58 Z" fill="url(#brush-wood)"/>
+      <path d="M9.2 4 L 9.6 56" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.8" stroke-linecap="round"/>
+      <!-- Ferrule, crimped onto the handle -->
+      <path d="M6.2 58 L 13.8 58 L 13.4 75 L 6.6 75 Z" fill="url(#brush-metal)"/>
+      <path d="M6.3 61 L 13.7 61 M6.4 63 L 13.6 63" stroke="#7D8286" stroke-width="0.7"/>
+      <!-- Bristles, tipped with this season's paint -->
+      <path d="M6.6 75 C 5.4 84 8.4 94 10 99.5 C 11.6 94 14.6 84 13.4 75 Z" fill="#3E2C21"/>
+      <path class="brush-tip" d="M8.2 90 C 8.9 94 9.6 97 10 99.5 C 10.4 97 11.1 94 11.8 90 Z"/>
+    </svg>
+    <div class="season-tin" id="season-tin" role="group" aria-label="Season colours">
+      <button type="button" class="season-pan" data-season="fall" aria-pressed="false" aria-label="Fall: rust orange" style="--paint: #C15B1F"></button>
+      <button type="button" class="season-pan" data-season="winter" aria-pressed="false" aria-label="Winter: blue" style="--paint: #1A6FD1"></button>
+      <button type="button" class="season-pan" data-season="spring" aria-pressed="false" aria-label="Spring: blossom pink" style="--paint: #E3457F"></button>
+      <button type="button" class="season-pan" data-season="summer" aria-pressed="false" aria-label="Summer: warm green" style="--paint: #50A121"></button>
+    </div>
+  </div>
+
   <!-- ============================================
        FOOTER
        ============================================ -->
@@ -970,7 +1077,7 @@
     <div class="modal-content exploration-modal-content" role="document">
       <button class="modal-close" aria-label="Close photo">&times;</button>
       <h2 id="headshot-modal-title">Uma Dhamija</h2>
-      <img class="exploration-modal-image" src="images/Headshot.jpeg" alt="Uma Dhamija" loading="lazy" decoding="async" width="2000" height="1894">
+      <img class="exploration-modal-image" src="images/headshot-1600.jpg" alt="Uma Dhamija" loading="lazy" decoding="async" width="1600" height="1515">
     </div>
   </div>
 
@@ -1377,7 +1484,7 @@
         });
       };
 
-      attachPoemTrigger(document.querySelector('img[src*="nyu.png"]'), 'nyu');
+      attachPoemTrigger(document.querySelector('img[src*="nyu"]'), 'nyu');
       attachPoemTrigger(document.querySelector('.poem-trigger[data-poem="paradox"]'), 'paradox');
       attachPoemTrigger(document.querySelector('[data-poem-trigger="name"]'), 'name');
       attachPoemTrigger(document.querySelector('[data-poem-trigger="website"]'), 'website');

@@ -64,7 +64,6 @@ const dom = {
   work:             document.getElementById('work'),
   splashCanvas:     document.getElementById('splash-canvas'),
   stormReveal:      document.querySelector('.storm-reveal'),
-  cursorDot:        document.querySelector('.cursor-dot'),
   magneticEls:      [...document.querySelectorAll('.btn, .social-link, .control-btn')],
   themeToggle:      document.getElementById('theme-toggle'),
   quietToggle:      document.getElementById('quiet-toggle'),
@@ -145,27 +144,26 @@ function applyTheme(theme) {
    - Single RAF vs multiple setIntervals
    ============================================ */
 
-// The word the cursor label shows over each kind of target.
-const CURSOR_LABELS = [
-  ['.project-card, .project-row', 'View'],
-  ['.deck-card', 'Read'],
-  ['.st-zoomable, .exploration-trigger', 'Zoom'],
-];
-
 function setupMouseTracking() {
   document.addEventListener('mousemove', (e) => {
     state.target.x = e.clientX;
     state.target.y = e.clientY;
+    state.lastPointer = performance.now();
+    wakeBackgroundLoop();
   }, { passive: true });
+}
 
-  const label = dom.cursorDot;
-  if (!label) return;
-  document.addEventListener('mouseover', (e) => {
-    const hit = CURSOR_LABELS.find(([sel]) => e.target.closest?.(sel));
-    if (hit) label.textContent = hit[1];
-    label.classList.toggle('is-on', !!hit);
-  }, { passive: true });
-  document.documentElement.addEventListener('mouseleave', () => label.classList.remove('is-on'));
+// The loop only runs while something moves: the pointer moved within
+// BG_IDLE_MS, a watercolour bloom is on screen, or the dark-mode
+// spotlight is still easing toward the pointer. Otherwise it sleeps
+// (no work, no battery) until the next move or click wakes it.
+const BG_IDLE_MS = 1200;
+let bgLoopAwake = false;
+
+function wakeBackgroundLoop() {
+  if (bgLoopAwake) return;
+  bgLoopAwake = true;
+  requestAnimationFrame(runBackgroundLoop);
 }
 
 function runBackgroundLoop(now) {
@@ -192,14 +190,6 @@ function runBackgroundLoop(now) {
       dom.stormReveal.style.webkitMaskImage = mask;
     }
 
-    // --- Cursor label: trails the pointer slightly (see section 5 of styles.css) ---
-    if (dom.cursorDot) {
-      state.mouse.x += (state.target.x - state.mouse.x) * 0.35;
-      state.mouse.y += (state.target.y - state.mouse.y) * 0.35;
-      dom.cursorDot.style.left = `${state.mouse.x}px`;
-      dom.cursorDot.style.top  = `${state.mouse.y}px`;
-    }
-
     // --- Magnetic elements — nearby buttons/social/control icons lean toward the cursor ---
     runMagneticButtons();
 
@@ -207,7 +197,10 @@ function runBackgroundLoop(now) {
     drawSplashField(now);
   }
 
-  requestAnimationFrame(runBackgroundLoop);
+  const easing = Math.abs(state.target.x - state.reveal.x) + Math.abs(state.target.y - state.reveal.y) > 0.5;
+  const busy = now - (state.lastPointer || 0) < BG_IDLE_MS || splashBlooms.length > 0 || easing;
+  if (busy) requestAnimationFrame(runBackgroundLoop);
+  else bgLoopAwake = false;
 }
 
 const MAGNET_RADIUS = 90; // px — how close the cursor needs to be to start pulling
@@ -217,8 +210,11 @@ const MAGNET_STRENGTH_SUBTLE = 4; // px — social links + accessibility control
 function runMagneticButtons() {
   if (!dom.magneticEls.length) return;
 
-  dom.magneticEls.forEach((el) => {
-    const rect = el.getBoundingClientRect();
+  // Read every position first, then write, so the browser works out the
+  // layout once per frame instead of once per button.
+  const rects = dom.magneticEls.map((el) => el.getBoundingClientRect());
+  dom.magneticEls.forEach((el, i) => {
+    const rect = rects[i];
     if (!rect.width || !rect.height) return; // hidden (e.g. inside a closed modal)
 
     const cx = rect.left + rect.width / 2;
@@ -281,7 +277,8 @@ function readCssColorList(name) {
 // (honey → apricot → clay) while it spreads. All three share
 // turbulence geometry, so the cross-fade is pixel-aligned — a
 // colour morph, not a visible double image.
-const SPLASH_COLORWAYS = ['--splash-1', '--splash-2', '--splash-3'].map(readCssColorList);
+const readSplashColorways = () => ['--splash-1', '--splash-2', '--splash-3'].map(readCssColorList);
+let SPLASH_COLORWAYS = readSplashColorways();
 const SPLASH_SPECKLE = readCssColorList('--white')[0] || 'white';
 const SPLASH_ART_SIZE = 460;  // viewBox units — see renderSplashSVG()
 const SPLASH_RASTER   = 540;  // px the SVG is rasterized at (kept modest — blooms
@@ -476,6 +473,15 @@ function buildSplashLibrary() {
   };
   if (window.requestIdleCallback) window.requestIdleCallback(rest, { timeout: 800 });
   else setTimeout(rest, 120);
+}
+
+// The pigments follow the season (styles.css SEASONS): re-read them and
+// rebuild the library. Blooms already on screen keep their old paint.
+function refreshSplashPigments() {
+  if (!splashCtx) return;
+  SPLASH_COLORWAYS = readSplashColorways();
+  splashImages = [];
+  buildSplashLibrary();
 }
 
 // pos: optional {x, y} in WORLD coordinates (document-relative — see
@@ -728,9 +734,187 @@ function setupSplashClickSpawn() {
     const b = makeSplashBloom(performance.now(), 0, pos);
     if (splashBlooms.length >= SPLASH_MAX_BLOOMS) splashBlooms.shift();
     splashBlooms.push(b);
+    wakeBackgroundLoop();
   });
 }
 
+
+
+/* ============================================
+   3c. WATER WAKE
+   The cursor drags through the page like a fingertip through still
+   water. A small height field (one cell per WATER_CELL px) carries
+   the waves outward and lets them settle; a WebGL canvas behind the
+   content (.water-canvas in styles.css) shades their slopes as faint
+   light and shadow, so the paper looks gently disturbed while the
+   content above it stays put. Homepage only (case studies keep a
+   still page), light mode only (dark mode has its own storm
+   background), desktop pointers only, never with reduced motion or
+   Motion paused, and the loop sleeps once the water is still.
+   ============================================ */
+
+const WATER_CELL    = 6;     // px per simulation cell
+const WATER_DAMPING = 0.92;  // how fast waves settle (lower: sooner)
+const WATER_PUSH    = 0.32;  // how hard a fast stroke presses the surface
+const WATER_RADIUS  = 2;     // cells around the cursor that it presses
+const WATER_SHADE   = { hi: [1.0, 1.0, 1.0], lo: [0.36, 0.27, 0.2], hiMax: 0.25, loMax: 0.022 }; // highlight + shadow colour and their ceilings
+
+function setupWaterWake() {
+  if (dom.body.dataset.project) return; // a case study page
+  if (state.reducedMotion || window.innerWidth < 768) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'water-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
+  if (!gl) return;
+  document.body.prepend(canvas);
+
+  const compile = (type, src) => {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    return sh;
+  };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, `#version 300 es
+    in vec2 a_pos;
+    out vec2 v_uv;
+    void main() {
+      v_uv = vec2(a_pos.x * 0.5 + 0.5, 0.5 - a_pos.y * 0.5);
+      gl_Position = vec4(a_pos, 0.0, 1.0);
+    }`));
+  // Light falls from the top left: slopes facing it brighten, slopes
+  // facing away darken. Flat water draws nothing.
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, `#version 300 es
+    precision mediump float;
+    uniform sampler2D u_h;
+    uniform vec2 u_texel;
+    uniform vec3 u_hi;
+    uniform vec3 u_lo;
+    uniform vec2 u_max;
+    in vec2 v_uv;
+    out vec4 o;
+    void main() {
+      float l = texture(u_h, v_uv - vec2(u_texel.x, 0.0)).r;
+      float r = texture(u_h, v_uv + vec2(u_texel.x, 0.0)).r;
+      float t = texture(u_h, v_uv - vec2(0.0, u_texel.y)).r;
+      float b = texture(u_h, v_uv + vec2(0.0, u_texel.y)).r;
+      float shade = (r - l) * 0.7 + (b - t) * 0.7;
+      float a = shade > 0.0 ? min(shade * 1.2, u_max.x) : min(-shade * 1.2, u_max.y);
+      vec3 c = shade > 0.0 ? u_hi : u_lo;
+      o = vec4(c * a, a);
+    }`));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.remove(); return; }
+  gl.useProgram(prog);
+
+  const quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+  const u = (n) => gl.getUniformLocation(prog, n);
+  const uTexel = u('u_texel'), uHi = u('u_hi'), uLo = u('u_lo'), uMax = u('u_max');
+
+  let cols = 0, rows = 0, cur, prev;
+  function size() {
+    cols = Math.ceil(window.innerWidth / WATER_CELL) + 2;
+    rows = Math.ceil(window.innerHeight / WATER_CELL) + 2;
+    cur = new Float32Array(cols * rows);
+    prev = new Float32Array(cols * rows);
+    // Twice the simulation's resolution is plenty: the waves are soft
+    // and the browser smooths the stretch.
+    canvas.width = cols * 2;
+    canvas.height = rows * 2;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, cols, rows, 0, gl.RED, gl.FLOAT, cur);
+    gl.uniform2f(uTexel, 1 / cols, 1 / rows);
+  }
+  size();
+  window.addEventListener('resize', debounce(size, 150));
+
+  // Press the surface along the path since the last move, harder the
+  // faster the stroke, so a slow drift barely stirs it.
+  let last = null;
+  function press(x, y, amount) {
+    const cx = Math.round(x / WATER_CELL) + 1;
+    const cy = Math.round(y / WATER_CELL) + 1;
+    for (let j = -WATER_RADIUS; j <= WATER_RADIUS; j++) {
+      for (let i = -WATER_RADIUS; i <= WATER_RADIUS; i++) {
+        const gx = cx + i, gy = cy + j;
+        if (gx < 1 || gy < 1 || gx >= cols - 1 || gy >= rows - 1) continue;
+        const fall = 1 - Math.hypot(i, j) / (WATER_RADIUS + 1);
+        if (fall > 0) cur[gy * cols + gx] -= amount * fall;
+      }
+    }
+  }
+
+  let running = false;
+  let calmFrames = 0;
+  const isDark = () => dom.html.getAttribute('data-theme') === 'dark';
+  function frame() {
+    if (state.quietMode || document.hidden || isDark()) {
+      cur.fill(0); prev.fill(0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      running = false;
+      return;
+    }
+    // One step of the wave equation: each cell moves toward the
+    // average of its neighbours, minus where it was, then settles.
+    let energy = 0;
+    for (let y = 1; y < rows - 1; y++) {
+      for (let x = 1; x < cols - 1; x++) {
+        const i = y * cols + x;
+        const v = ((cur[i - 1] + cur[i + 1] + cur[i - cols] + cur[i + cols]) * 0.5 - prev[i]) * WATER_DAMPING;
+        prev[i] = v;
+        if (v > energy) energy = v; else if (-v > energy) energy = -v;
+      }
+    }
+    const tmp = cur; cur = prev; prev = tmp;
+
+    gl.uniform3fv(uHi, WATER_SHADE.hi);
+    gl.uniform3fv(uLo, WATER_SHADE.lo);
+    gl.uniform2f(uMax, WATER_SHADE.hiMax, WATER_SHADE.loMax);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, cols, rows, gl.RED, gl.FLOAT, cur);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+    calmFrames = energy < 0.004 ? calmFrames + 1 : 0;
+    if (calmFrames > 30) {
+      cur.fill(0); prev.fill(0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      running = false;
+      return;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' || state.quietMode || isDark()) return;
+    if (last) {
+      const dx = e.clientX - last.x, dy = e.clientY - last.y;
+      const dist = Math.hypot(dx, dy);
+      const amount = Math.min(dist / 30, 1) * WATER_PUSH;
+      const steps = Math.max(1, Math.ceil(dist / WATER_CELL));
+      for (let k = 1; k <= steps; k++) press(last.x + (dx * k) / steps, last.y + (dy * k) / steps, amount / steps * 2);
+    }
+    last = { x: e.clientX, y: e.clientY };
+    if (!running) { running = true; calmFrames = 0; requestAnimationFrame(frame); }
+  }, { passive: true });
+  document.documentElement.addEventListener('mouseleave', () => { last = null; });
+}
 
 
 // Track whether user is in the hero section.
@@ -1599,7 +1783,7 @@ function setupExplorationGallery() {
     const thumbs = dom.explorationModalThumbs;
     const picked = event?.target?.closest?.('[data-photo]');
     const show = (index) => {
-      dom.explorationModalImage.src = photos[index].getAttribute('src');
+      dom.explorationModalImage.src = (photos[index].dataset.full || photos[index].getAttribute('src'));
       dom.explorationModalImage.alt = photos[index].alt;
       if (dom.explorationModalCaption) dom.explorationModalCaption.textContent = photos[index].alt;
       [...thumbs.children].forEach((b, i) => b.setAttribute('aria-pressed', i === index ? 'true' : 'false'));
@@ -1612,7 +1796,7 @@ function setupExplorationGallery() {
       btn.className = 'exploration-thumb';
       btn.setAttribute('aria-label', `Show ${photo.alt.toLowerCase()}`);
       const img = document.createElement('img');
-      img.src = photo.getAttribute('src');
+      img.src = (photo.dataset.full || photo.getAttribute('src'));
       img.alt = '';
       btn.appendChild(img);
       btn.addEventListener('click', () => show(index));
@@ -1764,6 +1948,191 @@ function setupViewportMaintenance() {
   window.addEventListener('resize', debounce(() => {
     resetTiltCards();
   }, 100));
+}
+
+
+/* ============================================
+   11b. ROTATING IMPACT LINES
+   Each featured card's impact line takes turns with the project's
+   other highlights, one every IMPACT_INTERVAL, cards staggered so
+   they don't all change at once. A row of dots under the line shows
+   which is up; the current one stretches into a bar that fills until
+   the next line, and hovering a dot shows its line. A card holds
+   still while hovered or focused, off screen or in a hidden tab, and
+   every card holds with reduced motion or the Motion toggle off (the
+   site's pause control, WCAG 2.2.2). Screen readers get every line;
+   the dots are for the mouse only.
+   ============================================ */
+
+const IMPACT_INTERVAL = 6000;
+
+function setupImpactRotation() {
+  const groups = [...document.querySelectorAll('.card-impact[data-rotate]')]
+    .map((el) => ({ el, card: el.closest('.project-card'), lines: [...el.querySelectorAll('li')], at: 0, held: false, seen: false, paused: true }))
+    .filter((g) => g.card && g.lines.length > 1);
+  if (!groups.length) return;
+
+  function show(g, i) {
+    g.lines[g.at].classList.remove('is-active');
+    g.dots[g.at].classList.remove('is-active');
+    g.at = i;
+    g.lines[i].classList.add('is-active');
+    g.dots[i].classList.add('is-active');
+  }
+
+  // Restart the current dot's fill so it runs the whole interval.
+  function restartTimer(g) {
+    const dot = g.dots[g.at];
+    dot.classList.remove('is-active');
+    void dot.offsetWidth;
+    dot.classList.add('is-active');
+  }
+
+  const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+    const g = groups.find((x) => x.el === en.target);
+    if (g) g.seen = en.isIntersecting;
+  }), { threshold: 0.6 });
+
+  const start = performance.now();
+  groups.forEach((g, k) => {
+    // Dots: inside the card's link, so a click on one mustn't follow it
+    const row = document.createElement('div');
+    row.className = 'card-impact-dots';
+    row.setAttribute('aria-hidden', 'true');
+    g.dots = g.lines.map((_, i) => {
+      const dot = document.createElement('span');
+      dot.className = `card-impact-dot${i === 0 ? ' is-active' : ''}`;
+      dot.addEventListener('mouseenter', () => { if (i !== g.at) show(g, i); });
+      dot.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+      row.appendChild(dot);
+      return dot;
+    });
+    g.el.after(row);
+    g.row = row;
+
+    io.observe(g.el);
+    g.next = start + IMPACT_INTERVAL + k * 900;
+    const hold = (on) => () => { g.held = on; };
+    g.card.addEventListener('mouseenter', hold(true));
+    g.card.addEventListener('mouseleave', hold(false));
+    g.card.addEventListener('focusin', hold(true));
+    g.card.addEventListener('focusout', hold(false));
+  });
+
+  setInterval(() => {
+    const now = performance.now();
+    const moving = !state.reducedMotion && !state.quietMode && !document.hidden;
+    groups.forEach((g) => {
+      const paused = !moving || g.held || !g.seen;
+      g.row.classList.toggle('is-paused', paused);
+      // Held or out of sight: wait a full turn once it's back.
+      if (paused) { g.next = now + IMPACT_INTERVAL; g.paused = true; return; }
+      if (g.paused) { g.paused = false; restartTimer(g); }
+      if (now < g.next) return;
+      show(g, (g.at + 1) % g.lines.length);
+      g.next = now + IMPACT_INTERVAL;
+    });
+  }, 200);
+}
+
+
+/* ============================================
+   11c. SEASONS
+   The watercolour tin (bottom left, homepage) switches the site
+   between fall, winter, spring and summer (styles.css SEASONS). The
+   first season comes from index.html's <head> (the visitor's choice,
+   or today's date). The tin hides below the corner with its brush's
+   handle peeking out. Hovering the brush pulls the tin out while the
+   pointer stays; clicking, tapping or pressing it (a disclosure
+   button) keeps it out until a click elsewhere or Escape. Clicking a
+   pan (or Enter/Space) switches the season, remembered for next
+   time. The page cross-fades into the new colours and one small
+   splash blooms from the pan.
+   ============================================ */
+
+function setupSeasons() {
+  const palette = document.querySelector('.season-palette');
+  if (!palette) return;
+  const pans = [...palette.querySelectorAll('.season-pan')];
+  const nameEl = palette.querySelector('.season-name');
+  const root = document.documentElement;
+  const names = { fall: 'Fall', winter: 'Winter', spring: 'Spring', summer: 'Summer' };
+
+  // The torn, wet edge for the splash: turbulence displacing the disc.
+  if (!document.getElementById('wet-edge')) {
+    document.body.insertAdjacentHTML('beforeend', `
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <filter id="wet-edge" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="7" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+          <feGaussianBlur stdDeviation="2"/>
+        </filter>
+      </svg>`);
+  }
+
+  const mark = () => pans.forEach((p) => p.setAttribute('aria-pressed', p.dataset.season === root.dataset.season ? 'true' : 'false'));
+  mark();
+
+  function splash(from) {
+    if (state.reducedMotion || state.quietMode) return;
+    const r = from.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.className = 'season-splash';
+    el.setAttribute('aria-hidden', 'true');
+    el.style.left = `${r.left + r.width / 2}px`;
+    el.style.top = `${r.top + r.height / 2}px`;
+    el.style.setProperty('--paint', getComputedStyle(from).getPropertyValue('--paint'));
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }
+
+  let pigmentTimer = 0;
+  function choose(pan) {
+    const season = pan.dataset.season;
+    if (root.dataset.season === season) return;
+    const apply = () => {
+      root.setAttribute('data-season', season);
+      mark();
+      splash(pan);
+    };
+    // The browser cross-fades a snapshot of the page into the new
+    // colours on the GPU; without view transitions it just switches.
+    if (document.startViewTransition && !state.reducedMotion && !state.quietMode) {
+      root.classList.add('season-switch');
+      document.startViewTransition(apply).finished.finally(() => root.classList.remove('season-switch'));
+    } else {
+      apply();
+    }
+    try { localStorage.setItem('season', season); } catch (_) {}
+    // Once the colours have settled, repaint the click watercolour.
+    clearTimeout(pigmentTimer);
+    pigmentTimer = setTimeout(refreshSplashPigments, 1500);
+  }
+
+  const showName = (pan) => { nameEl.textContent = names[pan.dataset.season]; nameEl.classList.add('is-on'); };
+  const hideName = () => nameEl.classList.remove('is-on');
+  pans.forEach((pan) => {
+    pan.addEventListener('pointerenter', () => showName(pan));
+    pan.addEventListener('pointerleave', hideName);
+    pan.addEventListener('focus', () => showName(pan));
+    pan.addEventListener('blur', hideName);
+    pan.addEventListener('click', () => choose(pan));
+  });
+
+  const handle = palette.querySelector('.season-handle');
+  const setOpen = (open) => {
+    palette.classList.toggle('is-open', open);
+    handle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+  handle.addEventListener('click', () => setOpen(!palette.classList.contains('is-open')));
+  document.addEventListener('pointerdown', (e) => {
+    if (!palette.contains(e.target)) setOpen(false);
+  });
+  palette.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !palette.classList.contains('is-open')) return;
+    setOpen(false);
+    handle.focus();
+  });
 }
 
 
@@ -2251,7 +2620,7 @@ function setupIntroScreen() {
   const cursor  = screen.querySelector('.intro-cursor');
   const skipBtn = screen.querySelector('.intro-skip-btn');
 
-  const TEXT      = 'designing technology for better services';
+  const TEXT      = 'Designing technology for better services';
   const CHAR_MS   = 25;   // ms per character
   const END_PAUSE = 900;  // ms to hold completed text before fading
 
@@ -2401,6 +2770,7 @@ function init() {
 
   // Wire up all interactions
   setupMouseTracking();
+  setupWaterWake();
   setupHeroObserver();
   setupNavScroll();
   setupMobileNav();
@@ -2414,6 +2784,8 @@ function init() {
   setupExplorationGallery();
   setupWritingDeck();      // replaces setupWritingCarousel
   setupMoreProjects();
+  setupImpactRotation();
+  setupSeasons();
   setupContactQuotes();
   setupScrollTopButton();
   setupViewportMaintenance();
@@ -2425,8 +2797,11 @@ function init() {
   setupSplashField();
   updateQuietIcon();
 
-  // Start the single animation loop
-  requestAnimationFrame(runBackgroundLoop);
+  // Start the single animation loop (it sleeps whenever nothing moves)
+  wakeBackgroundLoop();
+
+  // Tells index.html's safety net that the page came up properly.
+  window.__siteReady = true;
 }
 
 // Run when DOM is ready
