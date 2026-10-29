@@ -2519,7 +2519,7 @@ function setupContactQuotes() {
 
 function setupResumeModal() {
   const resumeModal = document.getElementById('resume-modal');
-  const resumePdfUrl = '/Uma_Dhamija_Resume.pdf';
+  const resumePdfUrl = '/Uma_Dhamija_Resume.pdf?v=20261029';
 
   // Subpages have no modal — just open the PDF in a new tab
   if (!resumeModal) {
