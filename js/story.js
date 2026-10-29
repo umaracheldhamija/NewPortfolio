@@ -827,6 +827,21 @@
     const reduced = () => reducedMQ.matches || document.body?.classList.contains('quiet-mode');
     root.classList.toggle('st-motion', !reduced());
     const navEl = document.querySelector('.site-nav');
+
+    // Pinned in the nav: which project this is, and the way back to the
+    // work. Keeps the page from looking like the homepage once the
+    // opening card has scrolled away.
+    const logo = navEl && navEl.querySelector('.nav-logo');
+    if (logo && !navEl.querySelector('.st-crumb')) {
+      logo.insertAdjacentHTML('afterend', `
+        <a class="st-crumb" href="/#work" data-st-back aria-label="Back to work. Current case study: ${esc(c.meta.title)}">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          <span class="st-crumb-work">Work</span>
+          <span class="st-crumb-sep" aria-hidden="true">/</span>
+          <span class="st-crumb-name">${esc(c.meta.title)}</span>
+        </a>`);
+      root.classList.add('st-has-crumb');
+    }
     const setNavH = () => root.style.setProperty('--st-nav-h', `${navEl ? navEl.offsetHeight : 64}px`);
     setNavH();
 

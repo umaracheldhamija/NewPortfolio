@@ -1937,18 +1937,65 @@
 
 .st-progress,
 .st-chapters-btn { display: none; }
+
+/* Pinned project name + way back, beside the logo (js/story.js) */
+.st-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  min-width: 0;
+  margin-left: var(--sp-6);
+  margin-right: auto;
+  padding: 0 var(--sp-3);
+  border-left: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.st-crumb i { color: var(--accent-primary); font-size: 0.85em; transition: transform var(--t-base); }
+.st-crumb:hover { color: var(--text-primary); }
+.st-crumb:hover i { transform: translateX(-3px); }
+.st-crumb-sep { color: var(--text-muted); }
+.st-crumb-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Narrower screens: just the arrow and the project name */
+@media (max-width: 1099px) {
+  .st-crumb-work,
+  .st-crumb-sep { display: none; }
+  .st-crumb { margin-left: var(--sp-3); }
+}
+
+/* Phones: no room for both, and the crumb is the more useful one
+   (Home is still in the menu). */
+@media (max-width: 600px) {
+  .st-has-crumb .nav-logo { display: none; }
+  .st-crumb { margin-left: 0; padding-left: 0; border-left: 0; }
+}
 .st-chapters-btn { font: inherit; font-size: 1rem; }
 
 @media (max-width: 1099px) {
+  /* A read-only reading-progress bar under the nav: it fills as you
+     scroll, and thin notches split it at each checkpoint (the ends of
+     the diamonds), so it reads as stages of one journey. Nothing on it
+     is a control (pointer-events off); "Chapters" below is the way to
+     jump around. */
   .st-progress {
     display: block;
     position: fixed;
     top: var(--st-nav-h);
     left: 0;
     right: 0;
-    height: 3px;
+    height: 5px;
     z-index: 899;
-    background: color-mix(in srgb, var(--text-muted) 18%, transparent);
+    pointer-events: none;
+    background: color-mix(in srgb, var(--text-muted) 22%, transparent);
   }
 
   .st-progress-fill {
@@ -1959,15 +2006,14 @@
     transform: scaleX(0);
   }
 
+  /* Notches: a sliver of page colour cutting the bar, fully inside it */
   .st-progress-mark {
     position: absolute;
-    top: -3px;
-    width: 9px;
-    height: 9px;
-    margin-left: -4.5px;
-    transform: rotate(45deg);
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    margin-left: -1.5px;
     background: var(--bg);
-    border: 2px solid var(--accent-strong);
   }
 
   .st-chapters-btn {

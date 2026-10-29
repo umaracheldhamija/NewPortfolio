@@ -1972,7 +1972,8 @@ function setupViewportMaintenance() {
    11b. IMPACT LINES (swipe, tap, hover)
    Each featured card holds a few highlights in one spot. They only
    change when the visitor asks (no auto-advance):
-   - phones: swipe the highlight sideways, or tap a dot
+   - phones: swipe the highlight sideways, tap the next one peeking
+     in from the right, or tap a dot
    - desktop: click or hover a dot
    - keyboard: Left/Right arrows while the card is focused
    The card is a link, so taps on a dot and swipes are caught at the
@@ -1998,6 +1999,7 @@ function setupImpactRotation() {
     g.at = i;
     g.lines[i].classList.add('is-active');
     g.dots[i].classList.add('is-active');
+    g.list.style.setProperty('--at', String(i));
   }
 
   groups.forEach((g) => {
@@ -2016,6 +2018,16 @@ function setupImpactRotation() {
     g.el.after(row);
     g.row = row;
     g.card.__impact = g;
+
+    // Lay the highlights out in a sideways track, so the next one peeks
+    // in from the right edge: a cue that there is more to swipe to.
+    const list = g.el.querySelector('.card-impact-lines');
+    const viewport = document.createElement('div');
+    viewport.className = 'card-impact-viewport';
+    list.before(viewport);
+    viewport.appendChild(list);
+    g.list = list;
+    g.lines.forEach((li, i) => { li.dataset.index = String(i); });
 
     // Swipe: the highlight and its dots are the swipe zone. touch-action
     // (styles.css) leaves vertical scrolling to the browser.
@@ -2049,12 +2061,15 @@ function setupImpactRotation() {
     const g = card && card.__impact;
     if (!g) return;
     const dot = e.target.closest('.card-impact-dot');
+    // The peeking (inactive) highlight is a tap target too.
+    const peek = e.target.closest('.card-impact-lines li:not(.is-active)');
     const justSwiped = g.swiped && performance.now() - g.swiped < 600;
-    if (!dot && !justSwiped) return;
+    if (!dot && !peek && !justSwiped) return;
     e.preventDefault();
     e.stopPropagation();
     g.swiped = 0;
-    if (dot) show(g, Number(dot.dataset.index));
+    const target = dot || peek;
+    if (target) show(g, Number(target.dataset.index));
   }, true);
 }
 
@@ -2645,8 +2660,8 @@ function setupIntroScreen() {
   const skipBtn = screen.querySelector('.intro-skip-btn');
 
   const TEXT      = 'Designing technology for better services';
-  const CHAR_MS   = 25;   // ms per character
-  const END_PAUSE = 900;  // ms to hold completed text before fading
+  const CHAR_MS   = 50;   // ms per character (about 2s to type the line)
+  const END_PAUSE = 1300; // ms to hold completed text before fading
 
   let isDone  = false;
   let isFading = false;

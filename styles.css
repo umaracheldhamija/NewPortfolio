@@ -1946,6 +1946,14 @@ body.intro-active .hero-content {
 .project-row.is-leaving .project-thumb img,
 .project-card.is-leaving .project-thumb img { transform: none !important; }
 
+/* ...and show the tap landed: an accent ring holds on the opened card
+   until the case study replaces the page (a moment on slow phones). */
+.project-card.is-leaving,
+.project-row.is-leaving {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
 /* Story cards (data-story) hint at what's inside: on hover or keyboard
    focus a thread draws out from the centre of the image's base, the
    same line the case study opens with. Purely decorative; the card is
@@ -3959,6 +3967,41 @@ body.large-text .control-btn { font-size: 1.05rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .card-impact-lines li { transform: none; transition: opacity 0.3s ease; }
+}
+
+/* With JavaScript the highlights sit in a sideways track instead
+   (setupImpactRotation wraps them in .card-impact-viewport): the
+   current one fills most of the width and the next one peeks in from
+   the right, faded, as a cue that there are more to swipe or tap. */
+.card-impact-viewport {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+}
+
+.card-impact-viewport .card-impact-lines {
+  --gap: var(--sp-4);
+  display: flex;
+  gap: var(--gap);
+  transform: translateX(calc(var(--at, 0) * -1 * (86% + var(--gap))));
+  transition: transform 0.5s var(--ease-out);
+}
+
+.card-impact-viewport .card-impact-lines li,
+.card-impact-viewport .card-impact-lines li.is-active {
+  grid-area: auto;
+  flex: 0 0 86%;
+  transform: none;
+  transition: opacity 0.4s ease;
+}
+
+.card-impact-viewport .card-impact-lines li { opacity: 0.32; cursor: pointer; }
+.card-impact-viewport .card-impact-lines li.is-active { opacity: 1; cursor: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-impact-viewport .card-impact-lines { transition: none; }
 }
 
 /* One dot per line, under it; the current one stretches into a bar.
