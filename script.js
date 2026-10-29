@@ -493,8 +493,8 @@ function makeSplashBloom(now, ageOffsetMs, pos) {
     worldX = pos.x;
     worldY = pos.y;
   } else {
-    // ~45% land in the hero+work "landing" zone (seen by default —
-    // setupBioTab() lands on Work); the rest spread across every other
+    // ~45% land in the hero+work "landing" zone (seen first: the
+    // page opens on the bio, with Work right below); the rest spread across every other
     // section so no part of the page feels empty.
     const inLanding = Math.random() < 0.45;
     worldY = inLanding
@@ -917,6 +917,21 @@ function setupWaterWake() {
 }
 
 
+// Runs fn once the intro screen is out of the way (right away if it
+// never showed). The intro starts fading on .intro-fade.
+function whenIntroGone(fn) {
+  const intro = document.getElementById('intro-screen');
+  const gone = () => !intro || getComputedStyle(intro).display === 'none'
+    || intro.classList.contains('intro-fade') || intro.classList.contains('intro-hidden');
+  if (gone()) { fn(); return; }
+  const obs = new MutationObserver(() => {
+    if (!gone()) return;
+    obs.disconnect();
+    fn();
+  });
+  obs.observe(intro, { attributes: true, attributeFilter: ['class'] });
+}
+
 // Track whether user is in the hero section.
 // Storm reveal only applies to hero (visual clarity on other sections).
 function setupHeroObserver() {
@@ -926,15 +941,17 @@ function setupHeroObserver() {
     (entries) => entries.forEach(e => {
       state.isInHero = e.isIntersecting;
 
-      // First time the hero is actually scrolled into view (usually via the
-      // About tab, since setupBioTab() lands on Work by default) — play a
-      // one-time blur/scale settle-in on the glass card.
+      // First time the hero is in view (on load, since the page opens on
+      // the bio) play a one-time blur/scale settle-in on the glass card,
+      // once the intro screen has faded so it isn't hidden behind it.
       if (e.isIntersecting && !state.heroSettleInPlayed && !state.reducedMotion && !state.quietMode) {
         state.heroSettleInPlayed = true;
-        dom.body.classList.add('intro-active');
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          dom.body.classList.remove('intro-active');
-        }));
+        whenIntroGone(() => {
+          dom.body.classList.add('intro-active');
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            dom.body.classList.remove('intro-active');
+          }));
+        });
       }
     }),
     { threshold: 0 }
@@ -1952,27 +1969,30 @@ function setupViewportMaintenance() {
 
 
 /* ============================================
-   11b. ROTATING IMPACT LINES
-   Each featured card's impact line takes turns with the project's
-   other highlights, one every IMPACT_INTERVAL, cards staggered so
-   they don't all change at once. A row of dots under the line shows
-   which is up; the current one stretches into a bar that fills until
-   the next line, and hovering a dot shows its line. A card holds
-   still while hovered or focused, off screen or in a hidden tab, and
-   every card holds with reduced motion or the Motion toggle off (the
-   site's pause control, WCAG 2.2.2). Screen readers get every line;
-   the dots are for the mouse only.
+   11b. IMPACT LINES (swipe, tap, hover)
+   Each featured card holds a few highlights in one spot. They only
+   change when the visitor asks (no auto-advance):
+   - phones: swipe the highlight sideways, or tap a dot
+   - desktop: click or hover a dot
+   - keyboard: Left/Right arrows while the card is focused
+   The card is a link, so taps on a dot and swipes are caught at the
+   window in the capture phase, before index.html's card-click
+   handler starts the page transition. Screen readers get every line
+   (the dots are aria-hidden).
    ============================================ */
 
-const IMPACT_INTERVAL = 6000;
+const SWIPE_MIN = 40; // px of sideways travel that counts as a swipe
 
 function setupImpactRotation() {
   const groups = [...document.querySelectorAll('.card-impact[data-rotate]')]
-    .map((el) => ({ el, card: el.closest('.project-card'), lines: [...el.querySelectorAll('li')], at: 0, held: false, seen: false, paused: true }))
+    .map((el) => ({ el, card: el.closest('.project-card'), lines: [...el.querySelectorAll('li')], at: 0 }))
     .filter((g) => g.card && g.lines.length > 1);
   if (!groups.length) return;
 
   function show(g, i) {
+    const n = g.lines.length;
+    i = ((i % n) + n) % n;
+    if (i === g.at) return;
     g.lines[g.at].classList.remove('is-active');
     g.dots[g.at].classList.remove('is-active');
     g.at = i;
@@ -1980,59 +2000,62 @@ function setupImpactRotation() {
     g.dots[i].classList.add('is-active');
   }
 
-  // Restart the current dot's fill so it runs the whole interval.
-  function restartTimer(g) {
-    const dot = g.dots[g.at];
-    dot.classList.remove('is-active');
-    void dot.offsetWidth;
-    dot.classList.add('is-active');
-  }
-
-  const io = new IntersectionObserver((entries) => entries.forEach((en) => {
-    const g = groups.find((x) => x.el === en.target);
-    if (g) g.seen = en.isIntersecting;
-  }), { threshold: 0.6 });
-
-  const start = performance.now();
-  groups.forEach((g, k) => {
-    // Dots: inside the card's link, so a click on one mustn't follow it
+  groups.forEach((g) => {
+    g.lines.forEach((li, i) => li.classList.toggle('is-active', i === 0));
     const row = document.createElement('div');
     row.className = 'card-impact-dots';
     row.setAttribute('aria-hidden', 'true');
     g.dots = g.lines.map((_, i) => {
       const dot = document.createElement('span');
       dot.className = `card-impact-dot${i === 0 ? ' is-active' : ''}`;
-      dot.addEventListener('mouseenter', () => { if (i !== g.at) show(g, i); });
-      dot.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+      dot.dataset.index = String(i);
+      dot.addEventListener('mouseenter', () => show(g, i));
       row.appendChild(dot);
       return dot;
     });
     g.el.after(row);
     g.row = row;
+    g.card.__impact = g;
 
-    io.observe(g.el);
-    g.next = start + IMPACT_INTERVAL + k * 900;
-    const hold = (on) => () => { g.held = on; };
-    g.card.addEventListener('mouseenter', hold(true));
-    g.card.addEventListener('mouseleave', hold(false));
-    g.card.addEventListener('focusin', hold(true));
-    g.card.addEventListener('focusout', hold(false));
+    // Swipe: the highlight and its dots are the swipe zone. touch-action
+    // (styles.css) leaves vertical scrolling to the browser.
+    let x0 = null, y0 = 0;
+    [g.el, row].forEach((zone) => {
+      zone.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse') return;
+        x0 = e.clientX; y0 = e.clientY;
+      });
+      zone.addEventListener('pointerup', (e) => {
+        if (x0 === null) return;
+        const dx = e.clientX - x0, dy = e.clientY - y0;
+        x0 = null;
+        if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+        show(g, g.at + (dx < 0 ? 1 : -1));
+        g.swiped = performance.now();
+      });
+      zone.addEventListener('pointercancel', () => { x0 = null; });
+    });
+
+    g.card.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(g, g.at + 1); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); show(g, g.at - 1); }
+    });
   });
 
-  setInterval(() => {
-    const now = performance.now();
-    const moving = !state.reducedMotion && !state.quietMode && !document.hidden;
-    groups.forEach((g) => {
-      const paused = !moving || g.held || !g.seen;
-      g.row.classList.toggle('is-paused', paused);
-      // Held or out of sight: wait a full turn once it's back.
-      if (paused) { g.next = now + IMPACT_INTERVAL; g.paused = true; return; }
-      if (g.paused) { g.paused = false; restartTimer(g); }
-      if (now < g.next) return;
-      show(g, (g.at + 1) % g.lines.length);
-      g.next = now + IMPACT_INTERVAL;
-    });
-  }, 200);
+  // Runs before any card-click handler: a dot tap switches the line,
+  // and the click that can follow a swipe never opens the case study.
+  window.addEventListener('click', (e) => {
+    const card = e.target.closest && e.target.closest('.project-card');
+    const g = card && card.__impact;
+    if (!g) return;
+    const dot = e.target.closest('.card-impact-dot');
+    const justSwiped = g.swiped && performance.now() - g.swiped < 600;
+    if (!dot && !justSwiped) return;
+    e.preventDefault();
+    e.stopPropagation();
+    g.swiped = 0;
+    if (dot) show(g, Number(dot.dataset.index));
+  }, true);
 }
 
 
@@ -2588,7 +2611,7 @@ function updateQuietIcon() {
 /* ============================================
    16a. INTRO LOADING SCREEN
    Types out Uma's intro text on first visit per
-   session, then fades to reveal the work section.
+   session, then fades to reveal the bio.
 
    Flow:
    1. Inline <script> in <head> adds html.intro-skip
@@ -2604,8 +2627,9 @@ function setupIntroScreen() {
   const screen = document.getElementById('intro-screen');
   if (!screen) return;
 
-  // Skip for reduced-motion users and mobile — purely decorative
-  if (state.reducedMotion || window.innerWidth < 768) {
+  // Skip for reduced-motion users (purely decorative). Phones get it
+  // too: it plays once per session and any tap skips it.
+  if (state.reducedMotion) {
     screen.classList.add('intro-hidden');
     return;
   }
@@ -2669,87 +2693,19 @@ function setupIntroScreen() {
 
 
 /* ============================================
-   16b. BIO TAB
-   Scroll page to work section on load so work
-   is immediately visible. A small straight tab
-   slides in from the left edge when the hero is
-   above the viewport; clicking it scrolls back.
+   16b. LANDING
+   Every fresh visit opens at the top, on the bio.
+   "View Case Studies" in the hero points down to
+   the work. Exception: coming back from a case
+   study, where the inline script in index.html's
+   <head> has already restored the reader's spot.
    ============================================ */
 
-function setupBioTab() {
-  const hero  = document.getElementById('hero');
-  const work  = document.getElementById('work');
-  const tab   = document.getElementById('bio-tab');
-
-  if (!hero || !work) return;
-
-  // Prevent browser from restoring a prior scroll position
+function setupLanding() {
+  // Stop the browser restoring an old scroll position on reload, so
+  // the page always opens on the bio.
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
-  }
-
-  // Skip past the hero so the Selected Work title is the first thing
-  // visible, just below the nav. html has scroll-behavior: smooth, so
-  // this glides (hidden behind the intro on desktop, seen on phones).
-  // Exception: coming back from a case study, where the inline script in
-  // index.html's <head> has already restored the reader's exact spot.
-  const navEl = document.querySelector('.site-nav');
-  const navH  = navEl ? navEl.offsetHeight : 64;
-  if (!window.__homeRestored) {
-    const workTarget = () => Math.max(0, work.offsetTop - navH);
-    let aimedAt = workTarget();
-    document.documentElement.scrollTop = aimedAt;
-
-    // The hero's height depends on its text, so it changes once the web
-    // fonts arrive (44px shorter on an iPhone 13), which left the title
-    // hidden under the nav. Re-aim after fonts and load, unless the
-    // visitor has already started scrolling on their own.
-    let userMoved = false;
-    const stop = () => { userMoved = true; };
-    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((type) =>
-      window.addEventListener(type, stop, { once: true, passive: true }));
-    const reaim = () => {
-      if (userMoved || workTarget() === aimedAt) return;
-      aimedAt = workTarget();
-      document.documentElement.scrollTop = aimedAt;
-    };
-    if (document.fonts) document.fonts.ready.then(reaim);
-    window.addEventListener('load', reaim, { once: true });
-  }
-
-  // Show/hide the tab based on hero visibility.
-  // rootMargin shrinks the observation zone by navH at top, so the hero
-  // counts as "not visible" even when its last few pixels are behind the nav.
-  if (tab) {
-    const isMobileView = window.innerWidth < 768;
-    let bioTabTimer = null;
-
-    const heroObs = new IntersectionObserver(
-      ([entry]) => {
-        const shouldShow = !entry.isIntersecting;
-        tab.classList.toggle('bio-tab-visible', shouldShow);
-
-        // On mobile: auto-hide bio-tab after 3 s so it doesn't crowd the screen
-        if (isMobileView) {
-          if (bioTabTimer) { clearTimeout(bioTabTimer); bioTabTimer = null; }
-          if (shouldShow) {
-            bioTabTimer = setTimeout(() => {
-              tab.classList.remove('bio-tab-visible');
-            }, 3000);
-          }
-        }
-      },
-      { threshold: 0, rootMargin: `-${navH + 1}px 0px 0px 0px` }
-    );
-    heroObs.observe(hero);
-
-    // Click → smooth scroll back to top
-    tab.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: (state.reducedMotion || state.quietMode) ? 'auto' : 'smooth',
-      });
-    });
   }
 }
 
@@ -2765,7 +2721,7 @@ function init() {
   // Apply saved user preferences before anything renders
   loadPreferences();
 
-  // Show intro screen (covers page while setupBioTab scrolls to work behind it)
+  // Show intro screen (fades to reveal the bio at the top of the page)
   setupIntroScreen();
 
   // Wire up all interactions
@@ -2790,7 +2746,7 @@ function init() {
   setupScrollTopButton();
   setupViewportMaintenance();
   setupTiltCards();
-  setupBioTab();
+  setupLanding();
   setupLiquidMetal();
   setupPressSplash();
   setupResumeModal();

@@ -3961,9 +3961,18 @@ body.large-text .control-btn { font-size: 1.05rem; }
   .card-impact-lines li { transform: none; transition: opacity 0.3s ease; }
 }
 
-/* One dot per line, under it. The current dot stretches into a bar
-   that fills over the line's turn (6s, IMPACT_INTERVAL in script.js);
-   hovering a dot shows its line. Each dot has a 24px hover area. */
+/* One dot per line, under it; the current one stretches into a bar.
+   Lines change only when the visitor swipes the highlight, taps or
+   hovers a dot, or uses the arrow keys (setupImpactRotation in
+   script.js). touch-action keeps vertical scrolling native while
+   sideways swipes reach the script. */
+.project-body .card-impact,
+.card-impact-dots {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .card-impact-dots {
   display: flex;
   align-items: center;
@@ -3979,10 +3988,7 @@ body.large-text .control-btn { font-size: 1.05rem; }
   transition: width 0.35s var(--ease-out);
 }
 
-/* The track (::before) and its fill (::after). The fill grows with a
-   transform, which the browser animates off the main thread. */
-.card-impact-dot::before,
-.card-impact-dot::after {
+.card-impact-dot::before {
   content: '';
   position: absolute;
   left: 9px;
@@ -3990,32 +3996,27 @@ body.large-text .control-btn { font-size: 1.05rem; }
   top: 9px;
   height: 6px;
   border-radius: var(--r-pill);
-}
-
-.card-impact-dot::before {
   background: color-mix(in srgb, var(--text-muted) 35%, transparent);
-}
-
-.card-impact-dot::after {
-  background: var(--accent-primary);
-  transform: scaleX(0);
-  transform-origin: left center;
+  transition: background-color 0.3s ease;
 }
 
 .card-impact-dot.is-active { width: 40px; }
 
-.card-impact-dot.is-active::after {
-  animation: impact-fill 6s linear forwards;
+.card-impact-dot.is-active::before {
+  background: var(--accent-primary);
 }
 
-/* Held (hovered, off screen, Motion off): the bar shows full */
-.card-impact-dots.is-paused .card-impact-dot.is-active::after {
-  animation: none;
-  transform: none;
-}
-
-@keyframes impact-fill {
-  to { transform: scaleX(1); }
+/* Touch screens: 44px tap targets around the same small marks */
+@media (pointer: coarse) {
+  .card-impact-dots {
+    height: 44px;
+    margin-top: calc(var(--sp-2) * -1 - 10px);
+    margin-bottom: calc(var(--sp-2) - 10px);
+    margin-left: calc(0.8em + var(--sp-2) - 19px);
+  }
+  .card-impact-dot { width: 44px; height: 44px; }
+  .card-impact-dot.is-active { width: 60px; }
+  .card-impact-dot::before { left: 19px; right: 19px; top: 19px; }
 }
 
 /* --- More projects --- */
@@ -5123,86 +5124,10 @@ body.large-text .control-btn { font-size: 1.05rem; }
 }
 
 
-/* ============================================
-   BIO TAB — Left edge indicator shown when
-   the hero section is above the viewport.
-   Straight (no rotation). Click → scroll to top.
-   ============================================ */
-
-/* Work section: scroll-margin so title clears the fixed nav */
+/* Work section: scroll-margin so the title clears the fixed nav
+   when "View Case Studies" or the Work link jumps to it. */
 #work {
   scroll-margin-top: 72px;
-}
-
-.bio-tab {
-  position: fixed;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%) translateX(-100%);
-  z-index: 500;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  padding: 1rem 0.6rem;
-
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-left: none;
-  border-radius: 0 var(--r-lg) var(--r-lg) 0;
-  box-shadow: 4px 0 20px color-mix(in srgb, var(--shade) 10%, transparent);
-
-  cursor: pointer;
-  color: inherit;
-
-  /* Hidden off left edge; slides in when hero out of view */
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.35s var(--ease-spring),
-              opacity 0.3s ease,
-              border-color 0.2s ease,
-              background-color 0.2s ease;
-}
-
-.bio-tab.bio-tab-visible {
-  transform: translateY(-50%) translateX(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.bio-tab:hover {
-  border-color: var(--glass-border-hover);
-  background: var(--accent-subtle);
-}
-
-.bio-tab-label {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  white-space: nowrap;
-  user-select: none;
-}
-
-.bio-tab-icon {
-  font-size: 0.65rem;
-  color: var(--accent-primary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bio-tab { transition: opacity 0.2s ease; }
-}
-
-@media (max-width: 768px) {
-  .bio-tab { top: 40%; }
 }
 
 
@@ -5408,9 +5333,10 @@ html:not(.js) #intro-screen { display: none !important; }
     display: none !important;
   }
 
-  /* --- Intro screen: skip on mobile --- */
-  #intro-screen {
-    display: none !important;
+  /* --- Intro screen: keep the Skip button clear of the home bar --- */
+  .intro-skip-btn {
+    bottom: calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
+    right: calc(var(--sp-4) + env(safe-area-inset-right, 0px));
   }
 
   /* --- Scroll reveal: show everything instantly, no entrance animation --- */
@@ -5719,10 +5645,6 @@ body[data-project="electric-scooters"] .tilt-card:hover {
   /* The open menu was see-through (a blurred panel inside the blurred
      nav can't blur), so page text showed through it. */
   .nav-links { background: var(--bg); }
-
-  /* The side "About" tab covered the left edge of cards on phones;
-     Home in the menu does the same job. */
-  .bio-tab { display: none; }
 
   /* Deck: dots are too small to tap, so show "3 / 8" instead (the
      arrows and swipe still move between articles), and keep the fanned
