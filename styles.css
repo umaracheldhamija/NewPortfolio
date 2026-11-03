@@ -1123,7 +1123,15 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
   margin-left: auto; /* links sit at the right, beside the display controls */
 }
 
-.nav-links a {
+/* Resume opens a modal, so it's a button dressed as a nav link */
+.nav-resume-btn {
+  background: none;
+  border: none;
+  line-height: inherit;
+}
+
+.nav-links a,
+.nav-resume-btn {
   color: var(--text-secondary);
   font-weight: 500;
   font-size: var(--text-sm);
@@ -1134,12 +1142,14 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 }
 
 .nav-links a:hover,
-.nav-links a[aria-current="true"] {
+.nav-links a[aria-current="true"],
+.nav-resume-btn:hover {
   color: var(--accent-primary);
 }
 
 /* Animated underline indicator */
-.nav-links a::after {
+.nav-links a::after,
+.nav-resume-btn::after {
   content: '';
   position: absolute;
   bottom: -3px;
@@ -1152,7 +1162,8 @@ body:not(.quiet-mode) .storm-reveal { opacity: 1; }
 }
 
 .nav-links a:hover::after,
-.nav-links a[aria-current="true"]::after { width: 100%; }
+.nav-links a[aria-current="true"]::after,
+.nav-resume-btn:hover::after { width: 100%; }
 
 /* Mobile hamburger toggle */
 .nav-toggle {
@@ -3416,7 +3427,8 @@ footer {
     pointer-events: auto;
   }
 
-  .nav-links a { font-size: var(--text-base); }
+  .nav-links a,
+  .nav-resume-btn { font-size: var(--text-base); }
 
   /* Phones: the three icons sit just left of the menu button */
   .accessibility-controls {
@@ -5448,7 +5460,8 @@ html:not(.js) #intro-screen { display: none !important; }
   }
 
   /* --- Nav-link underline: still functional but instant --- */
-  .nav-links a::after {
+  .nav-links a::after,
+  .nav-resume-btn::after {
     transition: none !important;
   }
 }
@@ -5656,6 +5669,7 @@ body[data-project="electric-scooters"] .tilt-card:hover {
   /* Tap targets */
   .nav-logo,
   .nav-links a,
+  .nav-resume-btn,
   .back-link,
   .contact-email,
   .footer-links a,
@@ -5665,7 +5679,8 @@ body[data-project="electric-scooters"] .tilt-card:hover {
     align-items: center;
   }
 
-  .nav-links a {
+  .nav-links a,
+  .nav-resume-btn {
     min-width: 44px;
     justify-content: center;
   }

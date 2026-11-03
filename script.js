@@ -1009,8 +1009,8 @@ function setupMobileNav() {
     state.navOpen ? closeNav(false) : openNav();
   });
 
-  // Close when any nav link is clicked
-  dom.navLinksAll.forEach(link => {
+  // Close when any nav link (or the Resume button) is clicked
+  dom.navLinks.querySelectorAll('a, button').forEach(link => {
     link.addEventListener('click', () => closeNav(false));
   });
 
@@ -2551,52 +2551,78 @@ function setupContactQuotes() {
 
 /* ============================================
    21. RESUME MODAL
-   Desktop: opens inline PDF in modal.
-   Mobile (touch or narrow): opens PDF in new tab.
+   Every [data-action="view-resume"] button (nav, footer) opens one
+   modal with a Download button. Built here rather than in each page,
+   so case studies get it too. Runs before setupModals, which wires
+   up its close button and backdrop.
    ============================================ */
 
+const RESUME_PDF_URL = '/Uma_Dhamija_Resume.pdf?v=20261029';
+
+// Whether this browser can show the PDF inside the modal. Where it
+// can't, the modal offers Open Resume (new tab) beside Download.
+// Needs a built-in PDF viewer (Android Chrome has none; older browsers
+// without pdfViewerEnabled fall back to a phone check) and room to
+// read a full page.
+function canShowPdfInline() {
+  const hasViewer = navigator.pdfViewerEnabled ?? !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  return hasViewer && window.innerWidth >= 640;
+}
+
+// The browser's own PDF toolbar and page sidebar are hidden
+// (#toolbar=0&navpanes=0): they repeated the file name, download
+// button and the page.
+function buildResumeModal(showInline) {
+  const modal = document.createElement('div');
+  modal.className = 'modal modal-resume';
+  modal.id = 'resume-modal';
+  modal.setAttribute('aria-labelledby', 'resume-modal-title');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-hidden', 'true');
+
+  const body = showInline
+    ? `<div class="resume-viewer">
+         <iframe src="${RESUME_PDF_URL}#toolbar=0&navpanes=0&view=FitH" title="Uma Dhamija Resume" class="resume-iframe" loading="lazy"></iframe>
+       </div>`
+    : `<div class="resume-mobile-fallback">
+         <p>On this device the PDF reads best in its own tab.</p>
+         <a href="${RESUME_PDF_URL}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+           <span>Open Resume</span>
+           <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+         </a>
+       </div>`;
+
+  modal.innerHTML = `
+    <div class="modal-content resume-modal-content" role="document">
+      <div class="resume-modal-top">
+        <h2 id="resume-modal-title">Resume</h2>
+        <a href="${RESUME_PDF_URL}" download class="btn btn-secondary" aria-label="Download resume PDF">
+          <span>Download</span>
+          <i class="fas fa-download" aria-hidden="true"></i>
+        </a>
+        <button class="modal-close" aria-label="Close resume">&times;</button>
+      </div>
+      ${body}
+    </div>
+  `;
+  dom.body.appendChild(modal);
+  return modal;
+}
+
 function setupResumeModal() {
-  const resumeModal = document.getElementById('resume-modal');
-  const resumePdfUrl = '/Uma_Dhamija_Resume.pdf?v=20261029';
+  const triggers = document.querySelectorAll('[data-action="view-resume"]');
+  if (!triggers.length) return;
 
-  // Subpages have no modal — just open the PDF in a new tab
-  if (!resumeModal) {
-    document.querySelectorAll('[data-action="view-resume"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.open(resumePdfUrl, '_blank', 'noopener');
-      });
-    });
-    return;
-  }
+  const modal = buildResumeModal(canShowPdfInline());
 
-  const isMobile = (
-    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-    window.innerWidth < 640
-  );
-
-  const viewer = document.getElementById('resume-viewer');
-  const mobileFallback = document.getElementById('resume-mobile-fallback');
-
-  if (isMobile && viewer && mobileFallback) {
-    viewer.style.display = 'none';
-    mobileFallback.style.display = 'flex';
-    mobileFallback.removeAttribute('aria-hidden');
-
-    document.querySelectorAll('[data-action="view-resume"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.open(resumePdfUrl, '_blank', 'noopener');
-      });
-    });
-    return;
-  }
-
-  // Desktop + homepage: open modal
-  document.querySelectorAll('[data-action="view-resume"]').forEach(btn => {
+  triggers.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      openModal('resume-modal', btn);
+      // The phone menu closes on this click, so focus returns to the
+      // menu button (still visible) when the modal closes
+      const fromPhoneMenu = btn.closest('.nav-links') && dom.navToggle?.offsetParent;
+      openModal(modal.id, fromPhoneMenu ? dom.navToggle : btn);
     });
   });
 }
@@ -2750,6 +2776,7 @@ function init() {
   setupAccessibilityControls();
   setupSmoothScroll();
   setupProjectImageLightbox();
+  setupResumeModal();      // builds its modal, so it runs before setupModals
   setupModals();
   setupContactSubmissionFlow();
   setupExplorationGallery();
@@ -2764,7 +2791,6 @@ function init() {
   setupLanding();
   setupLiquidMetal();
   setupPressSplash();
-  setupResumeModal();
   setupSplashField();
   updateQuietIcon();
 
