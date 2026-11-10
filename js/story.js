@@ -10,6 +10,10 @@
      <body> ... <main class="story" data-story="<slug>"></main> ...
    This file mounts every [data-story] element when it runs.
 
+   scripts/prerender.mjs runs render() below in Node and writes the
+   result into each page's <main>, so the text is in the HTML for
+   readers that never run JavaScript. Re-run it after content edits.
+
    Why defer + blocking="render": the opening screen must exist on the
    very first frame so the homepage card can morph into it (cross-
    document View Transitions). Deferred scripts run once the page is
@@ -748,11 +752,24 @@
      5. BEHAVIOUR
      ============================================ */
 
-  function mount(main, content) {
-    const slug = main.dataset.story;
-    const c = content || (window.CaseStudies || {})[slug];
-    if (!c) { console.error(`[story] no content registered for "${slug}"`); return; }
-    ROOT = main.dataset.root || '/';
+  // Short fingerprint of a rendered story. scripts/prerender.mjs stamps
+  // it on <main data-prerendered="...">, so mount() can tell whether the
+  // HTML already in the page still matches the content file.
+  function fingerprint(s) {
+    let h = 0x811c9dc5; // FNV-1a, 32 bit
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return (h >>> 0).toString(36);
+  }
+
+  // Builds the whole story as HTML strings. Pure (no DOM), so
+  // scripts/prerender.mjs runs this same code in Node and writes the
+  // result into each page: search engines, link previews, AI tools and
+  // readers without JavaScript get the full text, not an empty <main>.
+  //   main:  everything inside <main>
+  //   after: the navigator and mobile chapter menu (only useful with JS)
+  //   stops: reading-order stops; navigatorHTML adds each one's navY
+  function render(c, root = '/') {
+    ROOT = root;
     // A story without diamonds is told as plain numbered chapters.
     c.diamonds ||= [];
     check(c);
@@ -783,8 +800,29 @@
       });
     });
     html += closingHTML(c);
-    main.innerHTML = html;
-    main.insertAdjacentHTML('afterend', navigatorHTML(c, stops) + mobileNavHTML(c, stops));
+    return { main: html, after: navigatorHTML(c, stops) + mobileNavHTML(c, stops), stops };
+  }
+
+  function mount(main, content) {
+    const slug = main.dataset.story;
+    const c = content || (window.CaseStudies || {})[slug];
+    if (!c) { console.error(`[story] no content registered for "${slug}"`); return; }
+    const { main: html, after, stops } = render(c, main.dataset.root || '/');
+
+    // The page may already hold this story, written in by
+    // scripts/prerender.mjs (data-prerendered is its fingerprint).
+    // Keep it when it matches: rebuilding identical HTML would reload
+    // the opening image, which can flicker in browsers that don't hold
+    // the first frame. Otherwise (content edited without a prerender
+    // run, or a page never prerendered) build it fresh, so readers
+    // always get the current story.
+    const baked = main.dataset.prerendered;
+    if (baked !== fingerprint(html)) {
+      if (baked) console.warn(`[story:${slug}] this page's HTML is out of date; run node scripts/prerender.mjs`);
+      main.innerHTML = html;
+    }
+
+    main.insertAdjacentHTML('afterend', after);
 
     // Card-to-story morph: the homepage card's image frame grows into
     // the opening card's image frame (same name is set on the card in
@@ -1401,7 +1439,7 @@
     if (document.body) new MutationObserver(syncMotion).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
-  window.Story = { mount };
+  window.Story = { mount, render, fingerprint };
 
   // Deferred, so the document is parsed by now; the fallback covers a
   // page that loads this file without defer.

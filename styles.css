@@ -1387,13 +1387,9 @@ body.intro-active .hero-content {
   line-height: 1.9;
   max-width: 46rem;
   margin: 0 auto var(--sp-6);
-}
-
-/* Each role keeps its words (and the dot before it) on one row, so on
-   phones the line only breaks between roles. Below 360px a role may
-   still break rather than spill off screen. */
-@media (min-width: 360px) {
-  .hero-role .role { white-space: nowrap; }
+  /* Wraps on phones; balance gives two even lines ("Human Computer /
+     Interaction Specialist") instead of one word alone on the last */
+  text-wrap: balance;
 }
 
 /* Bio — readable, not too dense */

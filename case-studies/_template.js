@@ -16,6 +16,11 @@
       ACCENTS), or reuse an existing one.
    5. If the page is replacing an old URL, add a redirect in
       vercel.json.
+   6. Run `node scripts/prerender.mjs`. It writes the story's text
+      and link-preview tags into work/<slug>/index.html, so search
+      engines, link previews and AI tools can read the page without
+      running JavaScript. Run it again after every content edit
+      (`node scripts/prerender.mjs --check` tells you if you forgot).
 
    Copy rules the engine checks (warnings in the browser console):
    no em or en dashes, every image has alt text, every checkpoint and
