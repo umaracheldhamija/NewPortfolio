@@ -7,6 +7,11 @@
    homepage card. Each chapter's insight comes from the team's Medium
    series (linked under Related writing). The reflection is a draft
    built from that page's outcomes: edit freely.
+   Nov 2026: reframed around the service design work (current state,
+   co-design workshop, service blueprint, liaison statuses). New facts
+   come from Uma's resume, the team's Medium series, the final
+   presentation (interview counts) and the liaison prototype (the
+   three statuses). Nothing is estimated.
    Resized image variants live in images/story/care2care/.
    ============================================ */
 
@@ -16,8 +21,8 @@
     slug: 'care2care',
     homeCard: 'care2care',
     title: 'Care2Care',
-    subtitle: 'A support app for caregivers of gynecologic oncology patients at UPMC Magee-Womens Hospital.',
-    tags: ['Client: UPMC Magee-Womens', '8 months', 'Team of 3', 'Role: UX Research and Design', 'Ongoing'],
+    subtitle: 'A support service for caregivers of gynecologic oncology patients at UPMC Magee-Womens Hospital.',
+    tags: ['Client: UPMC Magee-Womens', '8 months', 'Team of 3', 'Role: UX Research and Service Design', 'Ongoing'],
     // Same image as the homepage card, so the card can morph into it.
     hero: {
       src: 'images/story/care2care/upmc-1600.jpg',
@@ -30,12 +35,12 @@
   },
 
   summary: {
-    lead: 'Designed a support app for cancer caregivers in 3 months, then won the funding to build it with UPMC.',
+    lead: 'Designed a support service for cancer caregivers, from research to tested prototype in 3 months, then won the funding to build it with UPMC.',
     points: [
       { label: 'Problem', text: 'Caregivers of gynecologic oncology patients are overlooked by existing healthcare tools while they navigate emotionally heavy, information-dense care journeys.' },
-      { label: 'Role', text: 'UX Research and Design' },
-      { label: 'Process', text: 'With my team of three, I partnered with CancerBridges, the Family CARE Center at UPMC, the University of Pittsburgh, and CMU to map journeys, shadow the care team, conduct stakeholder interviews, and test concepts with caregivers.' },
-      { label: 'Outcome', text: 'We built a final Care2Care prototype in three months. The project received the Lucie Young Kelly Faculty Leadership Award and is in development with the Family CARE Center.' },
+      { label: 'Role', text: 'UX Researcher and Service Designer' },
+      { label: 'Process', text: 'With my team of three, I partnered with CancerBridges, the Family CARE Center at UPMC, the University of Pittsburgh, and CMU to shadow the care team, interview patients, caregivers and staff, and run a co-design workshop. I turned what we found into patient and caregiver journey maps, an ecosystem map, and current and future-state service blueprints, then tested the concept with caregivers.' },
+      { label: 'Outcome', text: 'We built a final Care2Care prototype in three months: a mobile app for caregivers and a web app for the liaisons who support them. The project received the Lucie Young Kelly Faculty Leadership Award and is in development with the Family CARE Center.' },
     ],
     showMetrics: true,
   },
@@ -51,7 +56,7 @@
       heading: 'Cancer care is hard on patients. It is also hard on the people caring for them.',
       body: [
         'Oncology care journeys are emotionally heavy, information-dense and often fragmented.',
-        'I looked at how experience design could reduce friction, build trust and make the care pathway easier to understand, working with patients, caregivers, nurses and frontline hospital staff.',
+        'I looked at how service design could reduce friction, build trust and make the care pathway easier to understand, working with patients, caregivers, nurses and frontline hospital staff.',
       ],
       insight: { label: 'Finding', text: 'Each nurse manages 30 to 50 active chemotherapy patients and answers calls within the hour. Caregiver support, meanwhile, runs on Word documents and color-coded spreadsheets kept outside the medical record.' },
       layout: 'text-left',
@@ -73,7 +78,8 @@
       heading: 'We mapped the whole journey to find where caregivers struggle most.',
       body: [
         'I mapped end-to-end patient journeys to find the stress peaks and decision bottlenecks, and ran stakeholder interviews to line caregiver needs up with how the hospital actually runs.',
-        'We also shadowed the Family CARE Center at UPMC Magee to see the work up close, ran a caregiver survey through the CancerBridges newsletter, and held a participatory design workshop with patients, caregivers, nurses and CancerBridges staff.',
+        'We interviewed more than 10 cancer caregivers, 5 patients, 4 UPMC nurses and physicians, 4 Family CARE Center staff, 2 CancerBridges staff, 2 subject matter experts and a UPMC social worker.',
+        'We also shadowed the Family CARE Center at UPMC Magee to see the work up close, and ran a caregiver survey through the CancerBridges newsletter.',
       ],
       insight: { label: 'Finding', text: 'The heaviest burden was emotional, not logistical. Caregiving stacks many roles onto one person and can last over a decade, yet one caregiver told us no healthcare provider had asked about their wellbeing in eight years.' },
       links: { 'shadowed the Family CARE Center': 'https://medium.com/@yuktipoddar/a-e-i-o-u-in-action-shadowing-the-family-care-center-at-upmc-magee-1cca24440885' },
@@ -105,6 +111,22 @@
           height: 1366,
         },
       ],
+    },
+
+    {
+      id: 'current-state',
+      nav: 'Current state',
+      heading: 'The current service depended on staff bridging systems by hand.',
+      body: [
+        'Shadowing gave me the current state of the service, both what caregivers see and what happens behind it. We observed with the A.E.I.O.U. method: activities, environments, interactions, objects and users.',
+        'People: nurses and Family CARE Center staff act as the go-between for inpatient, outpatient, insurance and social work teams, often walking between wards to pass information along.',
+        'Process: one pharmacy handoff can mean printing a prescription, getting a wet signature and faxing it. A missed step can leave a patient billed thousands of dollars.',
+        'Technology and data: staff move between Epic, MyChart, iPads and sticky notes. Epic has no place for caregiver data, so the Family CARE Center tracks caregiver stress and capacity in its own color-coded spreadsheets.',
+      ],
+      insight: { label: 'Finding', text: 'Support reached caregivers by word of mouth. CancerBridges staff told us many people find their services because someone in the infusion center mentioned them, not through a formal referral.' },
+      links: { 'A.E.I.O.U. method': 'https://medium.com/@yuktipoddar/a-e-i-o-u-in-action-shadowing-the-family-care-center-at-upmc-magee-1cca24440885' },
+      layout: 'centered',
+      media: [],
     },
 
     {
@@ -142,6 +164,43 @@
           caption: 'Mapping the app, with notes from the team.',
           width: 1600,
           height: 1156,
+        },
+      ],
+    },
+
+    {
+      id: 'workshop',
+      nav: 'Workshop',
+      heading: 'We put the care journey on the wall, and the gaps were about timing.',
+      body: [
+        'We ran a participatory design workshop at UPMC Magee with patients, caregivers, nurses and CancerBridges staff. A pilot with CMU School of Design faculty three days earlier showed that our instructions left gaps, so we rewrote the introductions, reordered the journey phases and replaced the cards that did not land.',
+        'In the first activity, the Orbit Map, participants sorted resource cards into what helped, what was not enough, what they needed but could not find, and what did not apply. In the second, the Care Voyage Map, they wrote feelings, people, resources and needs onto a printed poster of the cancer journey.',
+      ],
+      insight: { label: 'Finding', text: 'The clearest unmet needs were information at the right time rather than a binder on day one, help with work and medical leave, and support when treatment ends and the routine of appointments disappears.' },
+      links: { 'participatory design workshop': 'https://medium.com/@yuktipoddar/what-we-heard-what-we-missed-and-what-comes-next-011c541f40d5' },
+      layout: 'centered',
+      media: [],
+    },
+
+    {
+      id: 'blueprint',
+      nav: 'Blueprint',
+      heading: 'The blueprint showed that the handoff mattered more than any screen.',
+      body: [
+        'Before wireframing, I drew the future service as a blueprint. It runs from diagnosis through treatment across four lanes: the clinician and hospital system, the caregiver, the patient, and support resources such as CancerBridges.',
+        'The frontstage is what a caregiver touches: an onboarding that builds their profile, a resource hub and regular check-ins. The backstage is what makes it work: matching resources to each caregiver, and a liaison who sees a flagged check-in and reaches out.',
+      ],
+      insight: { label: 'Finding', text: "Mapping the backstage turned the liaison's view into a design problem of its own. What a liaison can see decides whether a caregiver who flags a hard week gets a call." },
+      links: { 'a blueprint': 'https://medium.com/@umaracheldhamija/designing-for-the-invisible-details-of-caregiving-4c0ddf8e70b4' },
+      layout: 'wide',
+      media: [
+        {
+          src: 'images/story/care2care/blueprint-1600.jpg',
+          srcset: 'images/story/care2care/blueprint-800.jpg 800w, images/story/care2care/blueprint-1600.jpg 1600w',
+          alt: 'Hand-drawn service blueprint on a wall, with lanes for the clinician and hospital system, the caregiver, the patient and support resources, running from diagnosis to treatment, with onboarding, a resource hub, an automated check-in that flags a liaison, and a backend note on matching resources',
+          caption: 'The service blueprint, from diagnosis to treatment, with the ecosystem sketch pinned beside it.',
+          width: 1600,
+          height: 1016,
         },
       ],
     },
@@ -204,7 +263,8 @@
       nav: 'Two sides',
       heading: 'Care2Care has two sides: one for caregivers, one for the liaisons who support them.',
       body: [
-        'Caregivers use the mobile app. Liaisons, from the network of volunteers that includes the CARE Center and CancerBridges, work from a web app.',
+        'Caregivers use the mobile app, the frontstage of the service. Liaisons, from the network of volunteers that includes the CARE Center and CancerBridges, work backstage from a web app.',
+        "Every caregiver in a liaison's caseload carries one of three statuses: Stable, Needs Follow-Up or Alert. The status comes from the CARE Check, the wellbeing assessment the Family CARE Center already uses, so a liaison can see who needs a call first.",
         'Both prototypes are live below.',
       ],
       insight: "The liaison's view shows each caregiver's history and preferences, so caregivers never have to repeat their story to get help.",
@@ -240,7 +300,7 @@
       heading: 'From a class prototype to a funded build.',
       body: [
         'Care2Care won the Lucie Young Kelly Faculty Leadership Award, under the mentorship of Heidi Ann Scharf Donovan, a UPMC nurse and University of Pittsburgh research professor. That funding is moving it from an academic prototype to a real product.',
-        'We presented to program faculty and UPMC partners, including Professor Kristin Hughes, Grace Campbell PhD RN and Dr. Sarah Taylor. Work now continues on two fronts: usability and pilot testing with real caregivers and liaisons, and the backend architecture, pending IRB approval.',
+        'We presented to program faculty and UPMC partners, including Professor Kristin Hughes, Grace Campbell PhD RN and Dr. Sarah Taylor. Work now continues on two fronts: usability and pilot testing with real caregivers and liaisons, and a backend that uses language models and search to match caregivers to resources, pending IRB approval.',
       ],
       insight: { label: 'Impact', text: 'Care2Care won the Lucie Young Kelly Faculty Leadership Award and the backing of the Family CARE Center, which moved it past the capstone and into a real build.' },
       layout: 'showcase',
@@ -272,6 +332,7 @@
     items: [
       { value: 3, label: 'months to a final prototype' },
       { value: 4, label: 'partner organizations' },
+      { value: 10, suffix: '+', label: 'cancer caregivers interviewed' },
       { value: 10, label: 'articles in our writing series' },
     ],
   },
@@ -281,7 +342,7 @@
     // Draft built from the previous page's outcomes: edit freely.
     lines: [
       "The most useful shift was designing around caregivers' moments of uncertainty instead of the hospital's touchpoints. That is where the gap between them and the support meant for them was widest.",
-      'It also showed me that a service design approach can hold up in a high-stakes healthcare setting, well enough to earn funding and continue past the capstone.',
+      'It also taught me that in a hospital, a service works or fails at the handoff. The people who would run Care2Care were already stretched, so the design had to fit the way the Family CARE Center already works instead of adding to it.',
     ],
   },
 

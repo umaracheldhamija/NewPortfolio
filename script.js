@@ -2557,7 +2557,7 @@ function setupContactQuotes() {
    up its close button and backdrop.
    ============================================ */
 
-const RESUME_PDF_URL = '/Uma_Dhamija_Resume.pdf?v=20261104';
+const RESUME_PDF_URL = '/Uma_Dhamija_Resume.pdf?v=20261111';
 
 // Whether this browser can show the PDF inside the modal. Where it
 // can't, the modal offers Open Resume (new tab) beside Download.
